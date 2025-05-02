@@ -132,9 +132,6 @@ export const RegisterScreen = () => {
             >
               <Text className="text-white text-lg font-semibold">Đăng ký</Text>
             </TouchableOpacity>
-
-            {/* Optional: Add a "Already have an account? Login" link */}
-            
             <View className="flex-row justify-center items-center mt-6">
                 <Text className="text-sm text-gray-600">
                   Đã có tài khoản?

@@ -20,6 +20,7 @@ const Tab = createBottomTabNavigator<TabParamList>();
 const TabNavigator = () => {
   return (
     <Tab.Navigator
+      id={undefined}
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,

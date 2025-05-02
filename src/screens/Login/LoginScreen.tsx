@@ -93,11 +93,11 @@ export const LoginScreen = () => {
                   placeholderTextColor="#9CA3AF"
                 />
 
-                <TouchableOpacity className="self-end mt-3 mb-8">
+                {/* <TouchableOpacity className="self-end mt-3 mb-8">
                   <Text className="text-sm text-[#88131B] font-medium">
                     Quên mật khẩu?
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity
                   className="w-full h-14 bg-[#88131B] rounded-full items-center justify-center shadow-lg mb-10"
