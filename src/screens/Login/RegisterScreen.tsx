@@ -9,16 +9,15 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
-type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
-
 export const RegisterScreen = () => {
-  const navigation = useNavigation<RegisterScreenNavigationProp>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [username, setUsername] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -27,21 +26,21 @@ export const RegisterScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = () => {
-    // TODO: Thêm logic xử lý đăng ký ở đây
-    // Ví dụ: kiểm tra dữ liệu, gọi API, điều hướng sau khi thành công
-    console.log("Registering with:", {
-      username,
-      phoneNumber,
-      email,
-      password,
-      confirmPassword,
-    });
-    // if (password !== confirmPassword) {
-    //   alert("Mật khẩu nhập lại không khớp!");
-    //   return;
-    // }
-    // // Gọi API đăng ký...
-    // navigation.navigate('Login'); // Hoặc màn hình Home sau khi đăng ký thành công
+    // Kiểm tra thông tin đăng ký
+    if (!username || !email || !password || !confirmPassword) {
+      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      Alert.alert('Lỗi', 'Mật khẩu nhập lại không khớp');
+      return;
+    }
+    
+    // Thông báo đăng ký thành công và chuyển về màn hình đăng nhập
+    Alert.alert('Thành công', 'Đăng ký tài khoản thành công!', [
+      { text: 'OK', onPress: () => navigation.navigate('Login') }
+    ]);
   };
 
   return (
@@ -134,20 +133,18 @@ export const RegisterScreen = () => {
               <Text className="text-white text-lg font-semibold">Đăng ký</Text>
             </TouchableOpacity>
 
-             {/* Optional: Add a "Already have an account? Login" link */}
-             
-             <View className="flex-row justify-center items-center mt-6">
-                 <Text className="text-sm text-gray-600">
-                   Đã có tài khoản?
-                 </Text>
-                 <TouchableOpacity onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
-                   <Text className="text-sm text-[#88131B] font-semibold underline">
-                     Đăng nhập
-                   </Text>
-                 </TouchableOpacity>
-             </View>
+            {/* Optional: Add a "Already have an account? Login" link */}
             
-
+            <View className="flex-row justify-center items-center mt-6">
+                <Text className="text-sm text-gray-600">
+                  Đã có tài khoản?
+                </Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
+                  <Text className="text-sm text-[#88131B] ml-1 font-semibold underline">
+                    Đăng nhập
+                  </Text>
+                </TouchableOpacity>
+            </View>
           </ScrollView>
         </SafeAreaView>
       </View>
