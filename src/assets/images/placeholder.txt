@@ -1,0 +1,7 @@
+Thư mục này dùng để lưu trữ hình ảnh cho ứng dụng.
+
+Các hình ảnh cần có:
+- pho.jpg: Hình ảnh món phở
+- banh-mi.jpg: Hình ảnh bánh mì
+- com-rang.jpg: Hình ảnh cơm rang
+- avatar-placeholder.jpg: Hình ảnh đại diện người dùng mặc định

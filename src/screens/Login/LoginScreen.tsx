@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '@navigation/AppNavigator';
-import { SvgUri } from 'react-native-svg';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
 import {
   View,
@@ -15,24 +14,37 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
   ImageBackground,
 } from 'react-native';
 
-type LoginScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Login'
->;
+// Thông tin đăng nhập mặc định
+const DEFAULT_USERNAME = 'ADMIN';
+const DEFAULT_PASSWORD = 'ADMIN';
 
+// Đường dẫn ảnh
 const googleIcon = require('@assets/google.png');
 const facebookIcon = require('@assets/facebook.png');
 const appleIcon = require('@assets/apple.png');
 const backgroundImage = require('@assets/background.png');
 
 export const LoginScreen = () => {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleLogin = () => {
+    // Kiểm tra thông tin đăng nhập
+    if (username.trim() === DEFAULT_USERNAME && password === DEFAULT_PASSWORD) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
+    } else {
+      Alert.alert('Lỗi đăng nhập', 'Tên đăng nhập hoặc mật khẩu không đúng');
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -73,7 +85,7 @@ export const LoginScreen = () => {
                 />
 
                 <TextInput
-                  className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm"
+                  className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm self-end mt-3 mb-8"
                   value={password}
                   onChangeText={setPassword}
                   placeholder="Mật khẩu"
@@ -81,17 +93,15 @@ export const LoginScreen = () => {
                   placeholderTextColor="#9CA3AF"
                 />
 
-                <TouchableOpacity className="self-end mt-3 mb-8">
+                {/* <TouchableOpacity className="self-end mt-3 mb-8">
                   <Text className="text-sm text-[#88131B] font-medium">
                     Quên mật khẩu?
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity
                   className="w-full h-14 bg-[#88131B] rounded-full items-center justify-center shadow-lg mb-10"
-                  onPress={() =>
-                    console.log('Login pressed:', { username, password })
-                  }
+                  onPress={handleLogin}
                   activeOpacity={0.8}
                 >
                   <Text className="text-white text-lg font-semibold">
