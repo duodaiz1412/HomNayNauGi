@@ -20,6 +20,8 @@ const AboutContent = () => {
         <Text style={styles.bulletPoint}>• Hướng dẫn nấu ăn chi tiết</Text>
         <Text style={styles.bulletPoint}>• Tạo thực đơn cá nhân</Text>
         <Text style={styles.bulletPoint}>• Chia sẻ công thức nấu ăn</Text>
+        <Text className="text-gray-600 font-bold flex justify-center">Hello 12345</Text>
+        <Text className="text-red-500 font-bold justify-center items-center">Hello 123457</Text>
       </View>
 
       <View style={styles.contactContainer}>

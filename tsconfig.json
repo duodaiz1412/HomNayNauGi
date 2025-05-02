@@ -1,4 +1,25 @@
 {
-  "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "compilerOptions": {
+    "types": [
+      "nativewind/types"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@screens/*": ["./src/screens/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@navigation/*": ["./src/navigation/*"],
+      "@constants/*": ["./src/constants/*"],
+      "@store/*": ["./src/store/*"]
+    }
+  },
+  "extends": "expo/tsconfig.base",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "nativewind.d.ts",
+    "nativewind-env.d.ts"
+  ]
 }

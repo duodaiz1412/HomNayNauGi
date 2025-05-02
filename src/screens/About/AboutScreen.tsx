@@ -1,6 +1,7 @@
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import React from 'react';
-import AboutContent from '../../components/About/AboutContent';
+import AboutContent from '@components/About/AboutContent';
+
 
 const AboutScreen = () => {
   return (
