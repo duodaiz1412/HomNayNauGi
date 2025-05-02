@@ -49,7 +49,8 @@ export const RegisterScreen = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <View className="flex-1 bg-[#F8F5F2]"> {/* Màu nền giống Login */}
+      {/* Màu nền giống Login */}
+      <View className="flex-1 bg-[#F8F5F2]">
         <StatusBar hidden={true} />
         <SafeAreaView className="flex-1">
           <ScrollView
@@ -62,10 +63,10 @@ export const RegisterScreen = () => {
             showsVerticalScrollIndicator={false}
           >
             {/* Header Section */}
-            <Text className="text-4xl font-bold text-[#88131B] text-center mt-40 mb-3"> {/* Giảm margin top chút */}
+            <Text className="text-4xl font-bold text-[#88131B] text-center mt-40 mb-3">
               Tạo tài khoản
             </Text>
-            <Text className="text-base text-gray-500 text-center mb-10 px-4"> {/* Thêm padding ngang cho text dài */}
+            <Text className="text-base text-gray-500 text-center mb-10 px-4">
               Tạo tài khoản để có thể khám phá tất cả những công thức nấu ăn hấp dẫn
             </Text>
 
@@ -87,7 +88,7 @@ export const RegisterScreen = () => {
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
                 placeholder="Số điện thoại"
-                keyboardType="phone-pad" // Bàn phím số
+                keyboardType="phone-pad"
                 placeholderTextColor="#9CA3AF"
               />
 
@@ -97,7 +98,7 @@ export const RegisterScreen = () => {
                 value={email}
                 onChangeText={setEmail}
                 placeholder="Email"
-                keyboardType="email-address" // Bàn phím email
+                keyboardType="email-address"
                 autoCapitalize="none"
                 placeholderTextColor="#9CA3AF"
               />
@@ -108,7 +109,7 @@ export const RegisterScreen = () => {
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Mật khẩu"
-                secureTextEntry // Ẩn mật khẩu
+                secureTextEntry
                 placeholderTextColor="#9CA3AF"
               />
 
@@ -118,7 +119,7 @@ export const RegisterScreen = () => {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 placeholder="Nhập lại mật khẩu"
-                secureTextEntry // Ẩn mật khẩu
+                secureTextEntry
                 placeholderTextColor="#9CA3AF"
               />
             </View>
@@ -127,7 +128,7 @@ export const RegisterScreen = () => {
             {/* mt-auto sẽ đẩy nút xuống nếu nội dung quá ngắn, nếu form dài thì nó nằm ngay dưới input cuối */}
             <TouchableOpacity
               className="w-full h-14 bg-[#88131B] rounded-full items-center justify-center shadow-lg mt-5"
-              onPress={handleRegister} // Gọi hàm xử lý đăng ký
+              onPress={handleRegister}
               activeOpacity={0.8}
             >
               <Text className="text-white text-lg font-semibold">Đăng ký</Text>
@@ -137,7 +138,7 @@ export const RegisterScreen = () => {
              
              <View className="flex-row justify-center items-center mt-6">
                  <Text className="text-sm text-gray-600">
-                   Đã có tài khoản?{' '}
+                   Đã có tài khoản?
                  </Text>
                  <TouchableOpacity onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
                    <Text className="text-sm text-[#88131B] font-semibold underline">
