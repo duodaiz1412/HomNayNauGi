@@ -85,7 +85,7 @@ export const LoginScreen = () => {
                 />
 
                 <TextInput
-                  className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm"
+                  className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm self-end mt-3 mb-8"
                   value={password}
                   onChangeText={setPassword}
                   placeholder="Mật khẩu"
