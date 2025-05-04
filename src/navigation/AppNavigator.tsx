@@ -21,7 +21,7 @@ const AppNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator
         id={undefined}
-        initialRouteName="Login"
+        initialRouteName="MainTabs"
       >
         <Stack.Screen
           name="Login"
