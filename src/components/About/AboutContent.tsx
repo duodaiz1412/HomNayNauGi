@@ -4,14 +4,14 @@ import React from 'react';
 const AboutContent = () => {
   return (
     <View style={styles.container}>
-      <Image 
+      <Image
         source={require('../../assets/logo.png')}
         style={styles.logo}
         resizeMode="contain"
       />
       <Text style={styles.title}>Hôm Nay Ăn Gì?</Text>
       <Text style={styles.version}>Phiên bản 1.0.0</Text>
-      
+
       <View style={styles.descriptionContainer}>
         <Text style={styles.description}>
           Ứng dụng "Hôm Nay Ăn Gì?" là người bạn đồng hành đắc lực trong việc:
@@ -20,8 +20,12 @@ const AboutContent = () => {
         <Text style={styles.bulletPoint}>• Hướng dẫn nấu ăn chi tiết</Text>
         <Text style={styles.bulletPoint}>• Tạo thực đơn cá nhân</Text>
         <Text style={styles.bulletPoint}>• Chia sẻ công thức nấu ăn</Text>
-        <Text className="text-gray-600 font-bold flex justify-center">Hello 12345</Text>
-        <Text className="text-red-500 font-bold justify-center items-center">Hello 123457</Text>
+        <Text className="text-gray-600 font-bold flex justify-center">
+          Hello 12345
+        </Text>
+        <Text className="text-red-500 font-bold justify-center items-center">
+          Hello 123457
+        </Text>
       </View>
 
       <View style={styles.contactContainer}>
@@ -90,4 +94,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AboutContent; 
+export default AboutContent;

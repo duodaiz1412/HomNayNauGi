@@ -19,10 +19,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        id={undefined}
-        initialRouteName="MainTabs"
-      >
+      <Stack.Navigator id={undefined} initialRouteName="MainTabs">
         <Stack.Screen
           name="Login"
           component={LoginScreen}

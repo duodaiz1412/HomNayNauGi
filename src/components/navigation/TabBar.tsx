@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  Dimensions,
-  Alert,
-} from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
 
 import HomeIcon from '../icons/HomeIcon';
 import RecipeIcon from '../icons/RecipeIcon';
@@ -39,29 +32,35 @@ const TabBar = ({ state, descriptors, navigation }) => {
 
   const renderNavIconComponent = (routeName, color, size) => {
     switch (routeName) {
-      case 'Home': return <HomeIcon color={color} size={size} />;
-      case 'Recipe': return <RecipeIcon color={color} size={size} />;
-      case 'Favorite': return <FavoriteIcon color={color} size={size} />;
-      case 'Profile': return <ProfileIcon color={color} size={size} />;
-      default: return null;
+      case 'Home':
+        return <HomeIcon color={color} size={size} />;
+      case 'Recipe':
+        return <RecipeIcon color={color} size={size} />;
+      case 'Favorite':
+        return <FavoriteIcon color={color} size={size} />;
+      case 'Profile':
+        return <ProfileIcon color={color} size={size} />;
+      default:
+        return null;
     }
   };
 
   const handleCameraButtonPress = () => {
-    Alert.alert("Nút Camera", "Mở Camera/Gallery...");
+    Alert.alert('Nút Camera', 'Mở Camera/Gallery...');
   };
 
   const itemsToRender = [...state.routes];
-  itemsToRender.splice(CAMERA_BUTTON_INDEX, 0, { key: 'camera-button', name: 'CameraButton' });
+  itemsToRender.splice(CAMERA_BUTTON_INDEX, 0, {
+    key: 'camera-button',
+    name: 'CameraButton',
+  });
 
   return (
     <View
       className="absolute left-0 right-0 items-center"
       style={{ bottom: safeAreaBottom + TAB_BAR_FLOAT_BOTTOM }}
     >
-      <View
-        className="flex-row bg-white h-[60px] w-[95%] self-center rounded-2xl shadow-lg shadow-black/10"
-      >
+      <View className="flex-row bg-white h-[60px] w-[95%] self-center rounded-2xl shadow-lg shadow-black/10">
         {itemsToRender.map((item, index) => {
           if (item.name === 'CameraButton') {
             return (
@@ -84,13 +83,23 @@ const TabBar = ({ state, descriptors, navigation }) => {
           const route = item;
           const { options } = descriptors[route.key];
           const label = options.tabBarLabel ?? options.title ?? route.name;
-          const actualRouteIndex = state.routes.findIndex(r => r.key === route.key);
+          const actualRouteIndex = state.routes.findIndex(
+            (r) => r.key === route.key
+          );
           const isFocused = state.index === actualRouteIndex;
 
           const onPress = () => {
-            const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
             if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate({ name: route.name, merge: true, params: route.params });
+              navigation.navigate({
+                name: route.name,
+                merge: true,
+                params: route.params,
+              });
             }
           };
 
@@ -106,7 +115,12 @@ const TabBar = ({ state, descriptors, navigation }) => {
               className="flex-1 items-center pt-2 h-full"
             >
               <View className="h-[30px] items-center justify-center">
-                {!isFocused && renderNavIconComponent(route.name, INACTIVE_COLOR, ICON_SIZE_INACTIVE)}
+                {!isFocused &&
+                  renderNavIconComponent(
+                    route.name,
+                    INACTIVE_COLOR,
+                    ICON_SIZE_INACTIVE
+                  )}
               </View>
               {!isFocused && (
                 <Text className="mt-1 text-[11px] text-gray-500 font-medium text-center">
@@ -122,10 +136,16 @@ const TabBar = ({ state, descriptors, navigation }) => {
         const isFocused = state.index === index;
         if (!isFocused) return null;
 
-        const label = descriptors[route.key].options.tabBarLabel ?? descriptors[route.key].options.title ?? route.name;
+        const label =
+          descriptors[route.key].options.tabBarLabel ??
+          descriptors[route.key].options.title ??
+          route.name;
         const itemWidth = width / TOTAL_ITEMS;
-        const displayIndex = itemsToRender.findIndex(item => item.key === route.key);
-        const circleLeftOffset = displayIndex * itemWidth + (itemWidth - ACTIVE_CIRCLE_SIZE) / 2;
+        const displayIndex = itemsToRender.findIndex(
+          (item) => item.key === route.key
+        );
+        const circleLeftOffset =
+          displayIndex * itemWidth + (itemWidth - ACTIVE_CIRCLE_SIZE) / 2;
 
         return (
           <View
@@ -135,7 +155,11 @@ const TabBar = ({ state, descriptors, navigation }) => {
             pointerEvents="none"
           >
             <View className="w-11 h-11 rounded-full bg-red-700 items-center justify-center shadow-md shadow-black/20">
-              {renderNavIconComponent(route.name, ACTIVE_ICON_COLOR, ICON_SIZE_ACTIVE)}
+              {renderNavIconComponent(
+                route.name,
+                ACTIVE_ICON_COLOR,
+                ICON_SIZE_ACTIVE
+              )}
             </View>
             <Text className="mt-1 text-[11px] text-red-700 font-semibold text-center">
               {label}

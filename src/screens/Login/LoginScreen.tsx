@@ -29,7 +29,8 @@ const appleIcon = require('@assets/apple.png');
 const backgroundImage = require('@assets/background.png');
 
 export const LoginScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -140,7 +141,9 @@ export const LoginScreen = () => {
               </View>
 
               <View className="flex-row justify-center items-center mt-5">
-                <Text className="text-sm text-gray-600">Chưa có tài khoản?</Text>
+                <Text className="text-sm text-gray-600">
+                  Chưa có tài khoản?
+                </Text>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('Register')}
                   activeOpacity={0.7}

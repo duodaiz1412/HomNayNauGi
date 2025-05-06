@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "types": [
-      "nativewind/types"
-    ],
+    "types": ["nativewind/types"],
     "baseUrl": ".",
     "paths": {
       "@components/*": ["./src/components/*"],
@@ -16,10 +14,5 @@
     }
   },
   "extends": "expo/tsconfig.base",
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "nativewind.d.ts",
-    "nativewind-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "nativewind.d.ts", "nativewind-env.d.ts"]
 }

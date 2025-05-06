@@ -27,29 +27,29 @@ const TabNavigator = () => {
       }}
       initialRouteName="Home"
     >
-      <Tab.Screen 
-        name="Home" 
+      <Tab.Screen
+        name="Home"
         component={HomeScreen}
         options={{
           title: 'Trang chủ',
         }}
       />
-      <Tab.Screen 
-        name="Recipe" 
+      <Tab.Screen
+        name="Recipe"
         component={RecipeScreen}
         options={{
           title: 'Thực phẩm',
         }}
       />
-      <Tab.Screen 
-        name="Favorite" 
+      <Tab.Screen
+        name="Favorite"
         component={FavoriteScreen}
         options={{
           title: 'Món ngon',
         }}
       />
-      <Tab.Screen 
-        name="Profile" 
+      <Tab.Screen
+        name="Profile"
         component={ProfileScreen}
         options={{
           title: 'Tôi',
