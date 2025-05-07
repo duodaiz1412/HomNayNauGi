@@ -5,10 +5,10 @@ import TabNavigator from './TabNavigator';
 import { LoginScreen } from '../screens/Login/LoginScreen';
 import { RegisterScreen } from '../screens/Login/RegisterScreen';
 import AboutScreen from '@screens/About/AboutScreen';
-
-import RecipeDetail from '../screens/Home/RecipeDetail';
+import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
 import CookingGuide from '../screens/Home/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
+
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -55,7 +55,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen
           name="RecipeDetail"
-          component={RecipeDetail}
+          component={RecipeDetailScreen}
           options={{
             headerShown: false,
           }}

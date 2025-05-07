@@ -28,17 +28,26 @@ export default function SuggestDish({ dishes, onDishPress }: SuggestDishProps) {
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: item.imageUrl }}
+        source={{ uri: item.image }}
         className="w-full h-40 rounded-t-xl"
         resizeMode="cover"
       />
       <View className="p-3">
         <Text className="font-bold text-lg mb-1">{item.name}</Text>
-        <Text className="text-gray-500 text-xs mb-2">
-          {item.ingredients.join(', ')}
+        <Text className="text-gray-500 text-xs mb-2" numberOfLines={2}>
+          {item.description}
         </Text>
-        <View className="flex-row items-center">
-          <Text className="text-xs text-gray-500">Thời gian: {item.time}</Text>
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center">
+            <Image
+              source={{ uri: item.authorAvatar }}
+              className="w-5 h-5 rounded-full mr-1"
+            />
+            <Text className="text-xs text-gray-500">{item.author}</Text>
+          </View>
+          <View className="flex-row items-center">
+            <Text className="text-xs text-gray-500">{item.time}</Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
