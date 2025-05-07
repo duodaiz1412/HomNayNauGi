@@ -10,14 +10,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import IngredientCard from '@components/IngredientCard';
 import MyIngredient from '@components/MyIngredient';
 import SuggestDish from '@components/SuggestDish';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
 export default function RecipeScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<'ingredients' | 'dishes'>(
     'ingredients'
   );
@@ -531,7 +531,7 @@ export default function RecipeScreen() {
   };
 
   const handleAddIngredient = () => {
-    console.log('Thêm nguyên liệu mới');
+    navigation.navigate('AddIngredient');
   };
 
   const handleDishPress = (id: string) => {
