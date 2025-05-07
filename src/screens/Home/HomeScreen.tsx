@@ -234,7 +234,7 @@ const HomeScreen = () => {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingRight: 15, paddingTop: 40 }} // Tăng paddingTop để tạo không gian cho hình ảnh
+              contentContainerStyle={{ paddingRight: 15, paddingTop: 40 }}
             >
               {featuredItems.map((item) => (
                 <TouchableOpacity
@@ -251,7 +251,7 @@ const HomeScreen = () => {
                   <View className="absolute top-[-40px] left-0 right-0 items-center">
                     <Image
                       source={{ uri: item.image }}
-                      className="w-40 h-40 rounded-full border-4 border-white" // Giảm kích thước hình ảnh để vừa với card
+                      className="w-40 h-40 rounded-full border-4 border-white"
                       resizeMode="cover"
                     />
                   </View>

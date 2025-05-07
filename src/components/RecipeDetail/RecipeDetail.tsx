@@ -1,23 +1,49 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { RouteProp } from '@react-navigation/native';
-import 'nativewind';
-import { mockData } from '../../MockData/Data';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import Octicons from 'react-native-vector-icons/Octicons';
-type RecipeDetailRouteProp = RouteProp<RootStackParamList, 'RecipeDetail'>;
 
-const RecipeDetail = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RecipeDetailRouteProp>();
-  const { recipeId } = route.params;
-  const recipe = mockData.recipes.find((r) => Number(r.id) === recipeId);
+interface RecipeDetailProps {
+  recipe: {
+    id: string | number;
+    name: string;
+    image: string;
+    time: string;
+    description?: string;
+    isFavorite: boolean;
+    nutrition: {
+      carbs?: string;
+      protein?: string;
+      calories?: string;
+      fat?: string;
+    };
+    ingredients: Array<{
+      name: string;
+      amount: string;
+      image: string;
+    }>;
+    steps: Array<{
+      step: number;
+      description: string;
+    }>;
+  };
+  onBack: () => void;
+  onFavorite: (id: string | number) => void;
+  onStartCooking: (id: string | number) => void;
+}
+
+export default function RecipeDetail({
+  recipe,
+  onBack,
+  onFavorite,
+  onStartCooking,
+}: RecipeDetailProps) {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [quantity, setQuantity] = useState(3);
   const [activeTab, setActiveTab] = useState('ingredients');
 
@@ -42,12 +68,15 @@ const RecipeDetail = () => {
         {/* Back Button */}
         <TouchableOpacity
           className="absolute left-4 top-4 z-10 bg-white rounded-full p-1.5"
-          onPress={() => navigation.goBack()}
+          onPress={onBack}
         >
           <Ionicons name="return-up-back-outline" size={20} color="black" />
         </TouchableOpacity>
         {/* Favorite Button */}
-        <TouchableOpacity className="absolute top-4 right-4 bg-white/80 rounded-full p-1.5 z-10">
+        <TouchableOpacity 
+          className="absolute top-4 right-4 bg-white/80 rounded-full p-1.5 z-10"
+          onPress={() => onFavorite(recipe.id)}
+        >
           <Ionicons
             name={recipe.isFavorite ? 'heart' : 'heart-outline'}
             size={20}
@@ -258,9 +287,7 @@ const RecipeDetail = () => {
       {/* Bottom Action Button - Fixed at bottom */}
       <View className="absolute bottom-5 left-0 right-0 px-7">
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('CookingGuide', { recipeId: Number(recipe.id) })
-          }
+          onPress={() => onStartCooking(recipe.id)}
           className="bg-red-900 rounded-full py-4 items-center w-3/5 self-center"
         >
           <Text className="text-white font-bold text-lg">Nấu ngay</Text>
@@ -268,6 +295,4 @@ const RecipeDetail = () => {
       </View>
     </SafeAreaView>
   );
-};
-
-export default RecipeDetail;
+}

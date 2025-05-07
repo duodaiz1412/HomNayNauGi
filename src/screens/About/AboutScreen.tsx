@@ -2,11 +2,10 @@ import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import React from 'react';
 import AboutContent from '@components/About/AboutContent';
 
-
 const AboutScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
@@ -26,4 +25,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AboutScreen; 
+export default AboutScreen;

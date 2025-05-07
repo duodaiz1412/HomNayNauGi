@@ -75,8 +75,8 @@ export const RegisterScreen = () => {
                 Tạo tài khoản
               </Text>
               <Text className="text-base text-gray-500 text-center mb-10 px-4">
-                Tạo tài khoản để có thể khám phá tất cả những công thức nấu ăn hấp
-                dẫn
+                Tạo tài khoản để có thể khám phá tất cả những công thức nấu ăn
+                hấp dẫn
               </Text>
 
               {/* Register Form Section */}
@@ -140,7 +140,9 @@ export const RegisterScreen = () => {
                 onPress={handleRegister}
                 activeOpacity={0.8}
               >
-                <Text className="text-white text-lg font-semibold">Đăng ký</Text>
+                <Text className="text-white text-lg font-semibold">
+                  Đăng ký
+                </Text>
               </TouchableOpacity>
               <View className="flex-row justify-center items-center mt-6">
                 <Text className="text-sm text-gray-600">Đã có tài khoản?</Text>
