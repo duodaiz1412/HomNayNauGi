@@ -37,17 +37,17 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Recipe"
-        component={RecipeScreen}
-        options={{
-          title: 'Thực phẩm',
-        }}
-      />
-      <Tab.Screen
         name="Favorite"
         component={FavoriteScreen}
         options={{
           title: 'Món ngon',
+        }}
+      />
+      <Tab.Screen
+        name="Recipe"
+        component={RecipeScreen}
+        options={{
+          title: 'Thực phẩm',
         }}
       />
       <Tab.Screen

@@ -16,7 +16,6 @@ export default function MyIngredient({
   onDeleteIngredient,
   onIngredientPress,
   onDeleteAll,
-  onAddIngredient,
 }) {
   return (
     <View className="flex flex-col gap-3">
@@ -56,13 +55,6 @@ export default function MyIngredient({
           />
         </View>
       ))}
-
-      <TouchableOpacity
-        className="bg-red-800 rounded-full py-3 items-center mt-2 mb-20"
-        onPress={onAddIngredient}
-      >
-        <Text className="text-white font-medium">Thêm nguyên liệu</Text>
-      </TouchableOpacity>
     </View>
   );
 }

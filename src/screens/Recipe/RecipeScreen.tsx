@@ -604,7 +604,6 @@ export default function RecipeScreen() {
               onDeleteIngredient={handleDeleteIngredient}
               onIngredientPress={handleIngredientPress}
               onDeleteAll={handleDeleteAll}
-              onAddIngredient={handleAddIngredient}
             />
           </ScrollView>
         ) : (
@@ -614,6 +613,26 @@ export default function RecipeScreen() {
               onDishPress={handleDishPress}
             />
           </View>
+        )}
+
+        {/* Floating Action Button */}
+        {activeTab === 'ingredients' && (
+          <TouchableOpacity
+            onPress={handleAddIngredient}
+            className="absolute bottom-6 right-6 bg-red-800 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+            style={{
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+          >
+            <Ionicons name="add" size={30} color="white" />
+          </TouchableOpacity>
         )}
       </ImageBackground>
     </SafeAreaView>
