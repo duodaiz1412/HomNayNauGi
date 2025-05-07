@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/Home/HomeScreen';
 import RecipeScreen from '../screens/Recipe/RecipeScreen';
 import FavoriteScreen from '../screens/Favorite/FavoriteScreen';
@@ -8,6 +8,7 @@ import ProfileScreen from '../screens/Profile/ProfileScreen';
 
 import TabBar from '../components/navigation/TabBar';
 
+// Định nghĩa TabParamList cho Tab Navigator
 export type TabParamList = {
   Home: undefined;
   Recipe: undefined;
@@ -24,6 +25,7 @@ const TabNavigator = () => {
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,
+        tabBarStyle: { height: 0 },
       }}
       initialRouteName="Home"
     >

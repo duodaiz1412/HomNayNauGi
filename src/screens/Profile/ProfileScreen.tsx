@@ -11,11 +11,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-
+import { mockData } from '../../MockData/Data';
 const ProfileScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+  const profileOptions = [
+    { icon: '❤️', title: 'Yêu thích', onPress: () => {} },
+    { icon: '🕒', title: 'Lịch sử', onPress: () => {} },
+    { icon: '🔔', title: 'Thông báo', onPress: () => {} },
+    { icon: '💡', title: 'Thẩm tủy', onPress: () => {} },
+    { icon: '🔗', title: 'Chia sẻ', onPress: () => {} },
+    { icon: '⚙️', title: 'Cài đặt', onPress: () => {} },
+    { icon: '🔒', title: 'Chính sách bảo mật', onPress: () => {} },
+    { icon: '❓', title: 'Hỗ trợ', onPress: () => {} },
+    { icon: 'ℹ️', title: 'Về chúng tôi', onPress: () => {} },
+  ];
   const handleLogout = () => {
     Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
       {
@@ -37,36 +47,58 @@ const ProfileScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 p-4">
-        <Text className="text-2xl font-bold mb-4">Hồ sơ của tôi</Text>
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <ScrollView className="flex-1">
+        {/* Header */}
+        <View className="flex-row items-center p-4">
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text className="text-2xl">⬅️</Text>
+          </TouchableOpacity>
+          <Text className="text-2xl font-bold text-red-600 ml-4">
+            Tài khoản
+          </Text>
+        </View>
 
-        <View className="items-center mb-6">
-          <View className="w-24 h-24 rounded-full bg-gray-200 overflow-hidden mb-2">
-            <Image
-              source={require('../../assets/images/avatar-placeholder.jpg')}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
+        {/* User Info */}
+        <View className="flex-row items-center p-4 bg-white rounded-lg mx-4 mb-4 shadow">
+          <Image
+            source={{ uri: mockData.user.avatar }}
+            className="w-12 h-12 rounded-full mr-3"
+          />
+          <View className="flex-1">
+            <Text className="text-lg font-bold">{mockData.user.name}</Text>
+            <Text className="text-gray-500">{mockData.user.bio}</Text>
           </View>
-          <Text className="text-lg font-bold">Trung Phong</Text>
-          <Text className="text-gray-600">tphong@example.com</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('EditProfileScreen')}
+          >
+            <Text className="text-2xl">✏️</Text>
+          </TouchableOpacity>
         </View>
 
-        <View className="bg-gray-100 rounded-lg overflow-hidden mb-4">
-          <TouchableOpacity className="p-4 border-b border-gray-200">
-            <Text className="text-base">Thông tin cá nhân</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="p-4 border-b border-gray-200">
-            <Text className="text-base">Lịch sử tìm kiếm</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="p-4 border-b border-gray-200">
-            <Text className="text-base">Cài đặt</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="p-4" onPress={handleLogout}>
-            <Text className="text-base text-red-600">Đăng xuất</Text>
-          </TouchableOpacity>
+        {/* Options List */}
+        <View className="bg-white rounded-lg mx-4 shadow">
+          {profileOptions.map((option, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={option.onPress}
+              className="flex-row items-center p-4 border-b border-gray-200"
+            >
+              <Text className="text-2xl mr-3">{option.icon}</Text>
+              <Text className="text-lg">{option.title}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
+
+        {/* Logout Button */}
+        <TouchableOpacity
+          onPress={handleLogout}
+          className="mx-4 mt-6 mb-4 bg-red-600 rounded-full py-3"
+        >
+          <Text className="text-white text-center text-lg font-bold">
+            Đăng xuất
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
