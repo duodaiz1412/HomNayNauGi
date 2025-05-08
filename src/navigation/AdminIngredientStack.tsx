@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AdminIngredientManagementScreen } from '@screens/Admin/IngredientManagementScreen';
-import { AddIngredientScreen } from '@screens/Admin/Ingredient/AddIngredientScreen';
+import AddIngredientScreen from '@screens/AddIngredientScreen';
 import { EditIngredientScreen } from '@screens/Admin/Ingredient/EditIngredientScreen';
+import { IngredientManagementScreen } from '@screens/Admin/IngredientManagementScreen';
 
 export type AdminIngredientStackParamList = {
   AdminIngredientManagementScreen: undefined;
@@ -19,7 +19,7 @@ export const AdminIngredientStack = () => {
     >
       <Stack.Screen
         name="AdminIngredientManagementScreen"
-        component={AdminIngredientManagementScreen}
+        component={IngredientManagementScreen}
       />
 
       <Stack.Screen

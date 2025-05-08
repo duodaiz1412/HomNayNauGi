@@ -9,14 +9,16 @@ import {
   ActivityIndicator,
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { AdminHeader } from "@components/AdminHeader/AdminHeader"
+import { AdminUserStackParamList } from "@navigation/AdminUserStack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-
+type UserDetailScreenRouteProp = RouteProp<AdminUserStackParamList, "UserDetailScreen">
 export const UserDetailScreen = () => {
-  const navigation = useNavigation()
-  const route = useRoute()
+  const navigation = useNavigation<NativeStackNavigationProp<AdminUserStackParamList>>()
+  const route = useRoute<UserDetailScreenRouteProp>()
   const { userId } = route.params
 
   const [isFetching, setIsFetching] = useState(true)
@@ -279,7 +281,7 @@ export const UserDetailScreen = () => {
           <View className="flex-row mt-4">
             <TouchableOpacity
               className="flex-1 mr-2 bg-[#941D23] py-2 rounded-lg items-center"
-              onPress={() => navigation.navigate("EditUser", { userId: userData.id })}
+              onPress={() => navigation.navigate("EditUserScreen", { userId: userData.id })}
             >
               <Text className="text-white font-medium">Chỉnh sửa</Text>
             </TouchableOpacity>

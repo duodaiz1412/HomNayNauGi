@@ -14,15 +14,18 @@ import {
   ActivityIndicator,
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import * as ImagePicker from "expo-image-picker"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { AdminHeader } from "@components/AdminHeader/AdminHeader"
+import { AdminUserStackParamList } from "@navigation/AdminUserStack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+type EditUserScreenRouteProp = RouteProp<AdminUserStackParamList,"EditUserScreen">;
 
 export const EditUserScreen = () => {
-  const navigation = useNavigation()
-  const route = useRoute()
+  const navigation = useNavigation<NativeStackNavigationProp<AdminUserStackParamList>>();
+  const route = useRoute<EditUserScreenRouteProp>()
   const { userId } = route.params || { userId: null }
   const isAddMode = !userId
 

@@ -152,7 +152,8 @@ export const AdminPostManagementScreen = () => {
                 </TouchableOpacity>
               </>
             )}
-            <TouchableOpacity className="mr-2" onPress={() => navigation.navigate("PostDetail", { postId: item.id })}>
+            {/* onPress={() => navigation.navigate("PostDetail", { postId: item.id })} */}
+            <TouchableOpacity className="mr-2" >
               <Ionicons name="eye-outline" size={18} color="#454442" />
             </TouchableOpacity>
             <TouchableOpacity>

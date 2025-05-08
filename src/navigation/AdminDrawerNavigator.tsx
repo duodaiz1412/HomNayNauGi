@@ -5,18 +5,19 @@ import { AdminDashboardScreen } from '@screens/Admin/DashboardScreen';
 import { CustomDrawer } from '@components/navigation/CustomDrawer';
 import { AdminFoodStack } from './AdminFoodStack';
 import { AdminFoodCategoryStack } from './AdminFoodCategoryStack';
-import { AdminIngredientStack } from './AdminIngredientStack';
-import { UserManagementScreen } from '@screens/Admin/UserManagementScreen';
+import { AdminIngredientCategoryStack } from './AdminIngredientCategoryStack';
 import { AdminUserStack } from './AdminUserStack';
 import { AdminPostManagementScreen } from '@screens/Admin/PostManagementScreen';
 import { StatisticsScreen } from '@screens/Admin/StatisticsScreen';
+import { AdminIngredientStack } from './AdminIngredientStack';
 
 const screenWidth = Dimensions.get('window').width;
 export type AdminDrawerParamList = {
   AdminDashboard: undefined;
   AdminFoodManagement: undefined;
-  AdminFoodCategoryManagement:undefined;
   AdminIngredientManagement:undefined;
+  AdminFoodCategoryManagement:undefined;
+  AdminIngredientCategoryManagement:undefined;
   AdminUserManagement: undefined;
   AdminPostManagement:undefined;
   AdminStatistics:undefined;
@@ -66,6 +67,17 @@ export const AdminDrawerNavigator = () => {
           ),
         }}
       />
+      
+      <Drawer.Screen
+        name="AdminIngredientManagement"
+        component={AdminIngredientStack}
+        options={{
+          title: 'Quản lý Nguyên liệu',
+          drawerIcon: ({ color }) => (
+            <Ionicons name="leaf-outline" size={22} color={color} />
+          ),
+        }}
+      />
       <Drawer.Screen
         name="AdminFoodCategoryManagement"
         component={AdminFoodCategoryStack}
@@ -75,11 +87,11 @@ export const AdminDrawerNavigator = () => {
         }}
       />      
       <Drawer.Screen
-        name="AdminIngredientManagement"
-        component={AdminIngredientStack}
+        name="AdminIngredientCategoryManagement"
+        component={AdminIngredientCategoryStack}
         options={{
-          title: "Quản lý nguyên liệu",
-          drawerIcon: ({ color }) => <Ionicons name="leaf-outline" size={22} color={color} />,
+          title: "Danh mục nguyên liệu",
+          drawerIcon: ({ color }) => <Ionicons name="list-outline" size={22} color={color} />,
         }}
       />
       <Drawer.Screen
