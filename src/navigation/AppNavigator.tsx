@@ -9,6 +9,7 @@ import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
 import CookingGuide from '../screens/Home/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import AddIngredientScreen from '../screens/AddIngredientScreen';
+import AddDishScreen from '../screens/AddDish';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -19,6 +20,7 @@ export type RootStackParamList = {
   CookingGuide: { recipeId: number };
   EditProfileScreen: undefined;
   AddIngredient: undefined;
+  AddDish: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -81,6 +83,13 @@ const AppNavigator = () => {
           component={AddIngredientScreen}
           options={{
             title: 'Thêm nguyên liệu',
+          }}
+        />
+        <Stack.Screen
+          name="AddDish"
+          component={AddDishScreen}
+          options={{
+            title: 'Thêm món ăn',
           }}
         />
       </Stack.Navigator>

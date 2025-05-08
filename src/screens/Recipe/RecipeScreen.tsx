@@ -541,13 +541,9 @@ export default function RecipeScreen() {
     });
   };
 
-  const [todos, setTodos] = useState([]);
-
   useEffect(() => {
     // Gọi getDishes ngay khi component mount
     getDishes();
-    
-    // Thêm listener cho focus event
     const unsubscribe = navigation.addListener('focus', () => {
       getDishes();
     });
@@ -565,7 +561,6 @@ export default function RecipeScreen() {
 
       if (mon_an && mon_an.length > 0) {
         console.log(mon_an);
-        setTodos(mon_an);
       }
     } catch (error) {
       console.error('Error fetching dishes:', error.message);

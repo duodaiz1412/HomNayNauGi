@@ -19,7 +19,7 @@ const ProfileScreen = () => {
     { icon: '❤️', title: 'Yêu thích', onPress: () => {} },
     { icon: '🕒', title: 'Lịch sử', onPress: () => {} },
     { icon: '🔔', title: 'Thông báo', onPress: () => {} },
-    { icon: '💡', title: 'Thẩm tủy', onPress: () => {} },
+    { icon: '💡', title: 'Thêm món', onPress: () => navigation.navigate('AddDish') },
     { icon: '🔗', title: 'Chia sẻ', onPress: () => {} },
     { icon: '⚙️', title: 'Cài đặt', onPress: () => {} },
     { icon: '🔒', title: 'Chính sách bảo mật', onPress: () => {} },
