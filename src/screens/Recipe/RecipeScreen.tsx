@@ -1,5 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import MyIngredient from '@components/MyIngredient';
 import SuggestDish from '@components/SuggestDish';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { supabase } from '@utils/supabase';
 
 export default function RecipeScreen() {
   const navigation =
@@ -538,6 +539,37 @@ export default function RecipeScreen() {
     navigation.navigate('RecipeDetail', {
       recipeId: Number(id.replace('d', '')),
     });
+  };
+
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() => {
+    // Gọi getDishes ngay khi component mount
+    getDishes();
+    
+    // Thêm listener cho focus event
+    const unsubscribe = navigation.addListener('focus', () => {
+      getDishes();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  const getDishes = async () => {
+    try {
+      let { data: mon_an, error } = await supabase.from('mon_an').select('*');
+      if (error) {
+        console.error('Error fetching dishes:', error.message);
+        return;
+      }
+
+      if (mon_an && mon_an.length > 0) {
+        console.log(mon_an);
+        setTodos(mon_an);
+      }
+    } catch (error) {
+      console.error('Error fetching dishes:', error.message);
+    }
   };
 
   return (
