@@ -5,6 +5,7 @@ import HomeScreen from '../screens/Home/HomeScreen';
 import RecipeScreen from '../screens/Recipe/RecipeScreen';
 import FavoriteScreen from '../screens/Favorite/FavoriteScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
+import SearchScreen from '@screens/Search/SearchScreen';
 
 import TabBar from '../components/navigation/TabBar';
 
@@ -38,7 +39,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Favorite"
-        component={FavoriteScreen}
+        component={SearchScreen}
         options={{
           title: 'Món ngon',
         }}

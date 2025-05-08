@@ -14,6 +14,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from 'react';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { TextInput } from 'react-native';
+
 const backgroundImage = require('@assets/background.png');
 
 const HomeScreen = () => {

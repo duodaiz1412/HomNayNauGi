@@ -10,6 +10,13 @@ import CookingGuide from '../screens/Home/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import AddIngredientScreen from '../screens/AddIngredientScreen';
 import AddDishScreen from '../screens/AddDish';
+import SearchByIngredientScreen from '../screens/Search/SearchByIngredientScreen';
+import IngredientsScreen from '../screens/Search/IngredientsScreen';
+
+interface Ingredient {
+  name: string;
+  image: string;
+}
 
 export type RootStackParamList = {
   Login: undefined;
@@ -21,6 +28,9 @@ export type RootStackParamList = {
   EditProfileScreen: undefined;
   AddIngredient: undefined;
   AddDish: undefined;
+  SearchByIngredientScreen: undefined;
+  IngredientsScreen: { ingredients: Ingredient[] };
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -92,6 +102,17 @@ const AppNavigator = () => {
             title: 'Thêm món ăn',
           }}
         />
+        <Stack.Screen
+          name="SearchByIngredientScreen"
+          component={SearchByIngredientScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="IngredientsScreen"
+          component={IngredientsScreen}
+          options={{ headerShown: false }}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
