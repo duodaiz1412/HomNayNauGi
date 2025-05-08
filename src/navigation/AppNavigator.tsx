@@ -8,6 +8,7 @@ import AboutScreen from '@screens/About/AboutScreen';
 import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
 import CookingGuide from '../screens/Home/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
+import { AdminDrawerNavigator } from './AdminDrawerNavigator';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   RecipeDetail: { recipeId: number };
   CookingGuide: { recipeId: number };
   EditProfileScreen: undefined;
+  AdminDrawerNavigator: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -24,7 +26,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator id={undefined} initialRouteName="MainTabs">
+      <Stack.Navigator id={undefined} initialRouteName="AdminDrawerNavigator">
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -46,6 +48,13 @@ const AppNavigator = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="AdminDrawerNavigator"
+          component={AdminDrawerNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />     
         <Stack.Screen
           name="About"
           component={AboutScreen}

@@ -19,8 +19,10 @@ import {
 } from 'react-native';
 
 // Thông tin đăng nhập mặc định
-const DEFAULT_USERNAME = 'ADMIN';
-const DEFAULT_PASSWORD = 'ADMIN';
+const DEFAULT_USERNAME = 'user';
+const DEFAULT_PASSWORD = '123';
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = '123';
 
 // Đường dẫn ảnh
 const googleIcon = require('@assets/google.png');
@@ -42,7 +44,13 @@ export const LoginScreen = () => {
         index: 0,
         routes: [{ name: 'MainTabs' }],
       });
-    } else {
+    } else if(username.trim() === ADMIN_USERNAME && password === ADMIN_PASSWORD){
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'AdminNavigator' }],
+      });
+    }
+    else {
       Alert.alert('Lỗi đăng nhập', 'Tên đăng nhập hoặc mật khẩu không đúng');
     }
   };
