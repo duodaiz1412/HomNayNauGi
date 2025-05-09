@@ -8,7 +8,7 @@ import AboutScreen from '@screens/About/AboutScreen';
 import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
 import CookingGuide from '../screens/Home/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
-import AddIngredientScreen from '../screens/AddIngredientScreen';
+import AddIngredientScreen from '@screens/Recipe/AddIngredient';
 import AddDishScreen from '../screens/AddDish';
 
 export type RootStackParamList = {
@@ -19,7 +19,7 @@ export type RootStackParamList = {
   RecipeDetail: { recipeId: number };
   CookingGuide: { recipeId: number };
   EditProfileScreen: undefined;
-  AddIngredient: undefined;
+  AddIngredient: { isMultiSelect: boolean };
   AddDish: undefined;
 };
 
@@ -82,14 +82,14 @@ const AppNavigator = () => {
           name="AddIngredient"
           component={AddIngredientScreen}
           options={{
-            title: 'Thêm nguyên liệu',
+            headerShown: false,
           }}
         />
         <Stack.Screen
           name="AddDish"
           component={AddDishScreen}
           options={{
-            title: 'Thêm món ăn',
+            headerShown: false,
           }}
         />
       </Stack.Navigator>
