@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
-  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -532,7 +531,9 @@ export default function RecipeScreen() {
   };
 
   const handleAddIngredient = () => {
-    navigation.navigate('AddIngredient');
+    navigation.navigate('AddIngredient', {
+      isMultiSelect: true,
+    });
   };
 
   const handleDishPress = (id: string) => {
