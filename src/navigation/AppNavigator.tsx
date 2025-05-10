@@ -8,7 +8,18 @@ import AboutScreen from '../screens/About/AboutScreen';
 import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
 import CookingGuide from '../screens/Home/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
-import AddIngredientScreen from '../screens/AddIngredientScreen';
+import AddIngredientScreen from '@screens/Recipe/AddIngredient';
+import AddDishScreen from '../screens/AddDish';
+import SearchByIngredientScreen from '../screens/Search/SearchByIngredientScreen';
+import IngredientsScreen from '../screens/Search/IngredientsScreen';
+import SearchByRecipeScreen from '../screens/Search/SearchByRecipeScreen';
+import ListDishesScreen from '../screens/Search/ListDishesScreen';
+import FilterScreen from '../screens/Search/FilterScreen';
+
+interface Ingredient {
+  name: string;
+  image: string;
+}
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import FavoritesScreen from '../screens/Profile/FavoritesScreen';
 import HistoryScreen from '../screens/Profile/HistoryScreen';
@@ -28,7 +39,18 @@ export type RootStackParamList = {
   RecipeDetail: { recipeId: number };
   CookingGuide: { recipeId: number };
   EditProfileScreen: undefined;
-  AddIngredient: undefined;
+  AddIngredient: { isMultiSelect: boolean };
+  AddDish: undefined;
+  SearchByIngredientScreen: {
+    ingredients?: {
+      name: string;
+      image: string;
+    }[];
+  };
+  IngredientsScreen: { ingredients: Ingredient[] };
+  SearchByRecipeScreen: undefined;
+  ListDishesScreen: undefined;
+  FilterScreen: undefined;
   Profile: undefined;
   FavoritesScreen: undefined;
   HistoryScreen: undefined;
@@ -81,10 +103,19 @@ const AppNavigator = () => {
         <Stack.Screen name="AddIngredient" component={AddIngredientScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
-        <Stack.Screen name="NotificationsScreen" component={NotificationsScreen} />
-        <Stack.Screen name="AchievementsScreen" component={AchievementsScreen} />
+        <Stack.Screen
+          name="NotificationsScreen"
+          component={NotificationsScreen}
+        />
+        <Stack.Screen
+          name="AchievementsScreen"
+          component={AchievementsScreen}
+        />
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-        <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen} />
+        <Stack.Screen
+          name="PrivacyPolicyScreen"
+          component={PrivacyPolicyScreen}
+        />
         <Stack.Screen name="SupportScreen" component={SupportScreen} />
         <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
       </Stack.Navigator>
