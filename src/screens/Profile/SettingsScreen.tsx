@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, ImageBackground, TouchableOpacity, Alert, Switch, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockData } from '../../MockData/Data';
 const backgroundImage = require('@assets/background.png');
 
@@ -11,13 +12,35 @@ const SettingsScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [fontSize, setFontSize] = useState('medium');
   const [darkMode, setDarkMode] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (token) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+        navigation.replace('Login');
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
+  if (!isLoggedIn) return null;
 
   const handleLogout = () => {
     Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
       { text: 'Hủy', style: 'cancel' },
       {
         text: 'Đăng xuất',
-        onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login' as never }] }),
+        onPress: async () => {
+          await AsyncStorage.removeItem('accessToken');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'MainTabs' }],
+          });
+        },
         style: 'destructive',
       },
     ]);
@@ -96,8 +119,8 @@ const SettingsScreen = () => {
           </TouchableOpacity>
 
           {/* Đăng xuất */}
-          <TouchableOpacity className="mx-4 mt-6 mb-4 bg-red-600 rounded-full py-3" onPress={handleLogout}>
-            <Text className="text-white text-center text-lg font-bold">Đăng xuất</Text>
+          <TouchableOpacity onPress={handleLogout} className="mx-4 mt-6 mb-4 bg-white rounded-full py-3 border border-[#88131B]">
+            <Text className="text-[#88131B] text-center text-lg font-bold">Đăng xuất</Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
