@@ -1,147 +1,117 @@
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   FlatList,
-//   Image,
-//   TouchableOpacity,
-//   ScrollView,
-// } from 'react-native';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// import { useNavigation } from '@react-navigation/native';
-// import { SafeAreaView } from 'react-native-safe-area-context';
-// import { mockData } from '../../MockData/Data';
-
-// const IngredientsScreen = () => {
-//   const navigation = useNavigation();
-//   const allIngredients = mockData.recipes.flatMap(recipe => recipe.ingredients);
-//   const [amounts, setAmounts] = useState<Record<string, string>>({});
-
-//   const handleChangeAmount = (name: string, value: string) => {
-//     setAmounts(prev => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSearch = () => {
-//     // TODO: Handle search logic using selected ingredients
-//     console.log(amounts);
-//   };
-
-//   return (
-//     <SafeAreaView style={{ flex: 1, padding: 16 }}>
-//       {/* Header */}
-//       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-//         <TouchableOpacity onPress={() => navigation.goBack()}>
-//           <Ionicons name="arrow-back" size={24} color="#941D23" />
-//         </TouchableOpacity>
-//         <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#941D23', marginLeft: 12 }}>
-//           Nguyên liệu
-//         </Text>
-//       </View>
-
-//       {/* Selected Ingredients */}
-//       <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>
-//         Các nguyên liệu ({allIngredients.length} nguyên liệu)
-//       </Text>
-
-//       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-//         {allIngredients.map((item, index) => (
-//           <View
-//             key={`${item.name}-${index}`}
-//             style={{
-//               backgroundColor: '#fff',
-//               borderRadius: 12,
-//               flexDirection: 'row',
-//               alignItems: 'center',
-//               padding: 10,
-//               marginBottom: 12,
-//               shadowColor: '#000',
-//               shadowOffset: { width: 0, height: 2 },
-//               shadowOpacity: 0.1,
-//               shadowRadius: 4,
-//               elevation: 2,
-//             }}
-//           >
-//             <Image
-//               source={{ uri: item.image }}
-//               style={{ width: 40, height: 40, borderRadius: 20, marginRight: 12 }}
-//             />
-//             <Text style={{ flex: 1, fontWeight: '600', fontSize: 16 }}>{item.name}</Text>
-//             <TextInput
-//               placeholder="0"
-//               value={amounts[item.name] || ''}
-//               onChangeText={(text) => handleChangeAmount(item.name, text)}
-//               style={{
-//                 width: 80,
-//                 borderWidth: 1,
-//                 borderColor: '#ccc',
-//                 borderRadius: 8,
-//                 paddingHorizontal: 8,
-//                 paddingVertical: 4,
-//                 textAlign: 'center',
-//               }}
-//               keyboardType="numeric"
-//             />
-//           </View>
-//         ))}
-//       </ScrollView>
-
-//       {/* Button */}
-//       <TouchableOpacity
-//         onPress={handleSearch}
-//         style={{
-//           position: 'absolute',
-//           bottom: 16,
-//           left: 16,
-//           right: 16,
-//           backgroundColor: '#941D23',
-//           paddingVertical: 16,
-//           borderRadius: 24,
-//           alignItems: 'center',
-//         }}
-//       >
-//         <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Tìm món ngay 🍲</Text>
-//       </TouchableOpacity>
-//     </SafeAreaView>
-//   );
-// };
-
-// export default IngredientsScreen;
-
-
-import React from 'react';
-import { View, Text, FlatList, Image, TextInput, StyleSheet } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Modal,
+  Pressable,
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+// import { RootStackParamList } from '../../navigation/AppNavigator';
+import { mockData } from '../../MockData/Data';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
-interface Ingredient {
-    name: string;
-    image: string;
-  }
+const units = ['gram', 'kg', 'ml', 'lit', 'cái'];
+const quantities = ['200 gram', '300 gram', '400 gram', '500 gram', '600 gram'];
+
 const IngredientsScreen = () => {
-  const route = useRoute();
-  const { selectedIngredients } = route.params || {};
+
+  // const route = useRoute();
+  // const { ingredients } = route.params || {};
+  const route = useRoute<RouteProp<RootStackParamList, 'IngredientsScreen'>>();
+const { ingredients } = route.params;
+  const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [ingredientData, setIngredientData] = useState(
+    // mockData.recipes[0].ingredients.map(item => ({ ...item, quantity: '' }))
+    (ingredients || []).map(item => ({ ...item, quantity: '' }))
+  );
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleQuantitySelect = (index: number) => {
+    setSelectedIndex(index);
+    setShowDropdown(true);
+  };
+
+  const setQuantity = (value: string) => {
+    if (selectedIndex === null) return;
+    const newData = [...ingredientData];
+    newData[selectedIndex].quantity = value;
+    setIngredientData(newData);
+    setShowDropdown(false);
+  };
+
+  const renderDropdown = () => (
+    <Modal
+      visible={showDropdown}
+      transparent
+      animationType="fade"
+      onRequestClose={() => setShowDropdown(false)}>
+      <Pressable
+        style={styles.modalBackground}
+        onPress={() => setShowDropdown(false)}>
+        <View style={styles.dropdownWrapper}>
+          {quantities.map((qty, index) => (
+            <TouchableOpacity key={index} onPress={() => setQuantity(qty)}>
+              <Text style={styles.dropdownItem}>{qty}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </Pressable>
+    </Modal>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Các nguyên liệu</Text>
-      <Text style={styles.count}>{selectedIngredients?.length || 0} nguyên liệu</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#941D23" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Nguyên liệu</Text>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity onPress={() => navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData })}>
+            <Ionicons name="create-outline" size={22} color="#333" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData })}>
+            <Ionicons name="add-circle-outline" size={22} color="#333" style={{ marginLeft: 12 }} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <Text style={styles.subtitle}>Các nguyên liệu</Text>
+      <Text style={styles.count}>{ingredientData.length} nguyên liệu</Text>
 
       <FlatList
-        data={selectedIngredients || []}
+        data={ingredientData}
         keyExtractor={(item) => item.name}
-        renderItem={({ item }) => (
-          <View style={styles.ingredientItem}>
+        renderItem={({ item, index }) => (
+          <View style={styles.itemContainer}>
             <Image source={{ uri: item.image }} style={styles.image} />
             <Text style={styles.name}>{item.name}</Text>
-            <TextInput
-              placeholder="Khối lượng"
-              style={styles.input}
-            />
+            <TouchableOpacity
+              onPress={() => handleQuantitySelect(index)}
+              style={styles.quantityInput}
+            >
+              <Text>{item.quantity || 'Khối lượng'}</Text>
+            </TouchableOpacity>
           </View>
         )}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 120 }}
       />
+
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Tìm món ngay 🍜</Text>
+      </TouchableOpacity>
+
+      {renderDropdown()}
     </View>
   );
 };
@@ -153,18 +123,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 40,
   },
-  title: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#941D23',
-    marginBottom: 4,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+  },
+  subtitle: {
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: '600',
   },
   count: {
     fontSize: 14,
     color: '#333',
     marginBottom: 16,
   },
-  ingredientItem: {
+  itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f9f9f9',
@@ -184,7 +166,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#333',
   },
-  input: {
+  quantityInput: {
     backgroundColor: '#fff',
     borderRadius: 8,
     paddingHorizontal: 10,
@@ -192,6 +174,40 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     minWidth: 80,
+    alignItems: 'center',
+  },
+  button: {
+    position: 'absolute',
+    bottom: 24,
+    left: 16,
+    right: 16,
+    backgroundColor: '#941D23',
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  dropdownWrapper: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    width: 200,
+  },
+  dropdownItem: {
+    paddingVertical: 8,
+    fontSize: 16,
+    color: '#333',
   },
 });
 

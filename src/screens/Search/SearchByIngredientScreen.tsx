@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,16 +15,36 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { Alert } from 'react-native';
+import { RouteProp, useRoute } from '@react-navigation/native';
+// ✅ ADDED
+// import { useNavigation,  } from '@react-navigation/native';
+
+
 
 interface Ingredient {
   name: string;
   image: string;
 }
 
+// ✅ ADDED
+type IngredientRouteProp = RouteProp<RootStackParamList, 'SearchByIngredientScreen'>;
+
+
 const SearchByIngredientsScreen = () => {
   const navigation =
       useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+      // ✅ ADDED inside SearchByIngredientsScreen
+// const route = useRoute<IngredientRouteProp>();
+const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
+const initialIngredients = route.params?.ingredients || [];
+
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+
+    useEffect(() => {
+    if (initialIngredients.length > 0) {
+      setSelectedIngredients(initialIngredients.map(i => i.name));
+    }
+  }, [initialIngredients]);
 
   // Trích xuất danh sách nguyên liệu duy nhất
   const allIngredients: Ingredient[] = Array.from(

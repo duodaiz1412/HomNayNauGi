@@ -97,9 +97,11 @@ const SearchScreen = () => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#444' }}>
             Món ăn phổ biến
         </Text>
-        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d11c1c' }}>
-            Xem thêm
-        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('SearchByRecipeScreen')}>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d11c1c' }}>
+                Xem thêm
+            </Text>
+        </TouchableOpacity>
         </View>
 
         <ScrollView
@@ -154,10 +156,14 @@ const SearchScreen = () => {
         {/* Meals by time */}
         <View style={{ marginTop: 24, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#444' }}>Tìm theo bữa</Text>
-          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d11c1c' }}>Xem thêm</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('ListDishesScreen')}>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d11c1c' }}>
+                Xem thêm
+            </Text>
+        </TouchableOpacity>
         </View>
         <View style={{ marginTop: 16, paddingHorizontal: 16, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-          {['Bữa sáng', 'Bữa phụ', 'Bữa trưa', 'Ăn vặt'].map((meal, index) => (
+          {['Bữa sáng', 'Bữa phụ', 'Bữa trưa', 'Ăn vặt', 'Bữa tối', 'Tráng miệng', 'Bữa xế'].map((meal, index) => (
             <TouchableOpacity
               key={meal}
               style={{
@@ -170,16 +176,8 @@ const SearchScreen = () => {
                 
               }}
             >
-            <ImageBackground
-                source={mealImage}
-                resizeMode="cover"
-                style={{
-                flex: 1,
-                justifyContent: 'flex-start',
-                padding: 12,
-                }}
-            >
-              <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#333' }}>{meal}</Text></ImageBackground>
+
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#333' }}>{meal}</Text>
             </TouchableOpacity>
           ))}
         </View>

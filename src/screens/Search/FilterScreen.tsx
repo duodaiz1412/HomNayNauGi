@@ -7,66 +7,78 @@ import {
   StyleSheet,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
 const FilterScreen = () => {
-  const [selected, setSelected] = useState<{ [key: string]: string }>({});
+  const navigation =
+          useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [selected, setSelected] = useState({});
 
-  const toggleOption = (category: string, option: string) => {
-    setSelected((prev) => ({
-      ...prev,
-      [category]: prev[category] === option ? '' : option,
-    }));
+  const toggle = (category, option) => {
+    setSelected((prev) => {
+      const prevOptions = prev[category] || [];
+      const exists = prevOptions.includes(option);
+      return {
+        ...prev,
+        [category]: exists
+          ? prevOptions.filter((item) => item !== option)
+          : [...prevOptions, option],
+      };
+    });
   };
 
-  const renderGroup = (title: string, category: string, options: string[]) => (
+  const renderGroup = (title, category, options) => (
     <View style={styles.group}>
       <Text style={styles.groupTitle}>{title}</Text>
       <View style={styles.optionContainer}>
-        {options.map((option) => (
-          <TouchableOpacity
-            key={option}
-            onPress={() => toggleOption(category, option)}
-            style={[
-              styles.option,
-              selected[category] === option && styles.optionSelected,
-            ]}
-          >
-            <Text
-              style={[
-                styles.optionText,
-                selected[category] === option && styles.optionTextSelected,
-              ]}
+        {options.map((opt) => {
+          const isSelected = selected[category]?.includes(opt);
+          return (
+            <TouchableOpacity
+              key={opt}
+              style={[styles.option, isSelected && styles.optionSelected]}
+              onPress={() => toggle(category, opt)}
             >
-              {option}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                {opt}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
 
+  // const handleApply = () => {
+  //   navigation.navigate('RecipeListScreen', {
+  //     selectedFilters: selected,
+  //   });
+  // };
+
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Bộ lọc</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setSelected({})}>
           <Text style={styles.clearAll}>XÓA TẤT CẢ</Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        {renderGroup('Thời gian', 'time', ['Dưới 15 phút', 'Dưới 30 phút', 'Dưới 60 phút'])}
         {renderGroup('Chi phí nguyên liệu', 'cost', ['Dưới 50.000₫', 'Dưới 100.000₫', 'Dưới 200.000₫', 'Dưới 300.000₫'])}
         {renderGroup('Bữa trong ngày', 'meal', ['Bữa sáng', 'Bữa phụ', 'Bữa trưa', 'Bữa xế', 'Ăn vặt', 'Bữa tối', 'Tráng miệng'])}
         {renderGroup('Loại món ăn', 'type', ['Bánh mì', 'Đồ xào', 'Rau củ quả', 'Đồ chiên', 'Bún, miến, phở', 'Cơm rang', 'Salad'])}
         {renderGroup('Khẩu phần Calories', 'calories', ['Dưới 200 Cal', '200 - 400 Cal', '400 - 800 Cal'])}
+        {renderGroup('Chế độ ăn', '', ['Ăn kiêng', 'Ăn chay', 'Ít đường', 'Ít đạm', 'Keto'])}
+        {renderGroup('Dị ứng', '', ['Hải sản', 'Tôm', 'Đồ tanh', 'Cá', 'Sữa tươi', 'Trứng'])}
       </ScrollView>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListDishesScreen')}>
         <Text style={styles.buttonText}>Xem kết quả</Text>
       </TouchableOpacity>
     </View>
@@ -77,7 +89,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 16,
+    paddingTop: 50,
+    paddingRight: 20,
+    paddingLeft:20
   },
   header: {
     flexDirection: 'row',
@@ -111,8 +125,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     backgroundColor: '#f0f0f0',
     borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
   },
   optionSelected: {
     backgroundColor: '#be123c',
@@ -130,7 +142,7 @@ const styles = StyleSheet.create({
     bottom: 24,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#f97316',
+    backgroundColor: '#f43f5e',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -12,6 +12,9 @@ import AddIngredientScreen from '../screens/AddIngredientScreen';
 import AddDishScreen from '../screens/AddDish';
 import SearchByIngredientScreen from '../screens/Search/SearchByIngredientScreen';
 import IngredientsScreen from '../screens/Search/IngredientsScreen';
+import SearchByRecipeScreen from '../screens/Search/SearchByRecipeScreen';
+import ListDishesScreen from '../screens/Search/ListDishesScreen';
+import FilterScreen from '../screens/Search/FilterScreen';
 
 interface Ingredient {
   name: string;
@@ -28,9 +31,16 @@ export type RootStackParamList = {
   EditProfileScreen: undefined;
   AddIngredient: undefined;
   AddDish: undefined;
-  SearchByIngredientScreen: undefined;
+  SearchByIngredientScreen: {
+    ingredients?: {
+      name: string;
+      image: string;
+    }[];
+  };
   IngredientsScreen: { ingredients: Ingredient[] };
-
+  SearchByRecipeScreen: undefined;
+  ListDishesScreen: undefined;
+  FilterScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -110,6 +120,23 @@ const AppNavigator = () => {
         <Stack.Screen
           name="IngredientsScreen"
           component={IngredientsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SearchByRecipeScreen"
+          component={SearchByRecipeScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="ListDishesScreen"
+          component={ListDishesScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="FilterScreen"
+          component={FilterScreen}
           options={{ headerShown: false }}
         />
 
