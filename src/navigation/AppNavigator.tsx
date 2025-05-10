@@ -10,6 +10,16 @@ import CookingGuide from '../screens/Home/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import AddIngredientScreen from '@screens/Recipe/AddIngredient';
 import AddDishScreen from '../screens/AddDish';
+import SearchByIngredientScreen from '../screens/Search/SearchByIngredientScreen';
+import IngredientsScreen from '../screens/Search/IngredientsScreen';
+import SearchByRecipeScreen from '../screens/Search/SearchByRecipeScreen';
+import ListDishesScreen from '../screens/Search/ListDishesScreen';
+import FilterScreen from '../screens/Search/FilterScreen';
+
+interface Ingredient {
+  name: string;
+  image: string;
+}
 
 export type RootStackParamList = {
   Login: undefined;
@@ -21,6 +31,16 @@ export type RootStackParamList = {
   EditProfileScreen: undefined;
   AddIngredient: { isMultiSelect: boolean };
   AddDish: undefined;
+  SearchByIngredientScreen: {
+    ingredients?: {
+      name: string;
+      image: string;
+    }[];
+  };
+  IngredientsScreen: { ingredients: Ingredient[] };
+  SearchByRecipeScreen: undefined;
+  ListDishesScreen: undefined;
+  FilterScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -92,6 +112,34 @@ const AppNavigator = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="SearchByIngredientScreen"
+          component={SearchByIngredientScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="IngredientsScreen"
+          component={IngredientsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SearchByRecipeScreen"
+          component={SearchByRecipeScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="ListDishesScreen"
+          component={ListDishesScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="FilterScreen"
+          component={FilterScreen}
+          options={{ headerShown: false }}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
