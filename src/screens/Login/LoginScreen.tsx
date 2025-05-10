@@ -51,11 +51,11 @@ export const LoginScreen = () => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
-    >
-      <ImageBackground
-        source={backgroundImage}
-        style={{ flex: 1 }}
-        resizeMode="cover"
+      >
+        <ImageBackground
+          source={backgroundImage}
+          style={{ flex: 1 }}
+          resizeMode="cover"
       >
         <View className="flex-1">
           <StatusBar hidden={true} />
