@@ -30,6 +30,7 @@ const AddDishScreen = ({ navigation }) => {
   const [title, setTitle] = useState('');
   const [type, setType] = useState(dishTypes[0]);
   const [image, setImage] = useState(null);
+  const units = ['Gram', 'Kg', 'ml', 'Lít', 'Cái'];
   const [nutrition, setNutrition] = useState({
     carb: '',
     protein: '',
@@ -38,6 +39,9 @@ const AddDishScreen = ({ navigation }) => {
   });
   const [steps, setSteps] = useState([{ description: '', image: null }]);
   const [video, setVideo] = useState('');
+  const [ingredients, setIngredients] = useState([
+    { id: '', name: '', amount: '', unit: '', image: '' },
+  ]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -80,13 +84,44 @@ const AddDishScreen = ({ navigation }) => {
     setSteps(newSteps);
   };
 
+  const handleAddIngredient = () => {
+    navigation.navigate('AddIngredient', {
+      isMultiSelect: false,
+      onSelect: (selectedIngredient) => {
+        if (selectedIngredient) {
+          setIngredients([
+            ...ingredients,
+            {
+              id: selectedIngredient.id,
+              name: selectedIngredient.name,
+              amount: '',
+              unit: '',
+              image: selectedIngredient.image,
+            },
+          ]);
+        }
+      },
+    });
+  };
+
+  const handleRemoveIngredient = (idx) => {
+    if (ingredients.length === 1) return;
+    setIngredients(ingredients.filter((_, i) => i !== idx));
+  };
+
+  const handleIngredientChange = (idx, field, value) => {
+    const newIngredients = [...ingredients];
+    newIngredients[idx][field] = value;
+    setIngredients(newIngredients);
+  };
+
   const handleSave = () => {
     if (!name) {
       Alert.alert('Thiếu thông tin', 'Vui lòng nhập tên món ăn.');
       return;
     }
     // TODO: Xử lý lưu dữ liệu
-    console.log(name, title, type, image, nutrition, steps, video);
+    console.log(name, title, type, image, nutrition, steps, video, ingredients);
     Alert.alert('Thành công', 'Đã thêm món ăn mới!');
     navigation?.goBack?.();
   };
@@ -94,12 +129,21 @@ const AddDishScreen = ({ navigation }) => {
   const backgroundImage = require('@assets/background.png');
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 py-5 bg-white">
       <ImageBackground
         source={backgroundImage}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
+        <View className="flex-row items-center p-4">
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text className="text-3xl font-bold text-red-800 mx-auto">
+            Thêm thực phẩm
+          </Text>
+        </View>
+
         <ScrollView className="flex-1">
           <View className="p-6">
             {/* Ảnh món ăn */}
@@ -170,6 +214,126 @@ const AddDishScreen = ({ navigation }) => {
               </View>
             </View>
 
+            {/* Nguyên liệu */}
+            <View className="mb-4">
+              <Text className="text-gray-700 font-medium mb-2">
+                Nguyên liệu
+              </Text>
+              {ingredients.map((ingredient, idx) => (
+                <View
+                  key={idx}
+                  className="mb-3 p-3 bg-gray-50 rounded-xl border border-gray-200"
+                >
+                  <View className="flex-row justify-between items-center mb-2">
+                    <Text className="font-semibold">Nguyên liệu {idx + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => handleRemoveIngredient(idx)}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={22}
+                        color="#EF4444"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View className="flex-row items-center gap-4 mb-2">
+                    <View className="w-[96px] h-[96px] rounded-xl bg-gray-200 items-center justify-center">
+                      {ingredient.image ? (
+                        <Image
+                          source={{ uri: ingredient.image }}
+                          className="w-full h-full rounded-xl"
+                        />
+                      ) : (
+                        <Ionicons
+                          name="camera-outline"
+                          size={24}
+                          color="#9CA3AF"
+                        />
+                      )}
+                    </View>
+                    <View className="flex-col w-2/3 items-center mb-2">
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate('AddIngredient', {
+                            isMultiSelect: false,
+                            onSelect: (selectedIngredient) => {
+                              if (selectedIngredient) {
+                                const newIngredients = [...ingredients];
+                                newIngredients[idx] = {
+                                  ...newIngredients[idx],
+                                  id: selectedIngredient.id,
+                                  name: selectedIngredient.name,
+                                  image: selectedIngredient.image,
+                                };
+                                setIngredients(newIngredients);
+                              }
+                            },
+                          })
+                        }
+                        className="bg-white border border-gray-200 rounded-xl h-[42px] px-4 py-2 text-gray-800 mb-2 flex-row items-center"
+                      >
+                        <Text className="flex-1 text-gray-800">
+                          {ingredient.name || 'Chọn nguyên liệu'}
+                        </Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={20}
+                          color="#9CA3AF"
+                        />
+                      </TouchableOpacity>
+                      <View className="flex-row gap-2">
+                        <TextInput
+                          className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-800"
+                          value={ingredient.amount}
+                          onChangeText={(v) =>
+                            handleIngredientChange(idx, 'amount', v)
+                          }
+                          placeholder="Số lượng"
+                          keyboardType="numeric"
+                        />
+                        <View className="w-32 h-full bg-white  border border-gray-200 rounded-xl">
+                          <Picker
+                            selectedValue={ingredient.unit}
+                            onValueChange={(v) =>
+                              handleIngredientChange(idx, 'unit', v)
+                            }
+                            style={{ height: 50, color: '#4B5563' }}
+                            dropdownIconColor="#4B5563"
+                            mode="dropdown"
+                          >
+                            <Picker.Item
+                              label="Đơn vị"
+                              value=""
+                              color="#9CA3AF"
+                              style={{ fontSize: 14 }}
+                            />
+                            {units.map((unit) => (
+                              <Picker.Item
+                                key={unit}
+                                label={unit}
+                                value={unit}
+                                color="#4B5563"
+                                style={{ fontSize: 14 }}
+                              />
+                            ))}
+                          </Picker>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              ))}
+              <TouchableOpacity
+                onPress={handleAddIngredient}
+                className="bg-white py-2 rounded-xl items-center"
+              >
+                <Ionicons name="add-circle-outline" size={22} color="#B91C1C" />
+                <Text className="text-red-800 font-semibold">
+                  Thêm nguyên liệu
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             <View className="mb-4 flex flex-col gap-2">
               <Text className="text-gray-700 font-medium mb-2">
                 Dinh dưỡng (trên 1 khẩu phần)
@@ -192,7 +356,7 @@ const AddDishScreen = ({ navigation }) => {
                       <TextInput
                         className="text-gray-800 text-base p-0 m-0"
                         value={nutrition.carb}
-                        onChangeText={v => {
+                        onChangeText={(v) => {
                           setNutrition({ ...nutrition, carb: v });
                         }}
                         maxLength={40}
@@ -222,7 +386,7 @@ const AddDishScreen = ({ navigation }) => {
                       <TextInput
                         className="text-gray-800 text-base p-0 m-0"
                         value={nutrition.protein}
-                        onChangeText={v => {
+                        onChangeText={(v) => {
                           setNutrition({ ...nutrition, protein: v });
                         }}
                         placeholder="0"
@@ -250,7 +414,7 @@ const AddDishScreen = ({ navigation }) => {
                       <TextInput
                         className="text-gray-800 text-base p-0 m-0"
                         value={nutrition.kcal}
-                        onChangeText={v => {
+                        onChangeText={(v) => {
                           setNutrition({ ...nutrition, kcal: v });
                         }}
                         placeholder="0"
@@ -280,7 +444,7 @@ const AddDishScreen = ({ navigation }) => {
                       <TextInput
                         className="text-gray-800 text-base p-0 m-0"
                         value={nutrition.fat}
-                        onChangeText={v => {
+                        onChangeText={(v) => {
                           setNutrition({ ...nutrition, fat: v });
                         }}
                         placeholder="0"
