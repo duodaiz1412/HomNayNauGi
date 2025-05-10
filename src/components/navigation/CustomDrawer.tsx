@@ -6,45 +6,42 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { logout } from '../../api/api';
 
 export const CustomDrawer = (props) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Đăng xuất',
-      'Bạn có chắc chắn muốn đăng xuất?',
-      [
-        {
-          text: 'Hủy',
-          style: 'cancel',
-        },
-        {
-          text: 'Đăng xuất',
-          onPress: async () => {
-            try {
-              // Xóa thông tin đăng nhập
-              await AsyncStorage.removeItem('userToken');
-              await AsyncStorage.removeItem('userRole');
-
-              // Chuyển về màn hình đăng nhập
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-              });
-            } catch (error) {
-              console.log('Error logging out:', error);
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
+const handleLogout = () => {
+  Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
+    {
+      text: 'Hủy',
+      style: 'cancel',
+    },
+    {
+      text: 'Đăng xuất',
+      onPress: async () => {
+        try {
+          await logout();
+          console.log("Đăng xuất thành công");
+          // Chuyển về màn hình login
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+          });
+        } catch (error) {
+          console.error('Lỗi đăng xuất:', error);
+          Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+        }
+      },
+      style: 'destructive',
+    },
+  ]);
+};
 
   return (
     <SafeAreaView className="flex-1">
@@ -75,7 +72,7 @@ export const CustomDrawer = (props) => {
       {/* Footer */}
       <View className="p-5 border-t border-gray-100">
         <TouchableOpacity
-          className="flex-row items-center ml-5 py-2.5"
+          className="flex-row items-center ml-5 py-2.5 mb-16"
           onPress={handleLogout}
         >
           <Ionicons name="log-out-outline" size={22} color="#941D23" />

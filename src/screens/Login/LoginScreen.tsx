@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
   Text,
@@ -17,12 +17,7 @@ import {
   Alert,
   ImageBackground,
 } from 'react-native';
-
-// Thông tin đăng nhập mặc định
-const DEFAULT_USERNAME = 'user';
-const DEFAULT_PASSWORD = '123';
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = '123';
+import api from 'src/api/api';
 
 // Đường dẫn ảnh
 const googleIcon = require('@assets/google.png');
@@ -37,23 +32,42 @@ export const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Kiểm tra thông tin đăng nhập
-    if (username.trim() === DEFAULT_USERNAME && password === DEFAULT_PASSWORD) {
+const handleLogin = async () => {
+  try {
+    // Gọi API login
+    const response = await api.post(`/auth/login`, {
+      loginIdentifier: username.trim(),
+      password: password
+    });
+    const { accessToken, refreshToken } = response.data;
+    await AsyncStorage.setItem('accessToken', accessToken);
+    await AsyncStorage.setItem('refreshToken', refreshToken);
+    
+
+    // Kiểm tra role để điều hướng
+    if (response.data.account.role === 'admin') {
+      console.log("Danh nhap admin thanh cong");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'AdminDrawerNavigator' }],
+      });
+    } else {
+      console.log("Danh nhap user thanh cong");
       navigation.reset({
         index: 0,
         routes: [{ name: 'MainTabs' }],
       });
-    } else if(username.trim() === ADMIN_USERNAME && password === ADMIN_PASSWORD){
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'AdminNavigator' }],
-      });
     }
-    else {
-      Alert.alert('Lỗi đăng nhập', 'Tên đăng nhập hoặc mật khẩu không đúng');
+  } catch (error) {
+    if (error.response) {
+      // Lỗi từ server
+      Alert.alert('Lỗi đăng nhập', error.response.data.message || 'Tên đăng nhập hoặc mật khẩu không đúng');
+    } else {
+      // Lỗi kết nối
+      Alert.alert('Lỗi kết nối', 'Không thể kết nối đến server');
     }
-  };
+  }
+};
 
   return (
     <KeyboardAvoidingView

@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-
   Switch,
   Alert,
   KeyboardAvoidingView,

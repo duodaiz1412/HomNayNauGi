@@ -12,6 +12,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { mockData } from '../../MockData/Data';
+import { logout } from 'src/api/api';
+
 const ProfileScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -26,25 +28,34 @@ const ProfileScreen = () => {
     { icon: '❓', title: 'Hỗ trợ', onPress: () => {} },
     { icon: 'ℹ️', title: 'Về chúng tôi', onPress: () => {} },
   ];
-  const handleLogout = () => {
-    Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
-      {
-        text: 'Hủy',
-        style: 'cancel',
-      },
-      {
-        text: 'Đăng xuất',
-        onPress: () => {
-          // Đặt lại stack điều hướng và chuyển về màn hình đăng nhập
+const handleLogout = () => {
+  Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
+    {
+      text: 'Hủy',
+      style: 'cancel',
+    },
+    {
+      text: 'Đăng xuất',
+      onPress: async () => {
+        try {
+          await logout();
+          console.log("Đăng xuất thành công");
+          // Chuyển về màn hình login
           navigation.reset({
             index: 0,
             routes: [{ name: 'Login' }],
           });
-        },
-        style: 'destructive',
+        } catch (error) {
+          console.error('Lỗi đăng xuất:', error);
+          Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+        }
       },
-    ]);
-  };
+      style: 'destructive',
+    },
+  ]);
+};
+
+
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">

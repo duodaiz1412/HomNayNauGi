@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AddIngredientScreen from '@screens/AddIngredientScreen';
+import { AddIngredientScreen } from '@screens/Admin/Ingredient/AddIngredientScreen';
 import { EditIngredientScreen } from '@screens/Admin/Ingredient/EditIngredientScreen';
 import { IngredientManagementScreen } from '@screens/Admin/IngredientManagementScreen';
 
