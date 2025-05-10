@@ -36,6 +36,7 @@ const SearchByIngredientsScreen = () => {
       // ✅ ADDED inside SearchByIngredientsScreen
 // const route = useRoute<IngredientRouteProp>();
 const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
+
 const initialIngredients = route.params?.ingredients || [];
 
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
