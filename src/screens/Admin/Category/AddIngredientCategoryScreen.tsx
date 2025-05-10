@@ -91,8 +91,7 @@ export const AddIngredientCategoryScreen = () => {
       // Show success message
       Alert.alert('Thành công', 'Đã thêm danh mục mới');
 
-      // Navigate back
-      navigation.goBack();
+      navigation.replace("AdminIngredientCategoryManagementScreen");
     } catch (error) {
       console.error('Error:', error);
       // Show error message
@@ -115,7 +114,7 @@ export const AddIngredientCategoryScreen = () => {
           {/* Form */}
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
             <View className="mb-4">
-              <Text className="text-gray-700 mb-1">Tên danh mục *</Text>
+              <Text className="text-gray-700 mb-1">Tên danh mục nguyên liệu *</Text>
               <TextInput
                 className="border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="Nhập tên danh mục"

@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { AdminHeader } from "@components/AdminHeader/AdminHeader"
 import { AdminIngredientCategoryStackParamList } from "@navigation/AdminIngredientCategoryStack"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import api from "src/api/api"
 
 type EditIngredientCategoryScreenRouteProp = RouteProp<AdminIngredientCategoryStackParamList,'EditIngredientCategoryScreen'>
 
@@ -30,30 +31,31 @@ export const EditIngredientCategoryScreen = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isFetching, setIsFetching] = useState(true)
 
-  // Form states
   const [categoryName, setCategoryName] = useState("")
-  const [description, setDescription] = useState("")
-  const [categoryIcon, setCategoryIcon] = useState(null)
+  const [categoryImg, setCategoryImg] = useState(null)
 
   // Fetch category data
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      // Mock data for the selected category
-      const categoryData = {
-        id: ingredientCategoryId,
-        name: "Thịt",
-        description: "Các loại thịt tươi sống và đã qua chế biến",
-        icon: "https://cdn-icons-png.flaticon.com/128/3082/3082051.png",
+    const fetchCategory = async () =>{
+      try {
+        setIsFetching(true);
+        const reponse = await api.get(`/ingredient-categories/${ingredientCategoryId}`)
+        const categoryData = reponse.data.data;
+        console.log (categoryData)
+        if (!categoryData) {
+          throw new Error('Không tìm thấy danh mục');
+        }
+        setCategoryName(categoryData.name);
+        setCategoryImg(categoryData.imageUrl);
+      }catch (e){
+        console.error('Error fetching category:', e);
+        Alert.alert('Lỗi', 'Không thể tải thông tin danh mục');
       }
-
-      // Set form data
-      setCategoryName(categoryData.name)
-      setDescription(categoryData.description)
-      setCategoryIcon(categoryData.icon)
-
-      setIsFetching(false)
-    }, 1000)
+      finally {
+        setIsFetching(false);
+      }
+    }
+    fetchCategory();
   }, [ingredientCategoryId])
 
   // Pick image from gallery
@@ -66,35 +68,69 @@ export const EditIngredientCategoryScreen = () => {
     })
 
     if (!result.canceled) {
-      setCategoryIcon(result.assets[0].uri)
+      setCategoryImg(result.assets[0].uri)
     }
   }
 
   // Handle form submission
-  const handleSubmit = () => {
-    // Validate form
-    if (!categoryName) {
-      Alert.alert("Lỗi", "Vui lòng nhập tên danh mục")
-      return
+  const handleSubmit = async () => {
+    // Validate
+    if (!categoryName.trim()) {
+      return Alert.alert('Lỗi', 'Vui lòng nhập tên danh mục');
     }
 
-    if (!categoryIcon) {
-      Alert.alert("Lỗi", "Vui lòng chọn biểu tượng cho danh mục")
-      return
+    if (!categoryImg) {
+      return Alert.alert('Lỗi', 'Vui lòng chọn biểu tượng danh mục');
     }
 
-    // Submit form
-    setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
-      Alert.alert("Thành công", "Đã cập nhật danh mục nguyên liệu", [
+    try {
+      setIsLoading(true);
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('name', categoryName);
+
+      // Xử lý hình ảnh
+      if (categoryImg) {
+        const imageUriParts = categoryImg.split('.');
+        const fileExtension = imageUriParts[imageUriParts.length - 1];
+
+        const imageObject = {
+          uri: categoryImg,
+          name: `photo.${fileExtension}`,
+          type: `image/${fileExtension}`,
+        } as unknown as Blob;
+
+        formData.append('image', imageObject, `photo.${fileExtension}`);
+      }
+
+      console.log('Sending formData:', formData);
+
+      // Call API using configured instance
+      const response = await api.put(
+        `/ingredient-categories/edit/${ingredientCategoryId}`,
+        formData,
         {
-          text: "OK",
-          onPress: () => navigation.goBack(),
-        },
-      ])
-    }, 1500)
-  }
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      console.log('Response:', response.data);
+      // Show success message
+      Alert.alert('Thành công', 'Sửa danh mục thành công');
+
+      // Navigate back
+      navigation.replace("AdminIngredientCategoryManagementScreen");
+    } catch (error) {
+      console.error('Error:', error);
+      // Show error message
+      Alert.alert('Lỗi', error.response?.data?.message || 'Có lỗi xảy ra');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isFetching) {
     return (
@@ -118,7 +154,7 @@ export const EditIngredientCategoryScreen = () => {
           {/* Form */}
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
             <View className="mb-4">
-              <Text className="text-gray-700 mb-1">Tên danh mục *</Text>
+              <Text className="text-gray-700 mb-1">Tên danh mục nguyên liệu *</Text>
               <TextInput
                 className="border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="Nhập tên danh mục"
@@ -128,26 +164,13 @@ export const EditIngredientCategoryScreen = () => {
             </View>
 
             <View className="mb-4">
-              <Text className="text-gray-700 mb-1">Mô tả</Text>
-              <TextInput
-                className="border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="Nhập mô tả danh mục (không bắt buộc)"
-                value={description}
-                onChangeText={setDescription}
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-              />
-            </View>
-
-            <View className="mb-4">
               <Text className="text-gray-700 mb-1">Biểu tượng danh mục *</Text>
               <TouchableOpacity
                 className="border border-dashed border-gray-300 rounded-lg p-4 items-center justify-center"
                 onPress={pickImage}
               >
-                {categoryIcon ? (
-                  <Image source={{ uri: categoryIcon }} className="w-24 h-24 rounded-lg" resizeMode="contain" />
+                {categoryImg ? (
+                  <Image source={{ uri: categoryImg }} className="w-24 h-24 rounded-lg" resizeMode="contain" />
                 ) : (
                   <View className="items-center">
                     <Ionicons name="image-outline" size={48} color="#454442" />
@@ -156,7 +179,7 @@ export const EditIngredientCategoryScreen = () => {
                 )}
               </TouchableOpacity>
               <Text className="text-gray-500 text-xs mt-1">
-                Biểu tượng nên có kích thước vuông và nền trong suốt (PNG)
+                Biểu tượng nên có kích thước vuông và nền trong suốt
               </Text>
             </View>
           </View>

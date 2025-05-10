@@ -1,5 +1,5 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Dimensions,StatusBar } from 'react-native';
+import { Dimensions, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AdminDashboardScreen } from '@screens/Admin/DashboardScreen';
 import { CustomDrawer } from '@components/navigation/CustomDrawer';
@@ -10,17 +10,18 @@ import { AdminUserStack } from './AdminUserStack';
 import { AdminPostManagementScreen } from '@screens/Admin/PostManagementScreen';
 import { StatisticsScreen } from '@screens/Admin/StatisticsScreen';
 import { AdminIngredientStack } from './AdminIngredientStack';
+import { CommonActions } from '@react-navigation/native'; 
 
 const screenWidth = Dimensions.get('window').width;
 export type AdminDrawerParamList = {
   AdminDashboard: undefined;
   AdminFoodManagement: undefined;
-  AdminIngredientManagement:undefined;
-  AdminFoodCategoryManagement:undefined;
-  AdminIngredientCategoryManagement:undefined;
+  AdminIngredientManagement: undefined;
+  AdminFoodCategoryManagement: undefined;
+  AdminIngredientCategoryManagement: undefined;
   AdminUserManagement: undefined;
-  AdminPostManagement:undefined;
-  AdminStatistics:undefined;
+  AdminPostManagement: undefined;
+  AdminStatistics: undefined;
 };
 const Drawer = createDrawerNavigator<AdminDrawerParamList>();
 export const AdminDrawerNavigator = () => {
@@ -42,9 +43,8 @@ export const AdminDrawerNavigator = () => {
           fontWeight: '500',
           fontSize: 16,
         },
-        drawerHideStatusBarOnOpen:true,
+        drawerHideStatusBarOnOpen: true,
       }}
-      
       initialRouteName="AdminDashboard"
     >
       <Drawer.Screen
@@ -66,8 +66,21 @@ export const AdminDrawerNavigator = () => {
             <Ionicons name="restaurant-outline" size={22} color={color} />
           ),
         }}
+        listeners={({ navigation, route }) => ({
+          drawerItemPress: (e: any) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: route.name, // Tên của drawer screen hiện tại (AdminFoodManagement)
+                params: {
+                  screen: 'AdminFoodManagementScreen', // Tên màn hình khởi tạo trong AdminFoodStack
+                },
+              })
+            );
+          },
+        })}
       />
-      
+
       <Drawer.Screen
         name="AdminIngredientManagement"
         component={AdminIngredientStack}
@@ -77,37 +90,97 @@ export const AdminDrawerNavigator = () => {
             <Ionicons name="leaf-outline" size={22} color={color} />
           ),
         }}
+        listeners={({ navigation, route }) => ({
+          drawerItemPress: (e: any) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: route.name, // Tên của drawer screen hiện tại (AdminFoodManagement)
+                params: {
+                  screen: 'AdminIngredientManagementScreen', // Tên màn hình khởi tạo Stack
+                },
+              })
+            );
+          },
+        })}        
       />
       <Drawer.Screen
         name="AdminFoodCategoryManagement"
         component={AdminFoodCategoryStack}
         options={{
-          title: "Danh mục món ăn",
-          drawerIcon: ({ color }) => <Ionicons name="list-outline" size={22} color={color} />,
+          title: 'Danh mục món ăn',
+          drawerIcon: ({ color }) => (
+            <Ionicons name="list-outline" size={22} color={color} />
+          ),
         }}
-      />      
+        listeners={({ navigation, route }) => ({
+          drawerItemPress: (e: any) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: route.name, // Tên của drawer screen hiện tại (AdminFoodManagement)
+                params: {
+                  screen: 'AdminFoodCategoryManagementScreen', // Tên màn hình khởi tạo Stack
+                },
+              })
+            );
+          },
+        })}  
+      />
       <Drawer.Screen
         name="AdminIngredientCategoryManagement"
         component={AdminIngredientCategoryStack}
         options={{
-          title: "Danh mục nguyên liệu",
-          drawerIcon: ({ color }) => <Ionicons name="list-outline" size={22} color={color} />,
+          title: 'Danh mục nguyên liệu',
+          drawerIcon: ({ color }) => (
+            <Ionicons name="list-outline" size={22} color={color} />
+          ),
         }}
+        listeners={({ navigation, route }) => ({
+          drawerItemPress: (e: any) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: route.name, // Tên của drawer screen hiện tại (AdminFoodManagement)
+                params: {
+                  screen: 'AdminIngredientCategoryManagementScreen', // Tên màn hình khởi tạo Stack
+                },
+              })
+            );
+          },
+        })}  
       />
       <Drawer.Screen
         name="AdminUserManagement"
         component={AdminUserStack}
         options={{
-          title: "Quản lý người dùng",
-          drawerIcon: ({ color }) => <Ionicons name="people-outline" size={22} color={color} />,
+          title: 'Quản lý người dùng',
+          drawerIcon: ({ color }) => (
+            <Ionicons name="people-outline" size={22} color={color} />
+          ),
         }}
+        listeners={({ navigation, route }) => ({
+          drawerItemPress: (e: any) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: route.name, // Tên của drawer screen hiện tại (AdminFoodManagement)
+                params: {
+                  screen: 'AdminUserManagementScreen', // Tên màn hình khởi tạo Stack
+                },
+              })
+            );
+          },
+        })}  
       />
       <Drawer.Screen
         name="AdminPostManagement"
         component={AdminPostManagementScreen}
         options={{
-          title: "Quản lý bài đăng",
-          drawerIcon: ({ color }) => <Ionicons name="document-text-outline" size={22} color={color} />,
+          title: 'Quản lý bài đăng',
+          drawerIcon: ({ color }) => (
+            <Ionicons name="document-text-outline" size={22} color={color} />
+          ),
         }}
       />
 
@@ -115,11 +188,12 @@ export const AdminDrawerNavigator = () => {
         name="AdminStatistics"
         component={StatisticsScreen}
         options={{
-          title: "Thống kê",
-          drawerIcon: ({ color }) => <Ionicons name="bar-chart-outline" size={22} color={color} />,
+          title: 'Thống kê',
+          drawerIcon: ({ color }) => (
+            <Ionicons name="bar-chart-outline" size={22} color={color} />
+          ),
         }}
       />
-
     </Drawer.Navigator>
   );
 };

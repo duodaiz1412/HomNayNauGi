@@ -46,13 +46,13 @@ const handleLogin = async () => {
 
     // Kiểm tra role để điều hướng
     if (response.data.account.role === 'admin') {
-      console.log("Danh nhap admin thanh cong");
+      console.log("Danh nhap admin thanh cong", accessToken);
       navigation.reset({
         index: 0,
         routes: [{ name: 'AdminDrawerNavigator' }],
       });
     } else {
-      console.log("Danh nhap user thanh cong");
+      console.log("Danh nhap user thanh cong", accessToken);
       navigation.reset({
         index: 0,
         routes: [{ name: 'MainTabs' }],
