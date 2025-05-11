@@ -17,55 +17,55 @@ const INGREDIENTS = {
       id: '1',
       name: 'Ba chỉ',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/bacon-1239192_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '2',
       name: 'Thịt bò ta',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/beef-1239189_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '3',
       name: 'Bò tảng',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/beef-1239189_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '4',
       name: 'Gà nguyên con',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/chicken-1239193_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '5',
       name: 'Ức gà',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/chicken-1239193_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '6',
       name: 'Đùi gà',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/chicken-1239193_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '7',
       name: 'Thịt lợn xay',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/minced-meat-1239194_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '8',
       name: 'Tôm',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/shrimp-1239195_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '9',
       name: 'Đùi cừu',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/lamb-1239196_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
   ],
   'Rau củ': [
@@ -73,19 +73,19 @@ const INGREDIENTS = {
       id: '10',
       name: 'Súp lơ',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/cauliflower-1239197_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '11',
       name: 'Cà rốt',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/carrot-1239198_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '12',
       name: 'Rau cải',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/lettuce-1239199_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
   ],
   'Trái cây': [
@@ -93,13 +93,13 @@ const INGREDIENTS = {
       id: '13',
       name: 'Táo',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/apple-1239190_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '14',
       name: 'Cam',
       image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/orange-1239191_1280.jpg',
+        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
     },
     {
       id: '15',
@@ -240,22 +240,22 @@ const AddIngredientScreen = ({ navigation, route }) => {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => toggleSelect(item)}
-              className="flex-1 m-1"
-              style={{ maxWidth: '32%' }}
+              className="flex-1 m-2"
+              style={{ maxWidth: '30%'}}
             >
               <View
-                className={`rounded-xl overflow-hidden border ${selected.some((i) => i.id === item.id) ? 'border-red-800' : 'border-transparent'}`}
+                className={`rounded-xl overflow-hidden border ${selected.some((i) => i.id === item.id) ? 'border-red-800' : 'border-gray-300'}`}
               >
                 <Image
                   source={{ uri: item.image }}
-                  className="w-full h-20"
+                  className="w-full h-24"
                   resizeMode="cover"
                 />
-                <View className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white items-center justify-center">
+                <View className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-white items-center justify-center">
                   {selected.some((i) => i.id === item.id) && (
                     <Ionicons
                       name="checkmark-circle"
-                      size={20}
+                      size={18}
                       color="#B91C1C"
                     />
                   )}
