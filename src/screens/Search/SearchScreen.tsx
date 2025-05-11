@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,13 +16,54 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { mockData } from '../../MockData/Data';// Đường dẫn tùy chỉnh theo dự án
+import { RouteProp, useRoute } from '@react-navigation/native';
+
+
+interface Recipe {
+  id: string;
+  name: string;
+  description: string;
+  time: string;
+  image: string;
+  author: string;
+  authorAvatar: string;
+  isFavorite: boolean;
+  nutrition: {
+    calories: string;
+    protein: string;
+    carbs: string;
+    fat: string;
+  };
+  ingredients: {
+    name: string;
+    amount: string;
+  }[];
+  steps: {
+    step: number;
+    description: string;
+  }[];
+}
+
+
 
 const SearchScreen = () => {
-    const navigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [keyword, setKeyword] = useState<string>('');
   const backgroundImage = require('@assets/background.png');
   const mealImage = require('@assets/meal.png')
+
+        // ✅ ADDED inside SearchByIngredientsScreen
+  // const route = useRoute<IngredientRouteProp>();
+  const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
+  const initialIngredients = route.params?.ingredients || [];
+  
+    const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  
+      useEffect(() => {
+      if (initialIngredients.length > 0) {
+        setSelectedIngredients(initialIngredients.map(i => i.name));
+      }
+    }, [initialIngredients]);
 
   return (
     <ImageBackground
@@ -70,17 +111,43 @@ const SearchScreen = () => {
         </TouchableOpacity>
           {/* <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d11c1c' }}>Xem thêm</Text> */}
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8, paddingHorizontal: 16 }}>
+        {/* <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8, paddingHorizontal: 16 }}>
           {mockData.recipes[0].ingredients.map((item, index) => (
+            <TouchableOpacity
+            onPress={() => navigation.navigate('SearchByIngredientScreen')} >
             <View key={index} style={{ alignItems: 'center', marginRight: 16 }}>
               <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: '#ffe3e6', justifyContent: 'center', alignItems: 'center' }}>
                 <Image source={{ uri: item.image }} style={{ width: 64, height: 64, borderRadius: 32 }} />
               </View>
               <Text style={{ marginTop: 6, fontSize: 13, color: '#333', fontWeight: '600' }}>{item.name}</Text>
             </View>
+            </TouchableOpacity>
           ))}
+        </ScrollView> */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8, paddingHorizontal: 16 }}>
+            {mockData.recipes[0].ingredients.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => navigation.navigate('SearchByIngredientScreen', {
+                  ingredients: [{ id: item.id, name: item.name, image: item.image }]
+                })}
+              >
+                <View style={{ alignItems: 'center', marginRight: 16 }}>
+                  <View style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    backgroundColor: '#ffe3e6',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <Image source={{ uri: item.image }} style={{ width: 64, height: 64, borderRadius: 32 }} />
+                  </View>
+                  <Text style={{ marginTop: 6, fontSize: 13, color: '#333', fontWeight: '600' }}>{item.name}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
         </ScrollView>
-
         
 
 
@@ -109,9 +176,12 @@ const SearchScreen = () => {
         showsHorizontalScrollIndicator={false}
         style={{ marginTop: 12, paddingHorizontal: 16 }}
         >
-        {mockData.recipes.slice(0, 3).map((dish) => (
-            <View 
-            key={dish.id}
+        {mockData.recipes.slice(0, 3).map((recipe) => (
+          <TouchableOpacity
+          
+            
+            key={recipe.id}
+            onPress={() => navigation.navigate('RecipeDetail', { recipeId:parseInt(recipe.id) })}
             style={{
                 width: 140,
                 backgroundColor: '#fff',
@@ -127,7 +197,7 @@ const SearchScreen = () => {
             }}
             >
             <Image
-                source={{ uri: dish.image }}
+                source={{ uri: recipe.image }}
                 style={{
                 width: '90%',
                 height: 110,
@@ -145,10 +215,10 @@ const SearchScreen = () => {
                     textAlign: 'center',
                 }}
                 >
-                {dish.name}
+                {recipe.name}
                 </Text>
             </View>
-            </View>
+            </TouchableOpacity>
         ))}
         </ScrollView>
 
@@ -166,6 +236,7 @@ const SearchScreen = () => {
           {['Bữa sáng', 'Bữa phụ', 'Bữa trưa', 'Ăn vặt', 'Bữa tối', 'Tráng miệng', 'Bữa xế'].map((meal, index) => (
             <TouchableOpacity
               key={meal}
+              onPress={() => navigation.navigate('ListDishesScreen')}
               style={{
                 width: '48%',
                 backgroundColor: index % 2 === 0 ? '#fce5e6' : '#fff0f1',
