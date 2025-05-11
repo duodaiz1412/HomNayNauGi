@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
-  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -532,7 +531,9 @@ export default function RecipeScreen() {
   };
 
   const handleAddIngredient = () => {
-    navigation.navigate('AddIngredient');
+    navigation.navigate('AddIngredient', {
+      isMultiSelect: true,
+    });
   };
 
   const handleDishPress = (id: string) => {
@@ -541,36 +542,31 @@ export default function RecipeScreen() {
     });
   };
 
-  // const [todos, setTodos] = useState([]);
+  useEffect(() => {
+    // Gọi getDishes ngay khi component mount
+    getDishes();
+    const unsubscribe = navigation.addListener('focus', () => {
+      getDishes();
+    });
 
-  // useEffect(() => {
-  //   // Gọi getDishes ngay khi component mount
-  //   getDishes();
-    
-  //   // Thêm listener cho focus event
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     getDishes();
-  //   });
+    return unsubscribe;
+  }, [navigation]);
 
-  //   return unsubscribe;
-  // }, [navigation]);
+  const getDishes = async () => {
+    try {
+      let { data: mon_an, error } = await supabase.from('mon_an').select('*');
+      if (error) {
+        console.error('Error fetching dishes:', error.message);
+        return;
+      }
 
-  // const getDishes = async () => {
-  //   try {
-  //     let { data: mon_an, error } = await supabase.from('mon_an').select('*');
-  //     if (error) {
-  //       console.error('Error fetching dishes:', error.message);
-  //       return;
-  //     }
-
-  //     if (mon_an && mon_an.length > 0) {
-  //       console.log(mon_an);
-  //       setTodos(mon_an);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching dishes:', error.message);
-  //   }
-  // };
+      if (mon_an && mon_an.length > 0) {
+        console.log(mon_an);
+      }
+    } catch (error) {
+      console.error('Error fetching dishes:', error.message);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -651,7 +647,7 @@ export default function RecipeScreen() {
         {activeTab === 'ingredients' && (
           <TouchableOpacity
             onPress={handleAddIngredient}
-            className="absolute bottom-6 right-6 bg-red-800 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+            className="absolute bottom-12 right-6 bg-red-800 w-14 h-14 rounded-full items-center justify-center shadow-lg"
             style={{
               shadowColor: '#000',
               shadowOffset: {

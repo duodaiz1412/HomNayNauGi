@@ -2,33 +2,18 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  View,
-  Text,
-  Image,
-  SafeAreaView,
-  StatusBar,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  ImageBackground,
-} from 'react-native';
+import { View, Text, Image, SafeAreaView, StatusBar, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert, ImageBackground } from 'react-native';
+import axios from 'axios';  // Đảm bảo đã cài axios
+import AsyncStorage from '@react-native-async-storage/async-storage';  // Đảm bảo đã cài AsyncStorage
 import api from 'src/api/api';
-
 // Đường dẫn ảnh
 const googleIcon = require('@assets/google.png');
 const facebookIcon = require('@assets/facebook.png');
 const appleIcon = require('@assets/apple.png');
 const backgroundImage = require('@assets/background.png');
 
-export const LoginScreen = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+const LoginScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -115,23 +100,24 @@ const handleLogin = async () => {
                   secureTextEntry
                   placeholderTextColor="#9CA3AF"
                 />
+              </View>
 
-                {/* <TouchableOpacity className="self-end mt-3 mb-8">
+              {/* <TouchableOpacity className="self-end mt-3 mb-8">
                   <Text className="text-sm text-[#88131B] font-medium">
                     Quên mật khẩu?
                   </Text>
                 </TouchableOpacity> */}
 
-                <TouchableOpacity
-                  className="w-full h-14 bg-[#88131B] rounded-full items-center justify-center shadow-lg mb-10"
-                  onPress={handleLogin}
-                  activeOpacity={0.8}
-                >
-                  <Text className="text-white text-lg font-semibold">
-                    Đăng nhập
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                className="w-full h-14 bg-[#88131B] rounded-full items-center justify-center shadow-lg mb-10"
+                onPress={handleLogin}
+                activeOpacity={0.8}
+              >
+                <Text className="text-white text-lg font-semibold">
+                  Đăng nhập
+                </Text>
+              </TouchableOpacity>
+            
 
               <View className="mb-10">
                 <Text className="text-sm text-gray-500 text-center mb-6">
@@ -182,3 +168,5 @@ const handleLogin = async () => {
     </KeyboardAvoidingView>
   );
 };
+
+export default LoginScreen;

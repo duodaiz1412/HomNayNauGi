@@ -19,10 +19,10 @@ export default function MyIngredient({
 }) {
   return (
     <View className="flex flex-col gap-3">
-      <View className="flex-row justify-between items-center">
+      <View className="flex-row justify-between items-center px-2">
         <Text className="text-3xl text-[#454442] font-medium">Kho của tôi</Text>
         <TouchableOpacity onPress={onDeleteAll}>
-          <Text className="text-red-800 underline">Xóa tất cả</Text>
+          <Text className="text-red-800 underline italic">Xóa tất cả</Text>
         </TouchableOpacity>
       </View>
 

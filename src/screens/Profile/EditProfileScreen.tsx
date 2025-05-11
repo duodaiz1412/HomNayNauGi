@@ -28,6 +28,9 @@ const EditProfileScreen = () => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text className="text-2xl">⬅️</Text>
           </TouchableOpacity>
+          <Text className="text-2xl font-bold text-black ml-4">
+            Chỉnh sửa hồ sơ
+          </Text>
         </View>
 
         {/* User Avatar */}
@@ -36,7 +39,7 @@ const EditProfileScreen = () => {
             source={{ uri: mockData.user.avatar }}
             className="w-20 h-20 rounded-full"
           />
-          <Text className="text-2xl font-bold text-red-600 mt-2">{name}</Text>
+          <Text className="text-2xl font-bold text-black ml-4">{name}</Text>
         </View>
 
         {/* Form Fields */}

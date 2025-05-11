@@ -14,6 +14,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from 'react';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const backgroundImage = require('@assets/background.png');
 
 const HomeScreen = () => {
@@ -24,6 +27,15 @@ const HomeScreen = () => {
   const [featuredItems, setFeaturedItems] = useState(
     mockData.featuredByCategory['1']
   );
+
+  const handleProfilePress = async () => {
+    const token = await AsyncStorage.getItem('accessToken');
+    if (token) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('Login');
+    }
+  };
 
   useEffect(() => {
     setFeaturedItems(mockData.featuredByCategory[activeCategoryId] || []);
@@ -57,7 +69,7 @@ const HomeScreen = () => {
           {/* Header */}
           <View className="flex-row items-center justify-between mb-2 px-5 py-4">
             <TouchableOpacity
-              onPress={() => navigation.navigate('ProfileScreen' as never)}
+              onPress={handleProfilePress}
               className="flex-row items-center"
             >
               <Image
