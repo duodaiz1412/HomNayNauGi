@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabNavigator from './TabNavigator';
-import { LoginScreen } from '../screens/Login/LoginScreen';
+import LoginScreen from '../screens/Login/LoginScreen';
 import { RegisterScreen } from '../screens/Login/RegisterScreen';
 import AboutScreen from '../screens/About/AboutScreen';
 import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
@@ -22,7 +22,6 @@ interface Ingredient {
 }
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import FavoritesScreen from '../screens/Profile/FavoritesScreen';
-import HistoryScreen from '../screens/Profile/HistoryScreen';
 import NotificationsScreen from '../screens/Profile/NotificationsScreen';
 import AchievementsScreen from '../screens/Profile/AchievementsScreen';
 import SettingsScreen from '../screens/Profile/SettingsScreen';
@@ -35,6 +34,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   MainTabs: undefined;
+  HomeScreen: undefined;
   About: undefined;
   RecipeDetail: { recipeId: number };
   CookingGuide: { recipeId: number };
@@ -61,6 +61,7 @@ export type RootStackParamList = {
   PrivacyPolicyScreen: undefined;
   SupportScreen: undefined;
   AboutUsScreen: undefined;
+  AddDishScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -104,21 +105,14 @@ const AppNavigator = () => {
         <Stack.Screen name="AddIngredient" component={AddIngredientScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
-        <Stack.Screen
-          name="NotificationsScreen"
-          component={NotificationsScreen}
-        />
-        <Stack.Screen
-          name="AchievementsScreen"
-          component={AchievementsScreen}
-        />
+        <Stack.Screen name="NotificationsScreen" component={NotificationsScreen}/>
+        <Stack.Screen name="AchievementsScreen" component={AchievementsScreen}/>
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-        <Stack.Screen
-          name="PrivacyPolicyScreen"
-          component={PrivacyPolicyScreen}
-        />
+        <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen}/>
         <Stack.Screen name="AddDishScreen" component={AddDishScreen} />
         <Stack.Screen name="SearchByIngredientScreen" component={SearchByIngredientScreen} />
+        <Stack.Screen name="SupportScreen" component={SupportScreen} />
+        <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
         <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
         <Stack.Screen name="SearchByRecipeScreen" component={SearchByRecipeScreen} />
         <Stack.Screen name="ListDishesScreen" component={ListDishesScreen} />
