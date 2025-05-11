@@ -647,7 +647,7 @@ export default function RecipeScreen() {
         {activeTab === 'ingredients' && (
           <TouchableOpacity
             onPress={handleAddIngredient}
-            className="absolute bottom-6 right-6 bg-red-800 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+            className="absolute bottom-12 right-6 bg-red-800 w-14 h-14 rounded-full items-center justify-center shadow-lg"
             style={{
               shadowColor: '#000',
               shadowOffset: {
