@@ -29,6 +29,7 @@ import PrivacyPolicyScreen from '../screens/Profile/PrivacyPolicyScreen';
 import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
 import { supabase } from '../utils/supabase';
+import { AdminDrawerNavigator } from './AdminDrawerNavigator';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -62,6 +63,7 @@ export type RootStackParamList = {
   SupportScreen: undefined;
   AboutUsScreen: undefined;
   AddDishScreen: undefined;
+  AdminDrawerNavigator: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -105,18 +107,47 @@ const AppNavigator = () => {
         <Stack.Screen name="AddIngredient" component={AddIngredientScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
-        <Stack.Screen name="NotificationsScreen" component={NotificationsScreen}/>
-        <Stack.Screen name="AchievementsScreen" component={AchievementsScreen}/>
+        <Stack.Screen
+          name="NotificationsScreen"
+          component={NotificationsScreen}
+        />
+        <Stack.Screen
+          name="AchievementsScreen"
+          component={AchievementsScreen}
+        />
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-        <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen}/>
+        <Stack.Screen
+          name="PrivacyPolicyScreen"
+          component={PrivacyPolicyScreen}
+        />
         <Stack.Screen name="AddDishScreen" component={AddDishScreen} />
-        <Stack.Screen name="SearchByIngredientScreen" component={SearchByIngredientScreen} />
+        <Stack.Screen
+          name="SearchByIngredientScreen"
+          component={SearchByIngredientScreen}
+        />
         <Stack.Screen name="SupportScreen" component={SupportScreen} />
         <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
         <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
-        <Stack.Screen name="SearchByRecipeScreen" component={SearchByRecipeScreen} />
+        <Stack.Screen
+          name="SearchByRecipeScreen"
+          component={SearchByRecipeScreen}
+        />
         <Stack.Screen name="ListDishesScreen" component={ListDishesScreen} />
         <Stack.Screen name="FilterScreen" component={FilterScreen} />
+        <Stack.Screen
+          name="AddIngredient"
+          component={AddIngredientScreen}
+          options={{
+            title: 'Thêm nguyên liệu',
+          }}
+        />
+        <Stack.Screen
+          name="AdminDrawerNavigator"
+          component={AdminDrawerNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
