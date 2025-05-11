@@ -43,6 +43,7 @@ export type RootStackParamList = {
   AddDish: undefined;
   SearchByIngredientScreen: {
     ingredients?: {
+      id: string;
       name: string;
       image: string;
     }[];
@@ -116,8 +117,12 @@ const AppNavigator = () => {
           name="PrivacyPolicyScreen"
           component={PrivacyPolicyScreen}
         />
-        <Stack.Screen name="SupportScreen" component={SupportScreen} />
-        <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
+        <Stack.Screen name="AddDishScreen" component={AddDishScreen} />
+        <Stack.Screen name="SearchByIngredientScreen" component={SearchByIngredientScreen} />
+        <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
+        <Stack.Screen name="SearchByRecipeScreen" component={SearchByRecipeScreen} />
+        <Stack.Screen name="ListDishesScreen" component={ListDishesScreen} />
+        <Stack.Screen name="FilterScreen" component={FilterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

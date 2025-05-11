@@ -12,7 +12,7 @@ export const mockData = {
       id: '1',
       name: 'Phở Hà Nội',
       description:
-        'Phở Hà Nội là một trong những món ăn truyền thống nổi tiếng nhất của ẩm thực Việt Nam, đặc biệt là ở miền Bắc. Món ăn này không chỉ đơn thuần là một bát nước dùng với bánh phở và thịt, mà còn là sự kết tinh của nghệ thuật nấu ăn tinh tế, kỹ lưỡng và đầy tinh thần quê hương.',
+        'Công thức nấu phở bò',
       time: '60 Phút',
       image:
         'https://cdn.pixabay.com/photo/2023/05/27/12/39/noodle-soup-8021418_1280.png',

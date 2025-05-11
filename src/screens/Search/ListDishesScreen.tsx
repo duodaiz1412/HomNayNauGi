@@ -13,40 +13,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { mockData } from '../../MockData/Data';
 
 const backgroundImage = require('../../assets/background.png');
-
-const recipeData = [
-  {
-    id: '1',
-    name: 'Mì trứng gà hầm bắc thảo',
-    image: 'https://happyfood.vn/wp-content/uploads/2022/03/Picture1.png',
-    author: 'Trần Tú',
-    time: '20 Phút',
-  },
-  {
-    id: '2',
-    name: 'Bữa sáng kiểu Anh cùng rau củ',
-    image: 'https://afamilycdn.com/k:thumb_w/600/E88MOq9iOdccccccccccccjjVmV53G/Image/2015/11/20151126_ANKT_BuaSang%20(1)-e44dd/bua-sang-hoan-hao.jpg',
-    author: 'Tú Minh',
-    time: '20 Phút',
-  },
-  {
-    id: '3',
-    name: 'Bánh mì ăn sáng sốt trứng muối',
-    image: 'https://i.ytimg.com/vi/wK9W35MX1Xc/sddefault.jpg',
-    author: 'Xuân Sơn',
-    time: '15 Phút',
-  },
-  {
-    id: '4',
-    name: 'Súp tôm',
-    image: 'https://daynauan.info.vn/wp-content/uploads/2020/08/sup-tom.jpg',
-    author: 'Đại Minh',
-    time: '30 Phút',
-  },
-];
+const recipeData = mockData.recipes.map(recipe => ({
+  id: recipe.id,
+  name: recipe.name,
+  image: recipe.image,
+  author: recipe.author,
+  time: recipe.time,
+}));
 
 const RecipeListScreen = () => {
       const navigation =
@@ -88,7 +64,7 @@ const RecipeListScreen = () => {
           contentContainerStyle={{ paddingBottom: 100 }}
           columnWrapperStyle={{ justifyContent: 'space-between' }}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('RecipeDetail', { recipeId: parseInt(item.id) })}>
               <Image source={{ uri: item.image }} style={styles.image} />
               <View style={styles.cardContent}>
                 <Text style={styles.title} numberOfLines={2}>{item.name}</Text>
@@ -100,8 +76,10 @@ const RecipeListScreen = () => {
                   </View>
                 </View>
               </View>
-            </View>
+              
+             </TouchableOpacity>
           )}
+         
         />
       </View>
     </ImageBackground>
@@ -177,6 +155,12 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 150,
+    padding: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   cardContent: {
     padding: 10,
