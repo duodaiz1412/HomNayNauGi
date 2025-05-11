@@ -104,7 +104,6 @@ const AppNavigator = () => {
         <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
         <Stack.Screen name="CookingGuide" component={CookingGuide} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
-        <Stack.Screen name="AddIngredient" component={AddIngredientScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
         <Stack.Screen

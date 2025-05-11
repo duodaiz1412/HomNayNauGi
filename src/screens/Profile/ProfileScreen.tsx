@@ -26,6 +26,7 @@ const ProfileScreen = () => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       const token = await AsyncStorage.getItem('accessToken');
+      console.log("token",token)
       if (token) {
         setIsLoggedIn(true);
       } else {
