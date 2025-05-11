@@ -43,6 +43,7 @@ export type RootStackParamList = {
   AddDish: undefined;
   SearchByIngredientScreen: {
     ingredients?: {
+      id: string;
       name: string;
       image: string;
     }[];

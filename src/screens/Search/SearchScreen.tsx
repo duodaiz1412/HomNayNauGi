@@ -47,8 +47,7 @@ interface Recipe {
 
 
 const SearchScreen = () => {
-    const navigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [keyword, setKeyword] = useState<string>('');
   const backgroundImage = require('@assets/background.png');
   const mealImage = require('@assets/meal.png')
@@ -130,7 +129,7 @@ const SearchScreen = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => navigation.navigate('SearchByIngredientScreen', {
-                  ingredients: [{ name: item.name, image: item.image }]
+                  ingredients: [{ id: item.id, name: item.name, image: item.image }]
                 })}
               >
                 <View style={{ alignItems: 'center', marginRight: 16 }}>

@@ -15,8 +15,6 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mockData } from '../../MockData/Data';
 
-
-
 const backgroundImage = require('../../assets/background.png');
 const recipeData = mockData.recipes.map(recipe => ({
   id: recipe.id,
@@ -25,10 +23,6 @@ const recipeData = mockData.recipes.map(recipe => ({
   author: recipe.author,
   time: recipe.time,
 }));
-
-
-
-
 
 const RecipeListScreen = () => {
       const navigation =
