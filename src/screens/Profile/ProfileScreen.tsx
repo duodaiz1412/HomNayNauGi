@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  TextInput,
   ScrollView,
   Image,
   TouchableOpacity,
@@ -19,22 +20,8 @@ const backgroundImage = require('@assets/background.png');
 
 const ProfileScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem('accessToken');
-      if (token) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-        navigation.replace('Login');
-      }
-    };
-    checkLoginStatus();
-  }, []);
-
-  if (!isLoggedIn) return null;
+  
 
   const profileOptions = [
     { icon: '❤️', title: 'Yêu thích', onPress: () => navigation.navigate('FavoritesScreen') },

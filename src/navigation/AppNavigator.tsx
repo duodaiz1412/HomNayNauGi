@@ -20,6 +20,7 @@ interface Ingredient {
   name: string;
   image: string;
 }
+import PersonalScreen from '../screens/Profile/PersonalScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import FavoritesScreen from '../screens/Profile/FavoritesScreen';
 import NotificationsScreen from '../screens/Profile/NotificationsScreen';
@@ -51,7 +52,7 @@ export type RootStackParamList = {
   SearchByRecipeScreen: undefined;
   ListDishesScreen: undefined;
   FilterScreen: undefined;
-  Profile: undefined;
+  ProfileScreen: undefined;
   FavoritesScreen: undefined;
   HistoryScreen: undefined;
   NotificationsScreen: undefined;
@@ -60,6 +61,7 @@ export type RootStackParamList = {
   PrivacyPolicyScreen: undefined;
   SupportScreen: undefined;
   AboutUsScreen: undefined;
+  PersonalScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -101,7 +103,8 @@ const AppNavigator = () => {
         <Stack.Screen name="CookingGuide" component={CookingGuide} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="AddIngredient" component={AddIngredientScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="PersonalScreen" component={PersonalScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
         <Stack.Screen name="NotificationsScreen" component={NotificationsScreen}/>
         <Stack.Screen name="AchievementsScreen" component={AchievementsScreen}/>
