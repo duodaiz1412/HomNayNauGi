@@ -15,11 +15,6 @@ import IngredientsScreen from '../screens/Search/IngredientsScreen';
 import SearchByRecipeScreen from '../screens/Search/SearchByRecipeScreen';
 import ListDishesScreen from '../screens/Search/ListDishesScreen';
 import FilterScreen from '../screens/Search/FilterScreen';
-
-interface Ingredient {
-  name: string;
-  image: string;
-}
 import PersonalScreen from '../screens/Profile/PersonalScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import FavoritesScreen from '../screens/Profile/FavoritesScreen';
@@ -91,7 +86,6 @@ const AppNavigator = () => {
         <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
         <Stack.Screen name="CookingGuide" component={CookingGuide} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
-        <Stack.Screen name="AddIngredient" component={AddIngredientScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="PersonalScreen" component={PersonalScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
