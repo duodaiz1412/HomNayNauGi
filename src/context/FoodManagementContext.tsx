@@ -31,10 +31,17 @@ interface ClientCreateRecipePayload {
   videoUrl?: string | null;
   status: RecipeStatus;
   categoryIds: number[]; // Backend mong đợi categoryIds
-  ingredients: Array<
-    Omit<RecipeIngredient, 'recipeId' | 'ingredient' | 'unit'>
-  >; // Bỏ recipeId, ingredient object, unit object
-  steps: ClientCookingStepPayload[];
+  ingredients: Array<{
+    ingredientId: string;
+    quantity: number | null;
+    unitId: number | null;
+  }>;
+  steps: Array<{
+    stepOrder: number;
+    instruction: string;
+    imageUrl: string | null;
+    hasNewImageFile?: boolean;
+  }>;
   // Giữ imageUrl nếu client đã có uri (chỉ để hiển thị)
   // nhưng backend sẽ upload và tạo imageUrl mới
 
@@ -42,10 +49,7 @@ interface ClientCreateRecipePayload {
   recipeImageFile?: File | null; // File cho ảnh chính của công thức
   stepImageFiles?: (File | null)[]; // Mảng các file cho ảnh của từng bước
 }
-interface ClientCookingStepPayload
-  extends Omit<CookingStep, 'recipeId' | 'id'> {
-  hasNewImageFile?: boolean; // Cờ báo hiệu step này có file mới gửi lên không
-}
+
 // Định nghĩa kiểu dữ liệu cho context
 interface FoodManagementContextType {
   // State
@@ -225,9 +229,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       return null;
     }
   };
-  const createRecipeWithDetails = async (
-    payload: ClientCreateRecipePayload
-  ): Promise<Recipe> => {
+  const createRecipeWithDetails = async (payload: ClientCreateRecipePayload): Promise<Recipe> => {
     try {
       setIsLoadingRecipes(true);
       const formData = new FormData();
@@ -236,85 +238,78 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       formData.append('name', payload.name);
       formData.append('description', payload.description || '');
       formData.append('status', payload.status);
-      formData.append(
-        'hasNewRecipeImageFile',
-        payload.hasNewRecipeImageFile?.toString() || 'false'
-      );
+      
+      // Only append hasNewRecipeImageFile if it's true
+      if (payload.hasNewRecipeImageFile) {
+        formData.append('hasNewRecipeImageFile', 'true');
+      }
+
       if (payload.categoryIds && payload.categoryIds.length > 0) {
         payload.categoryIds.forEach((id) => {
-          formData.append('categoryIds[]', id.toString()); // Gửi từng ID
+          formData.append('categoryIds[]', id.toString());
         });
       }
+
       if (payload.ingredients && payload.ingredients.length > 0) {
         payload.ingredients.forEach((ing, index) => {
-          formData.append(
-            `ingredients[${index}][ingredientId]`,
-            ing.ingredientId
-          );
+          formData.append(`ingredients[${index}][ingredientId]`, ing.ingredientId);
           if (ing.quantity !== null && ing.quantity !== undefined) {
-            formData.append(
-              `ingredients[${index}][quantity]`,
-              ing.quantity.toString()
-            );
+            formData.append(`ingredients[${index}][quantity]`, ing.quantity.toString());
           }
           if (ing.unitId !== null && ing.unitId !== undefined) {
-            formData.append(
-              `ingredients[${index}][unitId]`,
-              ing.unitId.toString()
-            );
+            formData.append(`ingredients[${index}][unitId]`, ing.unitId.toString());
           }
         });
       }
-      // 4. Append steps (mảng object) - Gửi từng field của từng object, KHÔNG JSON.stringify
+
       if (payload.steps && payload.steps.length > 0) {
         payload.steps.forEach((step, index) => {
-          formData.append(
-            `steps[${index}][stepOrder]`,
-            step.stepOrder.toString()
-          );
+          formData.append(`steps[${index}][stepOrder]`, step.stepOrder.toString());
           formData.append(`steps[${index}][instruction]`, step.instruction);
           if (step.imageUrl !== null && step.imageUrl !== undefined) {
             formData.append(`steps[${index}][imageUrl]`, step.imageUrl);
           }
-          if (
-            step.hasNewImageFile !== null &&
-            step.hasNewImageFile !== undefined
-          ) {
-            formData.append(
-              `steps[${index}][hasNewImageFile]`,
-              step.hasNewImageFile?.toString(),
-            );
+          // Only append hasNewImageFile if it's true
+          if (step.hasNewImageFile) {
+            formData.append(`steps[${index}][hasNewImageFile]`, 'true');
           }
         });
       }
+
+      // Append nutrition info only if they are not null/undefined
+      if (payload.protein !== null && payload.protein !== undefined) {
+        formData.append('protein', payload.protein.toString());
+      }
+      if (payload.fat !== null && payload.fat !== undefined) {
+        formData.append('fat', payload.fat.toString());
+      }
+      if (payload.calories !== null && payload.calories !== undefined) {
+        formData.append('calories', payload.calories.toString());
+      }
+      if (payload.carbohydrates !== null && payload.carbohydrates !== undefined) {
+        formData.append('carbohydrates', payload.carbohydrates.toString());
+      }
+      if (payload.preparationTimeMinutes !== null && payload.preparationTimeMinutes !== undefined) {
+        formData.append('preparationTimeMinutes', payload.preparationTimeMinutes.toString());
+      }
+      if (payload.videoUrl) {
+        formData.append('videoUrl', payload.videoUrl);
+      }
+
+      // Append image files if they exist
       if (payload.recipeImageFile) {
         formData.append('images', payload.recipeImageFile as any);
       }
+
       if (payload.stepImageFiles && payload.stepImageFiles.length > 0) {
         payload.stepImageFiles.forEach((file) => {
-          formData.append('images', file as any);
+          if (file) {
+            formData.append('images', file as any);
+          }
         });
       }
-      if (payload.protein !== null && payload.protein !== undefined)
-        formData.append('protein', payload.protein.toString());
-      if (payload.fat !== null && payload.fat !== undefined)
-        formData.append('fat', payload.fat.toString());
-      if (payload.calories !== null && payload.calories !== undefined)
-        formData.append('calories', payload.calories.toString());
-      if (payload.carbohydrates !== null && payload.carbohydrates !== undefined)
-        formData.append('carbohydrates', payload.carbohydrates.toString());
-      if (
-        payload.preparationTimeMinutes !== null &&
-        payload.preparationTimeMinutes !== undefined
-      )
-        formData.append(
-          'preparationTimeMinutes',
-          payload.preparationTimeMinutes.toString()
-        );
-      if (payload.videoUrl) formData.append('videoUrl', payload.videoUrl);
 
-      console.log('FORMDATA TO SEND', formData);
-      // Gửi request với headers phù hợp
+      console.log("FORMDATA SEND", formData);
       const response = await api.post('/admin/recipes/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -325,11 +320,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       setRecipes((prev) => [newRecipe, ...prev]);
       return newRecipe;
     } catch (error: any) {
-      console.error(
-        'Error creating recipe in context:',
-        error.response?.data || error.message,
-        error.config
-      );
+      console.error('Error creating recipe in context:', error.response?.data || error.message, error.config);
       const apiError = error.response?.data;
       if (apiError && apiError.message) {
         if (Array.isArray(apiError.message)) {
@@ -633,6 +624,8 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
         ingredientId: ingredient.ingredientId || '',
         quantity: ingredient.quantity || null,
         unitId: ingredient.unitId || null,
+        ingredient: { id: ingredient.ingredientId || '', name: '', imageUrl: null },
+        unit: null
       };
 
       // Trong thực tế, bạn sẽ cập nhật dữ liệu thông qua API
@@ -655,6 +648,8 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
         ingredientId,
         quantity: data.quantity !== undefined ? data.quantity : null,
         unitId: data.unitId !== undefined ? data.unitId : null,
+        ingredient: { id: ingredientId, name: '', imageUrl: null },
+        unit: null
       };
 
       // Trong thực tế, bạn sẽ cập nhật dữ liệu thông qua API
@@ -812,7 +807,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
   // Hàm saveRecipe trong context sẽ gọi createRecipeWithDetails với payload được chuẩn bị:
   const saveRecipe = async (): Promise<Recipe | null> => {
     try {
-      setIsLoadingRecipes(true); // Có thể đặt isLoading ở đây hoặc trong useRecipeForm
+      setIsLoadingRecipes(true);
       const basicInfo = recipeForm.basicInfo;
       const categoriesFromForm = recipeForm.categories;
       const ingredientsFromForm = recipeForm.ingredients;
@@ -829,16 +824,15 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
 
       const stepImageFilesForUpload: any[] = [];
       stepsFromForm.forEach((step) => {
-        // Không dùng for...of nếu bạn dùng index
         if (step.imageUrl && step.imageUrl.startsWith('file://')) {
           stepImageFilesForUpload.push({
             uri: step.imageUrl,
-            // Đảm bảo step.id là duy nhất khi tạo hoặc sử dụng một định danh khác
             name: `step_${step.id || Date.now()}_${step.stepOrder}.${step.imageUrl.split('.').pop() || 'jpg'}`,
             type: `image/${step.imageUrl.split('.').pop() || 'jpeg'}`,
           });
         }
       });
+
       const payloadForBackend: ClientCreateRecipePayload = {
         name: basicInfo.name || '',
         description: basicInfo.description,
@@ -859,25 +853,16 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
         steps: stepsFromForm.map((step) => ({
           stepOrder: step.stepOrder,
           instruction: step.instruction,
-          imageUrl:
-            step.imageUrl && !step.imageUrl.startsWith('file://')
-              ? step.imageUrl
-              : null,
-          hasNewImageFile: !!(
-            step.imageUrl && step.imageUrl.startsWith('file://')
-          ), // True nếu có file URI mới
+          imageUrl: step.imageUrl && !step.imageUrl.startsWith('file://') ? step.imageUrl : null,
+          hasNewImageFile: !!(step.imageUrl && step.imageUrl.startsWith('file://')),
         })),
         recipeImageFile: recipeImageFileForUpload,
-        stepImageFiles: stepImageFilesForUpload, // Mảng các file ảnh cho steps
+        stepImageFiles: stepImageFilesForUpload,
       };
 
       let savedRecipe: Recipe;
       if (currentRecipe && currentRecipe.id) {
-        // Kiểm tra currentRecipe.id để chắc chắn là update
-        // TODO: Implement updateRecipeInContext
-        console.warn(
-          'Update recipe functionality in context needs to be fully implemented.'
-        );
+        console.warn('Update recipe functionality in context needs to be fully implemented.');
         throw new Error('Update recipe not fully implemented in context');
       } else {
         savedRecipe = await createRecipeWithDetails(payloadForBackend);
@@ -887,7 +872,6 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       return savedRecipe;
     } catch (error) {
       console.error('Error in saveRecipe (context):', error);
-      // Ném lỗi đã được xử lý từ createRecipeWithDetails hoặc lỗi mới
       throw error;
     } finally {
       setIsLoadingRecipes(false);

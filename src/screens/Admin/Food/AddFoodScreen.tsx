@@ -1,4 +1,3 @@
-'use client';
 import {
   View,
   Text,
@@ -10,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -19,8 +19,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { AdminFoodStackParamList } from '@navigation/AdminFoodStack';
 import { useRecipeForm } from '@hooks/RecipeForm';
-import { RecipeStatus } from 'src/types';
+import { RecipeStatus, UnitOfMeasure } from 'src/types';
 import { useFoodManagement } from 'src/context/FoodManagementContext';
+import { useEffect, useState } from 'react';
+import api from 'src/api/api';
+import { Picker } from '@react-native-picker/picker';
 const statusOptions = [
   { label: 'Nháp', value: RecipeStatus.DRAFT },
   { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
@@ -41,7 +44,9 @@ export const AddFoodScreen = () => {
     handleSave,
     handlePublic,
   } = useRecipeForm();
-
+  const [unitsOfMeasure, setUnitsOfMeasure] = useState<UnitOfMeasure[]>([]);
+  const [isLoadingUnits, setIsLoadingUnits] = useState(false);
+  const [errorUnits, setErrorUnits] = useState<string | null>(null);
   // Destructure form data
   const {
     basicInfo,
@@ -49,6 +54,26 @@ export const AddFoodScreen = () => {
     ingredients: selectedIngredients,
     steps,
   } = form;
+  // Fetch danh sách đơn vị đo lường khi component được mount
+  useEffect(() => {
+    const fetchUnitsOfMeasure = async () => {
+      setIsLoadingUnits(true);
+      setErrorUnits(null);
+      try {
+        const response = await api.get("/admin/unit-of-measure/all");
+
+        console.log("////////////////\n DON VI NE ", response.data)
+        setUnitsOfMeasure(response.data);
+      } catch (e: any) {
+        setErrorUnits(e.message || 'An unknown error occurred');
+        Alert.alert('Lỗi', 'Không thể tải danh sách đơn vị đo lường.');
+      } finally {
+        setIsLoadingUnits(false);
+      }
+    };
+
+    fetchUnitsOfMeasure();
+  }, []);
 
   // Pick image from gallery
   const pickImage = async (type, stepId = null) => {
@@ -75,10 +100,7 @@ export const AddFoodScreen = () => {
 
   // Add new step
   const addStep = () => {
-    const newId =
-      steps.length > 0
-        ? Number.parseInt(steps[steps.length - 1].id.toString()) + 1
-        : 1;
+    const newId = steps.length > 0 ? Number.parseInt(steps[steps.length - 1].id.toString()) + 1 : 1;
 
     updateSteps([
       ...steps,
@@ -125,17 +147,21 @@ export const AddFoodScreen = () => {
   };
 
   const handleSubmit = async () => {
-    const savedRecipe = await handleSave();
-    if (savedRecipe) {
-      Alert.alert('Thành công', 'Đã lưu và công khai món ăn!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            resetForm();
-            navigation.goBack();
+    try {
+      const savedRecipe = await handleSave();
+      if (savedRecipe) {
+        Alert.alert('Thành công', 'Đã lưu và công khai món ăn!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              resetForm();
+              navigation.goBack();
+            },
           },
-        },
-      ]);
+        ]);
+      }
+    } catch (error) {
+      Alert.alert('Lỗi', error.message || 'Không thể lưu món ăn');
     }
   };
 
@@ -391,19 +417,40 @@ export const AddFoodScreen = () => {
                         keyboardType="numeric"
                       />
                     </View>
-                    <View className="flex-1">
+                   <View className="flex-1 ml-2">
                       <Text className="text-gray-700 mb-1">Đơn vị *</Text>
-                      <TextInput
-                        className="border border-gray-300 rounded-lg px-3 py-2"
-                        placeholder="Nhập đơn vị"
-                        onChangeText={(value) =>
-                          updateIngredient(
-                            ingredient.ingredientId,
-                            'unit',
-                            value
-                          )
-                        }
-                      />
+                      {isLoadingUnits ? (
+                        <ActivityIndicator size="small" color="#941D23" className="mt-2"/>
+                      ) : errorUnits ? (
+                         <Text className="text-red-500 text-xs mt-1">Lỗi tải đơn vị</Text>
+                      ): (
+                        <View className="border border-gray-300 rounded-lg">
+                          <Picker
+                            selectedValue={ingredient.unitId}
+                            onValueChange={(itemValue) => {
+                              if (itemValue !== null && itemValue !== undefined) {
+                                updateIngredient(
+                                  ingredient.ingredientId,
+                                  'unitId',
+                                  itemValue
+                                );
+                              }
+                            }}
+                            prompt="Chọn đơn vị" // Cho Android
+                            style={{ height: 44, justifyContent: 'center' }} // Căn giữa Picker text trên iOS
+                            itemStyle={{ height: 44, fontSize: 16 }} // Style cho item
+                          >
+                            <Picker.Item label="-- Chọn đơn vị --" value={null} style={{color: '#9CA3AF'}}/>
+                            {unitsOfMeasure.map((unit) => (
+                              <Picker.Item
+                                key={unit.id}
+                                label={unit.symbol ? `${unit.unitName} (${unit.symbol})` : unit.unitName}
+                                value={unit.id}
+                              />
+                            ))}
+                          </Picker>
+                        </View>
+                      )}
                     </View>
                   </View>
                 </View>

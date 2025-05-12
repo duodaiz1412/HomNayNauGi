@@ -11,7 +11,7 @@ export enum AccountStatus {
 // Enum cho trạng thái công thức
 export enum RecipeStatus {
   PUBLIC = "public",
-  PRIVATE = 'private',
+  PRIVATE = "private",
   PENDING_APPROVAL = "pending_approval",
   REJECTED = "rejected",
   DRAFT = "draft",
@@ -27,10 +27,13 @@ export interface Role {
 export interface Account {
   id: string // UUID
   username: string
+  name: string
+  email: string
   status: AccountStatus
   lastLoginAt: string | null
   createdAt: string
   updatedAt: string
+  avatar: string | null
 }
 
 // Interface cho hồ sơ người dùng
@@ -85,16 +88,23 @@ export interface UnitOfMeasure {
   symbol: string | null
 }
 
+// Interface cho ánh xạ danh mục công thức
+export interface RecipeCategoryMapping {
+  recipeId: string
+  recipeCategoryId: number
+  recipeCategory: RecipeCategory
+  createdAt: string
+  updatedAt: string
+}
+
 // Interface cho nguyên liệu trong công thức
 export interface RecipeIngredient {
   recipeId: string
   ingredientId: string
   quantity: number | null
   unitId: number | null
-
-  // Thông tin bổ sung (không có trong DB)
-  ingredient?: Ingredient
-  unit?: UnitOfMeasure
+  ingredient: Ingredient
+  unit: UnitOfMeasure | null
 }
 
 // Interface cho bước nấu ăn
@@ -109,7 +119,7 @@ export interface CookingStep {
 // Interface cho công thức
 export interface Recipe {
   id: string // UUID
-  accountId: string | null
+  accountId: string
   name: string
   description: string | null
   protein: number | null
@@ -123,13 +133,14 @@ export interface Recipe {
   createdAt: string
   updatedAt: string
 
-  // Các quan hệ (không có trong DB)
-  categories?: RecipeCategory[]
-  ingredients?: RecipeIngredient[]
-  steps?: CookingStep[]
-  likeCount?: number
-  isLiked?: boolean
-  isFavorite?: boolean
+  // Các quan hệ
+  account: Account
+  categoryMappings: RecipeCategoryMapping[]
+  recipeIngredients: RecipeIngredient[]
+  cookingSteps: CookingStep[]
+  totalLikes: number
+  totalViews: number
+  totalFavorites: number
 }
 
 // Interface cho lượt thích công thức
@@ -152,4 +163,11 @@ export interface ViewHistory {
   accountId: string | null
   recipeId: string
   viewedAt: string
+}
+
+// Interface cho nguyên liệu trong tủ bếp
+export interface AccountPantryItem {
+  accountId: string
+  ingredientId: string
+  addedAt: string
 }

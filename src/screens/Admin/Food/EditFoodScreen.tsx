@@ -1,5 +1,3 @@
-
-import { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -7,120 +5,78 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-
-  StatusBar,
-  Switch,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-} from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import * as ImagePicker from "expo-image-picker"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { AdminHeader } from "@components/AdminHeader/AdminHeader"
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { AdminFoodStackParamList } from "@navigation/AdminFoodStack";
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { AdminHeader } from '@components/AdminHeader/AdminHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { AdminFoodStackParamList } from '@navigation/AdminFoodStack';
+import { useRecipeForm } from '@hooks/RecipeForm';
+import { RecipeStatus, UnitOfMeasure } from 'src/types';
+import { useEffect, useState } from 'react';
+import api from 'src/api/api';
+import { Picker } from '@react-native-picker/picker';
 
-type EditFoodScreenRouteProp = RouteProp<AdminFoodStackParamList, 'EditFoodScreen'>;
+const statusOptions = [
+  { label: 'Nháp', value: RecipeStatus.DRAFT },
+  { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
+  { label: 'Công khai', value: RecipeStatus.PUBLIC },
+];
+type EditFoodScreenRouteProp = RouteProp<AdminFoodStackParamList,"EditFoodScreen">
 export const EditFoodScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
   const route = useRoute<EditFoodScreenRouteProp>();
-  const { foodId } = route.params
+  const { foodId } = route.params as { foodId: string };
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [isFetching, setIsFetching] = useState(true)
+  const {
+    form,
+    isLoading,
+    error,
+    updateBasicInfo,
+    updateCategories,
+    updateIngredients,
+    updateSteps,
+    resetForm,
+    handleSave,
+    handlePublic,
+  } = useRecipeForm({ recipeId: foodId });
 
-  // Form states
-  const [foodName, setFoodName] = useState("")
-  const [description, setDescription] = useState("")
-  const [category, setCategory] = useState("")
-  const [foodImage, setFoodImage] = useState(null)
-  const [isActive, setIsActive] = useState(true)
+  const [unitsOfMeasure, setUnitsOfMeasure] = useState<UnitOfMeasure[]>([]);
+  const [isLoadingUnits, setIsLoadingUnits] = useState(false);
+  const [errorUnits, setErrorUnits] = useState<string | null>(null);
 
-  // Nutrition states
-  const [protein, setProtein] = useState("")
-  const [fat, setFat] = useState("")
-  const [carbs, setCarbs] = useState("")
-  const [calories, setCalories] = useState("")
+  // Destructure form data
+  const {
+    basicInfo,
+    categories,
+    ingredients: selectedIngredients,
+    steps,
+  } = form;
 
-  // Ingredients and steps
-  const [ingredients, setIngredients] = useState([])
-  const [steps, setSteps] = useState([])
-
-  // Mock categories for selection
-  const categories = [
-    { id: "1", name: "Phở" },
-    { id: "2", name: "Bánh mì" },
-    { id: "3", name: "Cơm" },
-    { id: "4", name: "Bún" },
-    { id: "5", name: "Gỏi cuốn" },
-  ]
-
-  // Fetch food data
+  // Fetch danh sách đơn vị đo lường khi component được mount
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      // Mock data for the selected food
-      const foodData = {
-        id: foodId,
-        name: "Phở Hà Nội",
-        description: "Phở bò truyền thống Hà Nội với nước dùng đậm đà, thơm ngon",
-        category: "1",
-        image: "https://cdn.pixabay.com/photo/2023/05/27/12/39/noodle-soup-8021418_1280.png",
-        isActive: true,
-        nutrition: {
-          protein: "25",
-          fat: "15",
-          carbs: "60",
-          calories: "480",
-        },
-        ingredients: [
-          { id: "1", name: "Phở", amount: "200", unit: "g" },
-          { id: "2", name: "Thịt bò", amount: "150", unit: "g" },
-          { id: "3", name: "Hành", amount: "50", unit: "g" },
-          { id: "4", name: "Gừng", amount: "20", unit: "g" },
-        ],
-        steps: [
-          {
-            id: "1",
-            description: "Đun sôi nước dùng với xương bò trong 6-8 giờ",
-            image: "https://cdn.pixabay.com/photo/2015/04/23/22/00/cooking-736678_1280.jpg",
-          },
-          {
-            id: "2",
-            description: "Thêm các gia vị như hoa hồi, quế, đinh hương",
-            image: "https://cdn.pixabay.com/photo/2015/04/23/22/00/spices-736679_1280.jpg",
-          },
-          {
-            id: "3",
-            description: "Chuẩn bị phở, thịt bò, rau thơm và thưởng thức",
-            image: "https://cdn.pixabay.com/photo/2017/01/31/09/30/raspberry-2023404_1280.jpg",
-          },
-        ],
+    const fetchUnitsOfMeasure = async () => {
+      setIsLoadingUnits(true);
+      setErrorUnits(null);
+      try {
+        const response = await api.get("/admin/unit-of-measure/all");
+        setUnitsOfMeasure(response.data);
+      } catch (e: any) {
+        setErrorUnits(e.message || 'An unknown error occurred');
+        Alert.alert('Lỗi', 'Không thể tải danh sách đơn vị đo lường.');
+      } finally {
+        setIsLoadingUnits(false);
       }
+    };
 
-      // Set form data
-      setFoodName(foodData.name)
-      setDescription(foodData.description)
-      setCategory(foodData.category)
-      setFoodImage(foodData.image)
-      setIsActive(foodData.isActive)
-
-      // Set nutrition data
-      setProtein(foodData.nutrition.protein)
-      setFat(foodData.nutrition.fat)
-      setCarbs(foodData.nutrition.carbs)
-      setCalories(foodData.nutrition.calories)
-
-      // Set ingredients and steps
-      setIngredients(foodData.ingredients)
-      setSteps(foodData.steps)
-
-      setIsFetching(false)
-    }, 1000)
-  }, [foodId])
+    fetchUnitsOfMeasure();
+  }, []);
 
   // Pick image from gallery
   const pickImage = async (type, stepId = null) => {
@@ -129,117 +85,96 @@ export const EditFoodScreen = () => {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
-    })
+    });
 
     if (!result.canceled) {
-      if (type === "food") {
-        setFoodImage(result.assets[0].uri)
-      } else if (type === "step" && stepId) {
-        setSteps(steps.map((step) => (step.id === stepId ? { ...step, image: result.assets[0].uri } : step)))
+      if (type === 'food') {
+        updateBasicInfo({ imageUrl: result.assets[0].uri });
+      } else if (type === 'step' && stepId) {
+        const updatedSteps = steps.map((step) =>
+          step.id === stepId
+            ? { ...step, imageUrl: result.assets[0].uri }
+            : step
+        );
+        updateSteps(updatedSteps);
       }
     }
-  }
-
-  // Add new ingredient
-  const addIngredient = () => {
-    const newId =
-      ingredients.length > 0 ? (Number.parseInt(ingredients[ingredients.length - 1].id) + 1).toString() : "1"
-    setIngredients([...ingredients, { id: newId, name: "", amount: "", unit: "" }])
-  }
-
-  // Remove ingredient
-  const removeIngredient = (id) => {
-    if (ingredients.length > 1) {
-      setIngredients(ingredients.filter((item) => item.id !== id))
-    } else {
-      Alert.alert("Thông báo", "Phải có ít nhất một nguyên liệu")
-    }
-  }
-
-  // Update ingredient
-  const updateIngredient = (id, field, value) => {
-    setIngredients(ingredients.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
-  }
+  };
 
   // Add new step
   const addStep = () => {
-    const newId = steps.length > 0 ? (Number.parseInt(steps[steps.length - 1].id) + 1).toString() : "1"
-    setSteps([...steps, { id: newId, description: "", image: null }])
-  }
+    const newId = steps.length > 0 ? Number.parseInt(steps[steps.length - 1].id.toString()) + 1 : 1;
+
+    updateSteps([
+      ...steps,
+      {
+        id: newId,
+        recipeId: foodId,
+        stepOrder: steps.length + 1,
+        instruction: '',
+        imageUrl: null,
+      },
+    ]);
+  };
 
   // Remove step
   const removeStep = (id) => {
     if (steps.length > 1) {
-      setSteps(steps.filter((item) => item.id !== id))
+      updateSteps(steps.filter((item) => item.id !== id));
     } else {
-      Alert.alert("Thông báo", "Phải có ít nhất một bước")
+      Alert.alert('Thông báo', 'Phải có ít nhất một bước');
     }
-  }
+  };
 
   // Update step
   const updateStep = (id, field, value) => {
-    setSteps(steps.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
-  }
+    updateSteps(
+      steps.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
+  };
 
-  // Handle form submission
-  const handleSubmit = () => {
-    // Validate form
-    if (!foodName || !description || !category || !foodImage) {
-      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin món ăn")
-      return
+  // Remove ingredient
+  const removeIngredient = (id) => {
+    updateIngredients(
+      selectedIngredients.filter((item) => item.ingredientId !== id)
+    );
+  };
+
+  // Update ingredient
+  const updateIngredient = (id, field, value) => {
+    updateIngredients(
+      selectedIngredients.map((item) =>
+        item.ingredientId === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const savedRecipe = await handleSave();
+      if (savedRecipe) {
+        Alert.alert('Thành công', 'Đã cập nhật món ăn!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.goBack();
+            },
+          },
+        ]);
+      }
+    } catch (error) {
+      Alert.alert('Lỗi', error.message || 'Không thể cập nhật món ăn');
     }
-
-    if (!protein || !fat || !carbs || !calories) {
-      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin dinh dưỡng")
-      return
-    }
-
-    const hasEmptyIngredient = ingredients.some((ing) => !ing.name || !ing.amount || !ing.unit)
-    if (hasEmptyIngredient) {
-      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin nguyên liệu")
-      return
-    }
-
-    const hasEmptyStep = steps.some((step) => !step.description)
-    if (hasEmptyStep) {
-      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin các bước nấu ăn")
-      return
-    }
-
-    // Submit form
-    setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
-      Alert.alert("Thành công", "Đã cập nhật món ăn", [
-        {
-          text: "OK",
-          onPress: () => navigation.goBack(),
-        },
-      ])
-    }, 1500)
-  }
-
-  if (isFetching) {
-    return (
-      <SafeAreaView className="flex-1 bg-gray-50">
-
-        {/* Header */}
-        {/* <AdminHeader title="Chinh sửa món ăn" /> */}
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#941D23" />
-          <Text className="mt-4 text-gray-600">Đang tải thông tin món ăn...</Text>
-        </View>
-      </SafeAreaView>
-    )
-  }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-
-      {/* Header */}
       <AdminHeader title="Chỉnh sửa món ăn" />
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
         <ScrollView className="flex-1 px-4 py-4">
           {/* Basic Information */}
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
@@ -250,8 +185,8 @@ export const EditFoodScreen = () => {
               <TextInput
                 className="border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="Nhập tên món ăn"
-                value={foodName}
-                onChangeText={setFoodName}
+                value={basicInfo.name}
+                onChangeText={(value) => updateBasicInfo({ name: value })}
               />
             </View>
 
@@ -260,39 +195,45 @@ export const EditFoodScreen = () => {
               <TextInput
                 className="border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="Nhập mô tả món ăn"
-                value={description}
-                onChangeText={setDescription}
+                value={basicInfo.description}
+                onChangeText={(value) =>
+                  updateBasicInfo({ description: value })
+                }
                 multiline
-                numberOfLines={3}
+                numberOfLines={10}
                 textAlignVertical="top"
               />
             </View>
 
             <View className="mb-4">
               <Text className="text-gray-700 mb-1">Danh mục *</Text>
-              <View className="border border-gray-300 rounded-lg px-3 py-2">
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  {categories.map((cat) => (
-                    <TouchableOpacity
-                      key={cat.id}
-                      className={`px-3 py-1 rounded-full mr-2 ${category === cat.id ? "bg-[#941D23]" : "bg-gray-100"}`}
-                      onPress={() => setCategory(cat.id)}
-                    >
-                      <Text className={`${category === cat.id ? "text-white" : "text-gray-700"}`}>{cat.name}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
+              <TouchableOpacity
+                className="border border-gray-300 rounded-lg px-3 py-3 flex-row justify-between items-center"
+                onPress={() => navigation.navigate('CategorySelectScreen')}
+              >
+                {categories && categories.length > 0 ? (
+                  <Text className="text-gray-700">
+                    {categories.map((cat) => cat.name).join(', ')}
+                  </Text>
+                ) : (
+                  <Text className="text-gray-400">Chọn danh mục</Text>
+                )}
+                <Ionicons name="chevron-forward" size={20} color="#454442" />
+              </TouchableOpacity>
             </View>
 
             <View className="mb-4">
               <Text className="text-gray-700 mb-1">Hình ảnh món ăn *</Text>
               <TouchableOpacity
                 className="border border-dashed border-gray-300 rounded-lg p-4 items-center justify-center"
-                onPress={() => pickImage("food")}
+                onPress={() => pickImage('food')}
               >
-                {foodImage ? (
-                  <Image source={{ uri: foodImage }} className="w-full h-48 rounded-lg" resizeMode="cover" />
+                {basicInfo.imageUrl ? (
+                  <Image
+                    source={{ uri: basicInfo.imageUrl }}
+                    className="w-full h-48 rounded-lg"
+                    resizeMode="cover"
+                  />
                 ) : (
                   <View className="items-center">
                     <Ionicons name="image-outline" size={48} color="#454442" />
@@ -302,14 +243,58 @@ export const EditFoodScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <View className="flex-row items-center justify-between">
-              <Text className="text-gray-700">Hiển thị món ăn</Text>
-              <Switch
-                value={isActive}
-                onValueChange={setIsActive}
-                trackColor={{ false: "#D1D1D6", true: "#E57373" }}
-                thumbColor={isActive ? "#941D23" : "#F4F3F4"}
+            <View className="mb-4">
+              <Text className="text-gray-700 mb-1">
+                Thời gian chuẩn bị (phút)
+              </Text>
+              <TextInput
+                className="border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Nhập thời gian chuẩn bị (phút)"
+                value={basicInfo.preparationTimeMinutes?.toString() || ''}
+                onChangeText={(value) =>
+                  updateBasicInfo({
+                    preparationTimeMinutes: Number.parseInt(value) || 0,
+                  })
+                }
+                keyboardType="numeric"
               />
+            </View>
+
+            <View className="mb-4">
+              <Text className="text-gray-700 mb-1">URL video hướng dẫn</Text>
+              <TextInput
+                className="border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Nhập URL video hướng dẫn"
+                value={basicInfo.videoUrl || ''}
+                onChangeText={(value) => updateBasicInfo({ videoUrl: value })}
+              />
+            </View>
+
+            <View className="space-y-2">
+              <Text className="text-gray-800 text-base font-semibold">
+                Trạng thái
+              </Text>
+
+              <View className="self-start rounded-full p-1 flex-row shadow-sm mt-2">
+                {statusOptions.map(({ label, value }) => {
+                  const isActive = basicInfo.status === value;
+                  return (
+                    <TouchableOpacity
+                      key={value}
+                      onPress={() => updateBasicInfo({ status: value })}
+                      className={`px-4 py-1.5 rounded-full mx-0.5
+            ${isActive ? 'bg-red-500' : 'bg-white'}
+          `}
+                    >
+                      <Text
+                        className={`text-sm font-medium ${isActive ? 'text-white' : 'text-gray-600'}`}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
           </View>
 
@@ -319,22 +304,28 @@ export const EditFoodScreen = () => {
 
             <View className="flex-row mb-4">
               <View className="flex-1 mr-2">
-                <Text className="text-gray-700 mb-1">Đạm (g) *</Text>
+                <Text className="text-gray-700 mb-1">Tinh bột (g) *</Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder="Nhập lượng đạm"
-                  value={protein}
-                  onChangeText={setProtein}
+                  placeholder="Nhập lượng tinh bột"
+                  value={basicInfo.carbohydrates?.toString()}
+                  onChangeText={(value) =>
+                    updateBasicInfo({
+                      carbohydrates: Number.parseFloat(value) || 0,
+                    })
+                  }
                   keyboardType="numeric"
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-700 mb-1">Chất béo (g) *</Text>
+                <Text className="text-gray-700 mb-1">Chất đạm (g) *</Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder="Nhập lượng chất béo"
-                  value={fat}
-                  onChangeText={setFat}
+                  placeholder="Nhập lượng chất đạm"
+                  value={basicInfo.protein?.toString()}
+                  onChangeText={(value) =>
+                    updateBasicInfo({ protein: Number.parseFloat(value) || 0 })
+                  }
                   keyboardType="numeric"
                 />
               </View>
@@ -342,22 +333,26 @@ export const EditFoodScreen = () => {
 
             <View className="flex-row mb-4">
               <View className="flex-1 mr-2">
-                <Text className="text-gray-700 mb-1">Tinh bột (g) *</Text>
+                <Text className="text-gray-700 mb-1">Calo (kcal) *</Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder="Nhập lượng tinh bột"
-                  value={carbs}
-                  onChangeText={setCarbs}
+                  placeholder="Nhập lượng calo"
+                  value={basicInfo.calories?.toString()}
+                  onChangeText={(value) =>
+                    updateBasicInfo({ calories: Number.parseInt(value) || 0 })
+                  }
                   keyboardType="numeric"
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-700 mb-1">Calo *</Text>
+                <Text className="text-gray-700 mb-1">Chất béo *</Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder="Nhập lượng calo"
-                  value={calories}
-                  onChangeText={setCalories}
+                  placeholder="Nhập lượng chất béo"
+                  value={basicInfo.fat?.toString()}
+                  onChangeText={(value) =>
+                    updateBasicInfo({ fat: Number.parseFloat(value) || 0 })
+                  }
                   keyboardType="numeric"
                 />
               </View>
@@ -368,73 +363,130 @@ export const EditFoodScreen = () => {
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
             <View className="flex-row justify-between items-center mb-4">
               <Text className="text-lg font-bold">Nguyên liệu</Text>
-              <TouchableOpacity className="bg-[#941D23] px-3 py-1 rounded-full" onPress={addIngredient}>
+              <TouchableOpacity
+                className="bg-[#941D23] px-3 py-1 rounded-full"
+                onPress={() => navigation.navigate('IngredientSelectScreen')}
+              >
                 <Text className="text-white">+ Thêm</Text>
               </TouchableOpacity>
             </View>
 
-            {ingredients.map((ingredient, index) => (
-              <View key={ingredient.id} className="mb-4 pb-4 border-b border-gray-100">
-                <View className="flex-row justify-between items-center mb-2">
-                  <Text className="font-medium">Nguyên liệu {index + 1}</Text>
-                  {ingredients.length > 1 && (
-                    <TouchableOpacity onPress={() => removeIngredient(ingredient.id)}>
-                      <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-                    </TouchableOpacity>
-                  )}
-                </View>
-
-                <View className="mb-2">
-                  <Text className="text-gray-700 mb-1">Tên nguyên liệu *</Text>
-                  <TextInput
-                    className="border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Nhập tên nguyên liệu"
-                    value={ingredient.name}
-                    onChangeText={(value) => updateIngredient(ingredient.id, "name", value)}
-                  />
-                </View>
-
-                <View className="flex-row">
-                  <View className="flex-1 mr-2">
-                    <Text className="text-gray-700 mb-1">Số lượng *</Text>
-                    <TextInput
-                      className="border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="Nhập số lượng"
-                      value={ingredient.amount}
-                      onChangeText={(value) => updateIngredient(ingredient.id, "amount", value)}
-                      keyboardType="numeric"
-                    />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-gray-700 mb-1">Đơn vị *</Text>
-                    <TextInput
-                      className="border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="Nhập đơn vị"
-                      value={ingredient.unit}
-                      onChangeText={(value) => updateIngredient(ingredient.id, "unit", value)}
-                    />
-                  </View>
-                </View>
+            {selectedIngredients.length === 0 ? (
+              <View className="border border-dashed border-gray-300 rounded-lg p-6 items-center justify-center">
+                <Text className="text-gray-500 mt-2">Chưa có nguyên liệu</Text>
               </View>
-            ))}
+            ) : (
+              selectedIngredients.map((ingredient, index) => (
+                <View
+                  key={ingredient.ingredientId}
+                  className="mb-4 pb-4 border-b border-gray-100"
+                >
+                  <View className="flex-row justify-between items-center mb-2">
+                    <Text className="font-medium">Nguyên liệu {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => removeIngredient(ingredient.ingredientId)}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={20}
+                        color="#FF3B30"
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View className="mb-2">
+                    <Text className="text-gray-700 mb-1">
+                      Tên nguyên liệu *
+                    </Text>
+                    <View className="border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
+                      <Text>{ingredient.ingredient?.name}</Text>
+                    </View>
+                  </View>
+
+                  <View className="flex-row">
+                    <View className="flex-1 mr-2">
+                      <Text className="text-gray-700 mb-1">Số lượng *</Text>
+                      <TextInput
+                        className="border border-gray-300 rounded-lg px-3 py-2"
+                        placeholder="Nhập số lượng"
+                        value={ingredient.quantity?.toString()}
+                        onChangeText={(value) =>
+                          updateIngredient(
+                            ingredient.ingredientId,
+                            'quantity',
+                            Number.parseFloat(value) || 0
+                          )
+                        }
+                        keyboardType="numeric"
+                      />
+                    </View>
+                    <View className="flex-1 ml-2">
+                      <Text className="text-gray-700 mb-1">Đơn vị *</Text>
+                      {isLoadingUnits ? (
+                        <ActivityIndicator size="small" color="#941D23" className="mt-2"/>
+                      ) : errorUnits ? (
+                         <Text className="text-red-500 text-xs mt-1">Lỗi tải đơn vị</Text>
+                      ): (
+                        <View className="border border-gray-300 rounded-lg">
+                          <Picker
+                            selectedValue={ingredient.unitId}
+                            onValueChange={(itemValue) => {
+                              if (itemValue !== null && itemValue !== undefined) {
+                                updateIngredient(
+                                  ingredient.ingredientId,
+                                  'unitId',
+                                  itemValue
+                                );
+                              }
+                            }}
+                            prompt="Chọn đơn vị"
+                            style={{ height: 44, justifyContent: 'center' }}
+                            itemStyle={{ height: 44, fontSize: 16 }}
+                          >
+                            <Picker.Item label="-- Chọn đơn vị --" value={null} style={{color: '#9CA3AF'}}/>
+                            {unitsOfMeasure.map((unit) => (
+                              <Picker.Item
+                                key={unit.id}
+                                label={unit.symbol ? `${unit.unitName} (${unit.symbol})` : unit.unitName}
+                                value={unit.id}
+                              />
+                            ))}
+                          </Picker>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              ))
+            )}
           </View>
 
           {/* Cooking Steps */}
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
             <View className="flex-row justify-between items-center mb-4">
               <Text className="text-lg font-bold">Các bước nấu ăn</Text>
-              <TouchableOpacity className="bg-[#941D23] px-3 py-1 rounded-full" onPress={addStep}>
+              <TouchableOpacity
+                className="bg-[#941D23] px-3 py-1 rounded-full"
+                onPress={addStep}
+              >
                 <Text className="text-white">+ Thêm</Text>
               </TouchableOpacity>
             </View>
 
             {steps.map((step, index) => (
-              <View key={step.id} className="mb-4 pb-4 border-b border-gray-100">
+              <View
+                key={step.id}
+                className="mb-4 pb-4 border-b border-gray-100"
+              >
                 <View className="flex-row justify-between items-center mb-2">
                   <Text className="font-medium">Bước {index + 1}</Text>
                   {steps.length > 1 && (
                     <TouchableOpacity onPress={() => removeStep(step.id)}>
-                      <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+                      <Ionicons
+                        name="trash-outline"
+                        size={20}
+                        color="#FF3B30"
+                      />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -444,8 +496,10 @@ export const EditFoodScreen = () => {
                   <TextInput
                     className="border border-gray-300 rounded-lg px-3 py-2"
                     placeholder="Nhập mô tả bước nấu ăn"
-                    value={step.description}
-                    onChangeText={(value) => updateStep(step.id, "description", value)}
+                    value={step.instruction}
+                    onChangeText={(value) =>
+                      updateStep(step.id, 'instruction', value)
+                    }
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
@@ -456,14 +510,24 @@ export const EditFoodScreen = () => {
                   <Text className="text-gray-700 mb-1">Hình ảnh minh họa</Text>
                   <TouchableOpacity
                     className="border border-dashed border-gray-300 rounded-lg p-4 items-center justify-center"
-                    onPress={() => pickImage("step", step.id)}
+                    onPress={() => pickImage('step', step.id)}
                   >
-                    {step.image ? (
-                      <Image source={{ uri: step.image }} className="w-full h-40 rounded-lg" resizeMode="cover" />
+                    {step.imageUrl ? (
+                      <Image
+                        source={{ uri: step.imageUrl }}
+                        className="w-full h-40 rounded-lg"
+                        resizeMode="cover"
+                      />
                     ) : (
                       <View className="items-center">
-                        <Ionicons name="image-outline" size={36} color="#454442" />
-                        <Text className="text-gray-500 mt-2">Chọn hình ảnh</Text>
+                        <Ionicons
+                          name="image-outline"
+                          size={36}
+                          color="#454442"
+                        />
+                        <Text className="text-gray-500 mt-2">
+                          Chọn hình ảnh
+                        </Text>
                       </View>
                     )}
                   </TouchableOpacity>
@@ -473,16 +537,26 @@ export const EditFoodScreen = () => {
           </View>
 
           {/* Submit Button */}
-          <TouchableOpacity
-            className={`bg-[#941D23] py-3 rounded-lg items-center mb-6 ${isLoading ? "opacity-70" : ""}`}
-            onPress={handleSubmit}
-            disabled={isLoading}
-          >
-            <Text className="text-white font-bold">{isLoading ? "Đang xử lý..." : "Cập nhật món ăn"}</Text>
-          </TouchableOpacity>
+          <View className="mb-6">
+            {error && (
+              <Text className="text-red-500 mb-2 text-center text-xl">{error}</Text>
+            )}
+
+            <View className="flex-row space-x-2">
+              <TouchableOpacity
+                className={`flex-1 bg-[#941D23] py-3 rounded-lg items-center ${isLoading ? 'opacity-70' : ''}`}
+                onPress={handleSubmit}
+                disabled={isLoading}
+              >
+                <Text className="text-white font-bold">
+                  {isLoading ? 'Đang xử lý...' : 'Cập nhật món ăn'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
-}
+  );
+};
 

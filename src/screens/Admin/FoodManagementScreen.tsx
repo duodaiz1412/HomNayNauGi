@@ -109,7 +109,7 @@ const renderFoodItem = ({ item }) => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/admin/recipes/${item.id}`);
+      await api.delete(`/admin/recipes/delete/${item.id}`);
       setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe.id !== item.id));
       Alert.alert('Thành công', 'Đã xóa món ăn.');
     } catch (error) {
