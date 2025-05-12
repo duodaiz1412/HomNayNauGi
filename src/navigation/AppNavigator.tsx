@@ -25,6 +25,8 @@ import PrivacyPolicyScreen from '../screens/Profile/PrivacyPolicyScreen';
 import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
 import { AdminDrawerNavigator } from './AdminDrawerNavigator';
+import ScanIngredientScreen from '../screens/ScanIngredient/ScanIngredientScreen';
+
 interface Ingredient {
   name: string;
   image: string;
@@ -64,6 +66,7 @@ export type RootStackParamList = {
   AddDishScreen: undefined;
   AdminDrawerNavigator: undefined;
   PersonalScreen: undefined;
+  ScanIngredient: { imageUri: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -123,6 +126,7 @@ const AppNavigator = () => {
             title: 'Thêm nguyên liệu',
           }}
         />
+        <Stack.Screen name="ScanIngredient" component={ScanIngredientScreen} />
         <Stack.Screen
           name="AdminDrawerNavigator"
           component={AdminDrawerNavigator}

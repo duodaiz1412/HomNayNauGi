@@ -83,7 +83,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
 
       if (!result.canceled) {
         // Điều hướng đến trang xử lý ảnh sau khi chụp
-        navigation.navigate('ScanResult', { imageUri: result.assets[0].uri });
+        navigation.navigate('ScanIngredient', { imageUri: result.assets[0].uri });
       }
     } catch (error) {
       console.log('Lỗi khi mở camera:', error);
