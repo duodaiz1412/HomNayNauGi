@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  TextInput,
   ScrollView,
   Image,
   TouchableOpacity,
@@ -37,7 +38,7 @@ const ProfileScreen = () => {
     checkLoginStatus();
   }, []);
 
-  if (!isLoggedIn) return null;
+  
 
   const profileOptions = [
     { icon: '❤️', title: 'Yêu thích', onPress: () => navigation.navigate('FavoritesScreen') },

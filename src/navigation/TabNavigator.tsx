@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/Home/HomeScreen';
 import RecipeScreen from '../screens/Recipe/RecipeScreen';
 import FavoriteScreen from '../screens/Favorite/FavoriteScreen';
-import ProfileScreen from '../screens/Profile/ProfileScreen';
+import PersonalScreen from '../screens/Profile/PersonalScreen';
 import SearchScreen from '@screens/Search/SearchScreen';
 
 import TabBar from '../components/navigation/TabBar';
@@ -53,7 +53,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={PersonalScreen}
         options={{
           title: 'Tôi',
         }}
