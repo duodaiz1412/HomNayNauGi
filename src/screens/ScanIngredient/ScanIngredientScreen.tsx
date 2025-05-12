@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   ScrollView,
   TextInput,
   ImageBackground,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -22,7 +24,10 @@ interface DetectedIngredient {
   name: string;
   image?: string;
   quantity?: string;
+  unit?: string;
 }
+
+const UNITS = ['Gram', 'Kg', 'ml', 'Lit', 'Cái'];
 
 const ScanIngredientScreen = () => {
   const navigation =
@@ -30,7 +35,7 @@ const ScanIngredientScreen = () => {
   const route = useRoute<ScanIngredientRouteProp>();
   const { imageUri } = route.params || {};
   const backgroundImage = require('@assets/background.png');
-
+  
   const [isLoading, setIsLoading] = useState(false);
   const [ingredients, setIngredients] = useState<DetectedIngredient[]>([
     {
@@ -38,14 +43,16 @@ const ScanIngredientScreen = () => {
       name: 'Phở',
       image:
         'https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250230038502.jpg',
-      quantity: '200 gr',
+      quantity: '200',
+      unit: 'Gram',
     },
     {
       id: '2',
       name: 'Thịt bò',
       image:
         'https://cdn.tgdd.vn/Files/2021/08/09/1373325/phan-biet-cac-loai-thit-bo-my-uc-va-thit-bo-viet-nam-202203151512039104.jpg',
-      quantity: '3 kg',
+      quantity: '3',
+      unit: 'Kg',
     },
     {
       id: '3',
@@ -53,6 +60,7 @@ const ScanIngredientScreen = () => {
       image:
         'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2021/12/11/cach-chon-nam-huong-1-1639192987692459809655.jpg',
       quantity: '',
+      unit: '',
     },
     {
       id: '4',
@@ -60,9 +68,13 @@ const ScanIngredientScreen = () => {
       image:
         'https://cdn.tgdd.vn/Files/2021/08/09/1373350/rau-thom-la-gi-cac-loai-rau-thom-thuong-gap-va-cach-bao-quan-tuoi-lau-202108091555088759.jpg',
       quantity: '',
+      unit: '',
     },
   ]);
-
+  
+  const [showUnitPicker, setShowUnitPicker] = useState(false);
+  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
+  
   const handleQuantityChange = (id: string, value: string) => {
     setIngredients(
       ingredients.map((ingredient) =>
@@ -70,7 +82,21 @@ const ScanIngredientScreen = () => {
       )
     );
   };
-
+  
+  const handleUnitChange = (id: string, unit: string) => {
+    setIngredients(
+      ingredients.map((ingredient) =>
+        ingredient.id === id ? { ...ingredient, unit: unit } : ingredient
+      )
+    );
+    setShowUnitPicker(false);
+  };
+  
+  const openUnitPicker = (id: string) => {
+    setSelectedIngredientId(id);
+    setShowUnitPicker(true);
+  };
+  
   const handleAddNewIngredient = () => {
     // Chức năng thêm nguyên liệu mới
     Alert.alert(
@@ -78,7 +104,7 @@ const ScanIngredientScreen = () => {
       'Chức năng thêm nguyên liệu sẽ được phát triển sau'
     );
   };
-
+  
   const handleFindRecipe = () => {
     // Chức năng tìm món ăn từ các nguyên liệu đã chọn
     const ingredientsWithQuantity = ingredients.filter((i) => i.quantity);
@@ -97,11 +123,11 @@ const ScanIngredientScreen = () => {
       );
     }
   };
-
+  
   const handleEdit = () => {
     Alert.alert('Thông báo', 'Chức năng chỉnh sửa sẽ được phát triển sau');
   };
-
+  
   return (
     <ImageBackground source={backgroundImage} className="flex-1 w-full">
       <SafeAreaView className="flex-1 px-4">
@@ -134,7 +160,7 @@ const ScanIngredientScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-
+        
         <ScrollView className="flex-1 mb-20">
           {ingredients.map((ingredient) => (
             <View
@@ -154,29 +180,41 @@ const ScanIngredientScreen = () => {
               <Text className="flex-1 text-base font-medium text-[#333]">
                 {ingredient.name}
               </Text>
-              <TextInput
-                className="bg-white border border-[#ddd] rounded px-2 py-1 min-w-[80px] text-center text-sm"
-                value={ingredient.quantity}
-                onChangeText={(value) =>
-                  handleQuantityChange(ingredient.id, value)
-                }
-                placeholder="Nhập"
-                placeholderTextColor="#999"
-              />
+              <View className="flex-row items-center">
+                <TextInput
+                  className="bg-white border border-[#ddd] rounded-l px-2 py-1 w-[60px] text-center text-sm"
+                  value={ingredient.quantity}
+                  onChangeText={(value) =>
+                    handleQuantityChange(ingredient.id, value)
+                  }
+                  placeholder="Nhập"
+                  placeholderTextColor="#999"
+                  keyboardType="numeric"
+                />
+                <TouchableOpacity 
+                  onPress={() => openUnitPicker(ingredient.id)}
+                  className="bg-white border border-[#ddd] border-l-0 rounded-r px-2 py-1 min-w-[70px] flex-row items-center justify-between"
+                >
+                  <Text className="text-sm text-[#333] flex-1 text-center">
+                    {ingredient.unit || 'Đơn vị'}
+                  </Text>
+                  <Ionicons name="chevron-down-outline" size={14} color="#666" />
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
         </ScrollView>
-
+        
         <View className="absolute bottom-[90px] self-center">
-          <TouchableOpacity
+          <TouchableOpacity 
             className="bg-white w-[50px] h-[50px] rounded-full items-center justify-center shadow-md"
             onPress={handleAddNewIngredient}
           >
             <Ionicons name="add" size={30} color="#444" />
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
+        
+        <TouchableOpacity 
           className="absolute bottom-5 left-4 right-4 bg-[#941D23] h-[50px] rounded-full items-center justify-center shadow-md"
           onPress={handleFindRecipe}
         >
@@ -184,6 +222,39 @@ const ScanIngredientScreen = () => {
             Tìm món ngay 🍜
           </Text>
         </TouchableOpacity>
+
+        {/* Unit Picker Modal */}
+        <Modal
+          visible={showUnitPicker}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowUnitPicker(false)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setShowUnitPicker(false)}
+            className="flex-1 justify-center items-center bg-black/30"
+          >
+            <View className="bg-white w-[250px] rounded-lg overflow-hidden">
+              <View className="border-b border-gray-200 py-2 px-4">
+                <Text className="text-center font-medium text-base">Đơn vị</Text>
+              </View>
+              <FlatList
+                data={UNITS}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    className="py-3 px-4 border-b border-gray-100"
+                    onPress={() => selectedIngredientId && handleUnitChange(selectedIngredientId, item)}
+                  >
+                    <Text className="text-center">{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
       </SafeAreaView>
     </ImageBackground>
   );
