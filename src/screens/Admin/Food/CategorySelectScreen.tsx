@@ -23,7 +23,7 @@ export const CategorySelectScreen = () => {
   const fetchCategories = async (query = '', offset = 0, limit = 10) => {
     try {
       setLoading(true);
-      const response = await api.get('/recipe-categories', {
+      const response = await api.get('/admin/recipe-categories/search', {
         params: { query, offset, limit },
       });
       const { data, total } = response.data;

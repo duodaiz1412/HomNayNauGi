@@ -24,14 +24,14 @@ const handleLogin = async () => {
       loginIdentifier: username.trim(),
       password: password
     });
+    
     const { accessToken, refreshToken } = response.data;
     await AsyncStorage.setItem('accessToken', accessToken);
     await AsyncStorage.setItem('refreshToken', refreshToken);
-    
 
     // Kiểm tra role để điều hướng
-    if (response.data.account.role === 'admin') {
-      console.log("Danh nhap admin thanh cong", accessToken);
+    if (response.data.user.roles.includes('admin')) {
+      console.log("Danh nhap admin thanh cong   " + accessToken+"           &        "+refreshToken);
       navigation.reset({
         index: 0,
         routes: [{ name: 'AdminDrawerNavigator' }],

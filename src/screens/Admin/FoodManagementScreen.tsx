@@ -51,7 +51,7 @@ export const AdminFoodManagementScreen = () => {
         limit,
       };
       // console.log("Fetching recipes with params:", params);
-      const response = await api.get('/recipes', { params });
+      const response = await api.get('/admin/recipes/search', { params });
       const { data, total } = response.data;
       console.log("recipes",data)
       return { data: data || [], total: total || 0 };
@@ -109,7 +109,7 @@ const renderFoodItem = ({ item }) => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/recipes/${item.id}`);
+      await api.delete(`/admin/recipes/${item.id}`);
       setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe.id !== item.id));
       Alert.alert('Thành công', 'Đã xóa món ăn.');
     } catch (error) {
