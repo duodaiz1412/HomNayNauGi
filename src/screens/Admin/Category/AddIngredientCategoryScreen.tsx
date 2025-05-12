@@ -78,7 +78,7 @@ export const AddIngredientCategoryScreen = () => {
 
       // Call API using configured instance
       const response = await api.post(
-        '/ingredient-categories/create',
+        '/admin/ingredient-categories/create',
         formData,
         {
           headers: {

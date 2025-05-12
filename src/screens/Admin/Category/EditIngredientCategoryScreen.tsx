@@ -39,7 +39,7 @@ export const EditIngredientCategoryScreen = () => {
     const fetchCategory = async () =>{
       try {
         setIsFetching(true);
-        const reponse = await api.get(`/ingredient-categories/${ingredientCategoryId}`)
+        const reponse = await api.get(`/admin/ingredient-categories/search/${ingredientCategoryId}`)
         const categoryData = reponse.data.data;
         console.log (categoryData)
         if (!categoryData) {
@@ -108,7 +108,7 @@ export const EditIngredientCategoryScreen = () => {
 
       // Call API using configured instance
       const response = await api.put(
-        `/ingredient-categories/edit/${ingredientCategoryId}`,
+        `/admin/ingredient-categories/edit/${ingredientCategoryId}`,
         formData,
         {
           headers: {

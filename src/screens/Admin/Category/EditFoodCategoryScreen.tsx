@@ -41,7 +41,7 @@ export const EditFoodCategoryScreen = () => {
     const fetchCategory = async () => {
       try {
         setIsFetching(true);
-        const reponse = await api.get(`/recipe-categories/${categoryId}`);
+        const reponse = await api.get(`/admin/recipe-categories/search/${categoryId}`)
         const categoryData = reponse.data.data;
         console.log(categoryData);
         if (!categoryData) {
@@ -109,7 +109,7 @@ export const EditFoodCategoryScreen = () => {
 
       // Call API using configured instance
       const response = await api.put(
-        `/recipe-categories/edit/${categoryId}`,
+        `/admin/recipe-categories/edit/${categoryId}`,
         formData,
         {
           headers: {

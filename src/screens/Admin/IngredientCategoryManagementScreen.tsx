@@ -30,7 +30,7 @@ export const AdminIngredientCategoryManagementScreen = () => {
   const fetchCategories = async (query = '', offset = 0, limit = 10) => {
     try {
       setLoading(true);
-      const response = await api.get('/ingredient-categories', {
+      const response = await api.get('/admin/ingredient-categories/search', {
         params: { query, offset, limit },
       });
       const { data, total } = response.data;
@@ -64,7 +64,7 @@ export const AdminIngredientCategoryManagementScreen = () => {
 
   const deleteCategory = async (id) => {
     try {
-      await api.delete(`/ingredient-categories/delete/${id}`);
+      await api.delete(`/admin/ingredient-categories/delete/${id}`);
       setCategories((prev) => prev.filter((item) => item.id !== id));
       Alert.alert('Thành công', 'Xóa danh mục thành công');
     } catch (error) {

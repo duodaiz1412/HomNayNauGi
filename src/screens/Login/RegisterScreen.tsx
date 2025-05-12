@@ -16,6 +16,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import api from 'src/api/api';
 
 // Đường dẫn ảnh
 const backgroundImage = require('@assets/background.png');
@@ -25,27 +26,52 @@ export const RegisterScreen = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [username, setUsername] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    try {
+      if (!username || !email || !password || !confirmPassword) {
+        Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        Alert.alert('Lỗi', 'Mật khẩu nhập lại không khớp');
+        return;
+      }
+      const response = await api.post('/auth/register', {
+        username: username,
+        email: email,
+        name: fullName,
+        password: password,
+      });
+      // Kiểm tra nếu đăng ký thành công
+      if (
+        response.data &&
+        response.data.message === 'Registration successful'
+      ) {
+        Alert.alert('Thành công', 'Đăng ký tài khoản thành công');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Lỗi', 'Đăng ký không thành công, vui lòng thử lại');
+      }
+    } catch (error) {
+      if (error.response) {
+        // Lỗi từ server
+        Alert.alert(
+          'Lỗi đăng nhập',
+          error.response.data.message ||
+            'Tên đăng nhập hoặc mật khẩu không đúng'
+        );
+      } else {
+        // Lỗi kết nối
+        Alert.alert('Lỗi kết nối', 'Không thể kết nối đến server');
+      }
+    }
     // Kiểm tra thông tin đăng ký
-    if (!username || !email || !password || !confirmPassword) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu nhập lại không khớp');
-      return;
-    }
-
-    // Thông báo đăng ký thành công và chuyển về màn hình đăng nhập
-    Alert.alert('Thành công', 'Đăng ký tài khoản thành công!', [
-      { text: 'OK', onPress: () => navigation.navigate('Login') },
-    ]);
   };
 
   return (
@@ -91,16 +117,6 @@ export const RegisterScreen = () => {
                   placeholderTextColor="#9CA3AF"
                 />
 
-                {/* Phone Number Input */}
-                <TextInput
-                  className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm mb-5"
-                  value={phoneNumber}
-                  onChangeText={setPhoneNumber}
-                  placeholder="Số điện thoại"
-                  keyboardType="phone-pad"
-                  placeholderTextColor="#9CA3AF"
-                />
-
                 {/* Email Input */}
                 <TextInput
                   className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm mb-5"
@@ -111,7 +127,14 @@ export const RegisterScreen = () => {
                   autoCapitalize="none"
                   placeholderTextColor="#9CA3AF"
                 />
-
+                <TextInput
+                  className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm mb-5"
+                  value={fullName}
+                  onChangeText={setFullName}
+                  placeholder="Họ và tên"
+                  autoCapitalize="none"
+                  placeholderTextColor="#9CA3AF"
+                />
                 {/* Password Input */}
                 <TextInput
                   className="w-full h-14 px-5 bg-white border border-gray-200 rounded-xl text-base shadow-sm mb-5"

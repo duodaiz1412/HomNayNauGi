@@ -21,7 +21,11 @@ import type { AdminFoodStackParamList } from '@navigation/AdminFoodStack';
 import { useRecipeForm } from '@hooks/RecipeForm';
 import { RecipeStatus } from 'src/types';
 import { useFoodManagement } from 'src/context/FoodManagementContext';
-
+const statusOptions = [
+  { label: 'Nháp', value: RecipeStatus.DRAFT },
+  { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
+  { label: 'Công khai', value: RecipeStatus.PUBLIC },
+];
 export const AddFoodScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
@@ -33,6 +37,7 @@ export const AddFoodScreen = () => {
     updateCategories,
     updateIngredients,
     updateSteps,
+    resetForm,
     handleSave,
     handlePublic,
   } = useRecipeForm();
@@ -119,62 +124,18 @@ export const AddFoodScreen = () => {
     );
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
-    // Validate form
-    if (
-      !basicInfo.name ||
-      !basicInfo.description ||
-      !categories ||
-      categories.length === 0 ||
-      !basicInfo.imageUrl ||
-      !basicInfo.preparationTimeMinutes ||
-      !basicInfo.videoUrl
-    ) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin món ăn');
-      return;
-    }
-
-    if (
-      !basicInfo.protein ||
-      !basicInfo.fat ||
-      !basicInfo.carbohydrates ||
-      !basicInfo.calories
-    ) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin dinh dưỡng');
-      return;
-    }
-
-    if (selectedIngredients.length === 0) {
-      Alert.alert('Lỗi', 'Vui lòng thêm ít nhất một nguyên liệu');
-      return;
-    }
-
-    const hasEmptyIngredient = selectedIngredients.some((ing) => !ing.quantity);
-    if (hasEmptyIngredient) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ số lượng cho các nguyên liệu');
-      return;
-    }
-
-    const hasEmptyStep = steps.some((step) => !step.instruction);
-    if (hasEmptyStep) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin các bước nấu ăn');
-      return;
-    }
-
-    // Submit form
-    try {
-      const savedRecipe = await handleSave();
-      if (savedRecipe) {
-        Alert.alert('Thành công', 'Đã thêm món ăn mới', [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
+    const savedRecipe = await handleSave();
+    if (savedRecipe) {
+      Alert.alert('Thành công', 'Đã lưu và công khai món ăn!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm();
+            navigation.goBack();
           },
-        ]);
-      }
-    } catch (err) {
-      Alert.alert('Lỗi', 'Không thể lưu món ăn. Vui lòng thử lại sau.');
+        },
+      ]);
     }
   };
 
@@ -281,22 +242,31 @@ export const AddFoodScreen = () => {
                 onChangeText={(value) => updateBasicInfo({ videoUrl: value })}
               />
             </View>
-            <View className="flex-row items-center justify-between">
-              <Text className="text-gray-700">Hiển thị món ăn</Text>
-              <Switch
-                value={basicInfo.status === 'public'}
-                onValueChange={(value) =>
-                  updateBasicInfo({
-                    status: value
-                      ? RecipeStatus.PUBLIC
-                      : RecipeStatus.PRIVATE,
-                  })
-                }
-                trackColor={{ false: '#D1D1D6', true: '#E57373' }}
-                thumbColor={
-                  basicInfo.status === 'public' ? '#941D23' : '#F4F3F4'
-                }
-              />
+            <View className="space-y-2">
+              <Text className="text-gray-800 text-base font-semibold">
+                Trạng thái
+              </Text>
+
+              <View className="self-start rounded-full p-1 flex-row shadow-sm mt-2">
+                {statusOptions.map(({ label, value }) => {
+                  const isActive = basicInfo.status === value;
+                  return (
+                    <TouchableOpacity
+                      key={value}
+                      onPress={() => updateBasicInfo({ status: value })}
+                      className={`px-4 py-1.5 rounded-full mx-0.5
+            ${isActive ? 'bg-red-500' : 'bg-white'}
+          `}
+                    >
+                      <Text
+                        className={`text-sm font-medium ${isActive ? 'text-white' : 'text-gray-600'}`}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
           </View>
 
@@ -516,41 +486,26 @@ export const AddFoodScreen = () => {
             ))}
           </View>
 
-          {/* Submit Button */}
-          <View className="flex-row space-x-2 mb-6">
-            <TouchableOpacity
-              className={`flex-1 bg-gray-500 py-3 rounded-lg items-center ${isLoading ? 'opacity-70' : ''}`}
-              onPress={async () => {
-                updateBasicInfo({ status: RecipeStatus.DRAFT });
-                console.log('===== Lưu nháp =====');
-                console.log('Basic Info:', basicInfo);
-                console.log('Categories:', categories);
-                console.log('Ingredients:', selectedIngredients);
-                console.log('Steps:', steps);
-                await handleSave();
-              }}
-              disabled={isLoading}
-            >
-              <Text className="text-white font-bold">Lưu nháp</Text>
-            </TouchableOpacity>
+{/* Submit Button */}
+<View className="mb-6">
+  {error && (
+    <Text className="text-red-500 mb-2 text-center text-xl">{error}</Text>
+  )}
 
-            <TouchableOpacity
-              className={`flex-1 bg-[#941D23] py-3 rounded-lg items-center ${isLoading ? 'opacity-70' : ''}`}
-              onPress={async () => {
-                console.log('===== Gửi lên server =====');
-                console.log('Basic Info:', basicInfo);
-                console.log('Categories:', categories);
-                console.log('Ingredients:', selectedIngredients);
-                console.log('Steps:', steps);
-                await handleSave();
-              }}
-              disabled={isLoading}
-            >
-              <Text className="text-white font-bold">
-                {isLoading ? 'Đang xử lý...' : 'Thêm món ăn'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+  <View className="flex-row space-x-2">
+    <TouchableOpacity
+      className={`flex-1 bg-[#941D23] py-3 rounded-lg items-center ${isLoading ? 'opacity-70' : ''}`}
+      onPress={() => {
+        handleSubmit();
+      }}
+      disabled={isLoading}
+    >
+      <Text className="text-white font-bold">
+        {isLoading ? 'Đang xử lý...' : 'Thêm món ăn'}
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
