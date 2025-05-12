@@ -15,11 +15,6 @@ import IngredientsScreen from '../screens/Search/IngredientsScreen';
 import SearchByRecipeScreen from '../screens/Search/SearchByRecipeScreen';
 import ListDishesScreen from '../screens/Search/ListDishesScreen';
 import FilterScreen from '../screens/Search/FilterScreen';
-
-interface Ingredient {
-  name: string;
-  image: string;
-}
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import FavoritesScreen from '../screens/Profile/FavoritesScreen';
 import NotificationsScreen from '../screens/Profile/NotificationsScreen';
@@ -28,8 +23,11 @@ import SettingsScreen from '../screens/Profile/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/Profile/PrivacyPolicyScreen';
 import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
-import { supabase } from '../utils/supabase';
 import { AdminDrawerNavigator } from './AdminDrawerNavigator';
+interface Ingredient {
+  name: string;
+  image: string;
+}
 
 export type RootStackParamList = {
   Login: undefined;
@@ -69,24 +67,6 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
-  if (loading) {
-    return null;
-  }
-
   return (
     <NavigationContainer>
       <Stack.Navigator

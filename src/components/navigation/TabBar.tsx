@@ -73,6 +73,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
         duration: 150,
         useNativeDriver: true,
       }),
+
       Animated.timing(animatedValues[index], {
         toValue: 0, // Trở về vị trí ban đầu
         duration: 150,
@@ -90,16 +91,16 @@ const TabBar = ({ state, descriptors, navigation }) => {
   // Tính chiều rộng của SVG path
   const svgWidth = width * 0.95;
   const curveHeight = 30; // Giảm nhẹ độ lõm
-  const itemWidth = svgWidth / TOTAL_ITEMS; 
+  const itemWidth = svgWidth / TOTAL_ITEMS;
   const curveWidth = itemWidth * 1.5; // Giảm độ rộng của vùng lõm
-  const curveCenterPosition = (CAMERA_BUTTON_INDEX * itemWidth) + (itemWidth / 2);
-  const curveStartPosition = curveCenterPosition - (curveWidth / 2);
-  const curveEndPosition = curveCenterPosition + (curveWidth / 2);
+  const curveCenterPosition = CAMERA_BUTTON_INDEX * itemWidth + itemWidth / 2;
+  const curveStartPosition = curveCenterPosition - curveWidth / 2;
+  const curveEndPosition = curveCenterPosition + curveWidth / 2;
 
   // Path cho SVG (đường đi của đường viền tabbar có phần lõm)
   const createPath = () => {
     const tabBarWidth = svgWidth;
-    
+
     return `
       M 0,0
       H ${curveStartPosition}
@@ -133,11 +134,12 @@ const TabBar = ({ state, descriptors, navigation }) => {
             elevation: 5,
           }}
         >
-          <Svg width="100%" height={TABBAR_HEIGHT} style={{ position: 'absolute' }}>
-            <Path
-              d={createPath()}
-              fill="white"
-            />
+          <Svg
+            width="100%"
+            height={TABBAR_HEIGHT}
+            style={{ position: 'absolute' }}
+          >
+            <Path d={createPath()} fill="white" />
           </Svg>
 
           {/* Container cho tất cả items */}
@@ -206,9 +208,11 @@ const TabBar = ({ state, descriptors, navigation }) => {
                       isFocused ? ICON_SIZE_ACTIVE : ICON_SIZE_INACTIVE
                     )}
                   </View>
-                  <Text 
+                  <Text
                     className={`mt-1 text-[11px] ${
-                      isFocused ? 'text-red-700 font-semibold' : 'text-gray-500 font-medium'
+                      isFocused
+                        ? 'text-red-700 font-semibold'
+                        : 'text-gray-500 font-medium'
                     } text-center`}
                   >
                     {label}
