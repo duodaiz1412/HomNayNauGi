@@ -5,7 +5,7 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { View, Text, Image, SafeAreaView, StatusBar, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert, ImageBackground } from 'react-native';
 import axios from 'axios';  // Đảm bảo đã cài axios
 import AsyncStorage from '@react-native-async-storage/async-storage';  // Đảm bảo đã cài AsyncStorage
-
+import api from 'src/api/api';
 // Đường dẫn ảnh
 const googleIcon = require('@assets/google.png');
 const facebookIcon = require('@assets/facebook.png');
@@ -17,59 +17,42 @@ const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  // Hàm xử lý đăng nhập
-  const handleLogin = async () => {
-    try {
-      // Xóa bỏ khoảng trắng đầu và cuối
-      const trimmedUsername = username.trim();
-      const trimmedPassword = password.trim();
-  
-      // Giả lập kiểm tra thông tin đăng nhập
-      if (trimmedUsername === 'user' && trimmedPassword === 'pass') {
-        const response = {
-          data: {
-            accessToken: 'mock_token_user', // Token giả lập
-            account: { role: 'user' }, // Giả lập tài khoản người dùng
-          },
-        };
-  
-        // Lưu token và role vào AsyncStorage
-        await AsyncStorage.setItem('accessToken', response.data.accessToken);
-        await AsyncStorage.setItem('userRole', response.data.account.role); // Lưu role
-  
-        console.log('Token và role lưu vào AsyncStorage:', response.data.accessToken, response.data.account.role);
-  
-        // Điều hướng đến màn hình chính của người dùng
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        });
-      } else if (trimmedUsername === 'ADMIN' && trimmedPassword === 'ADMIN') {
-        const response = {
-          data: {
-            accessToken: 'mock_token_admin', // Token giả lập
-            account: { role: 'admin' }, // Giả lập tài khoản admin
-          },
-        };
-  
-        // Lưu token và role vào AsyncStorage
-        await AsyncStorage.setItem('accessToken', response.data.accessToken);
-        await AsyncStorage.setItem('userRole', response.data.account.role); // Lưu role
-  
-        console.log('Token và role lưu vào AsyncStorage:', response.data.accessToken, response.data.account.role);
-  
-        // Điều hướng đến màn hình chính của admin
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        });
-      } else {
-        Alert.alert('Lỗi đăng nhập', 'Tên đăng nhập hoặc mật khẩu không đúng');
-      }
-    } catch (error) {
-      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi đăng nhập');
+const handleLogin = async () => {
+  try {
+    // Gọi API login
+    const response = await api.post(`/auth/login`, {
+      loginIdentifier: username.trim(),
+      password: password
+    });
+    const { accessToken, refreshToken } = response.data;
+    await AsyncStorage.setItem('accessToken', accessToken);
+    await AsyncStorage.setItem('refreshToken', refreshToken);
+    
+
+    // Kiểm tra role để điều hướng
+    if (response.data.account.role === 'admin') {
+      console.log("Danh nhap admin thanh cong", accessToken);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'AdminDrawerNavigator' }],
+      });
+    } else {
+      console.log("Danh nhap user thanh cong", accessToken);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
     }
-  };  
+  } catch (error) {
+    if (error.response) {
+      // Lỗi từ server
+      Alert.alert('Lỗi đăng nhập', error.response.data.message || 'Tên đăng nhập hoặc mật khẩu không đúng');
+    } else {
+      // Lỗi kết nối
+      Alert.alert('Lỗi kết nối', 'Không thể kết nối đến server');
+    }
+  }
+};
 
   return (
     <KeyboardAvoidingView

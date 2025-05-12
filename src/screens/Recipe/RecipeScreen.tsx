@@ -1,5 +1,5 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import {useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,6 @@ import MyIngredient from '@components/MyIngredient';
 import SuggestDish from '@components/SuggestDish';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { supabase } from '@utils/supabase';
 
 export default function RecipeScreen() {
   const navigation =
@@ -542,32 +541,6 @@ export default function RecipeScreen() {
     });
   };
 
-  useEffect(() => {
-    // Gọi getDishes ngay khi component mount
-    getDishes();
-    const unsubscribe = navigation.addListener('focus', () => {
-      getDishes();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  const getDishes = async () => {
-    try {
-      let { data: mon_an, error } = await supabase.from('mon_an').select('*');
-      if (error) {
-        console.error('Error fetching dishes:', error.message);
-        return;
-      }
-
-      if (mon_an && mon_an.length > 0) {
-        console.log(mon_an);
-      }
-    } catch (error) {
-      console.error('Error fetching dishes:', error.message);
-    }
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ImageBackground
@@ -647,7 +620,7 @@ export default function RecipeScreen() {
         {activeTab === 'ingredients' && (
           <TouchableOpacity
             onPress={handleAddIngredient}
-            className="absolute bottom-6 right-6 bg-red-800 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+            className="absolute bottom-12 right-6 bg-red-800 w-14 h-14 rounded-full items-center justify-center shadow-lg"
             style={{
               shadowColor: '#000',
               shadowOffset: {

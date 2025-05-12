@@ -15,11 +15,28 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockData } from '../../MockData/Data';
+import { logout } from 'src/api/api';
+
 
 const backgroundImage = require('@assets/background.png');
 
 const ProfileScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('accessToken');
+      console.log("token",token)
+      if (token) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+        navigation.replace('Login');
+      }
+    };
+    checkLoginStatus();
+  }, []);
 
   
 
@@ -32,23 +49,34 @@ const ProfileScreen = () => {
     { icon: '❓', title: 'Hỗ trợ', onPress: () => navigation.navigate('SupportScreen') },
     { icon: 'ℹ️', title: 'Về chúng tôi', onPress: () => navigation.navigate('AboutUsScreen') },
   ];
-
-  const handleLogout = () => {
-    Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
-      { text: 'Hủy', style: 'cancel' },
-      {
-        text: 'Đăng xuất',
-        onPress: async () => {
-          await AsyncStorage.removeItem('accessToken');
+const handleLogout = () => {
+  Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
+    {
+      text: 'Hủy',
+      style: 'cancel',
+    },
+    {
+      text: 'Đăng xuất',
+      onPress: async () => {
+        try {
+          await logout();
+          console.log("Đăng xuất thành công");
+          // Chuyển về màn hình login
           navigation.reset({
             index: 0,
             routes: [{ name: 'MainTabs' }],
           });
-        },
-        style: 'destructive',
+        } catch (error) {
+          console.error('Lỗi đăng xuất:', error);
+          Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+        }
       },
-    ]);
-  };
+      style: 'destructive',
+    },
+  ]);
+};
+
+
 
   return (
     <ImageBackground source={backgroundImage} style={{ flex: 1 }} resizeMode="cover">

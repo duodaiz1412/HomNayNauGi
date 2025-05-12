@@ -29,7 +29,11 @@ import SettingsScreen from '../screens/Profile/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/Profile/PrivacyPolicyScreen';
 import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
-import { supabase } from '../utils/supabase';
+import { AdminDrawerNavigator } from './AdminDrawerNavigator';
+interface Ingredient {
+  name: string;
+  image: string;
+}
 
 export type RootStackParamList = {
   Login: undefined;
@@ -44,6 +48,7 @@ export type RootStackParamList = {
   AddDish: undefined;
   SearchByIngredientScreen: {
     ingredients?: {
+      id: string;
       name: string;
       image: string;
     }[];
@@ -61,30 +66,14 @@ export type RootStackParamList = {
   PrivacyPolicyScreen: undefined;
   SupportScreen: undefined;
   AboutUsScreen: undefined;
+  AddDishScreen: undefined;
+  AdminDrawerNavigator: undefined;
   PersonalScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
-  if (loading) {
-    return null;
-  }
-
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -106,12 +95,47 @@ const AppNavigator = () => {
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="PersonalScreen" component={PersonalScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
-        <Stack.Screen name="NotificationsScreen" component={NotificationsScreen}/>
-        <Stack.Screen name="AchievementsScreen" component={AchievementsScreen}/>
+        <Stack.Screen
+          name="NotificationsScreen"
+          component={NotificationsScreen}
+        />
+        <Stack.Screen
+          name="AchievementsScreen"
+          component={AchievementsScreen}
+        />
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-        <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen}/>
+        <Stack.Screen
+          name="PrivacyPolicyScreen"
+          component={PrivacyPolicyScreen}
+        />
+        <Stack.Screen name="AddDishScreen" component={AddDishScreen} />
+        <Stack.Screen
+          name="SearchByIngredientScreen"
+          component={SearchByIngredientScreen}
+        />
         <Stack.Screen name="SupportScreen" component={SupportScreen} />
         <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
+        <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
+        <Stack.Screen
+          name="SearchByRecipeScreen"
+          component={SearchByRecipeScreen}
+        />
+        <Stack.Screen name="ListDishesScreen" component={ListDishesScreen} />
+        <Stack.Screen name="FilterScreen" component={FilterScreen} />
+        <Stack.Screen
+          name="AddIngredient"
+          component={AddIngredientScreen}
+          options={{
+            title: 'Thêm nguyên liệu',
+          }}
+        />
+        <Stack.Screen
+          name="AdminDrawerNavigator"
+          component={AdminDrawerNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
