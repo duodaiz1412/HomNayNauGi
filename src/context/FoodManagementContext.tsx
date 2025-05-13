@@ -750,11 +750,6 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
     try {
       // Giả lập API call
       const mockUnits: UnitOfMeasure[] = [
-        { id: 1, unitName: 'Gram', symbol: 'g' },
-        { id: 2, unitName: 'Milliliter', symbol: 'ml' },
-        { id: 3, unitName: 'Piece', symbol: 'pcs' },
-        { id: 4, unitName: 'Tablespoon', symbol: 'tbsp' },
-        { id: 5, unitName: 'Teaspoon', symbol: 'tsp' },
       ];
 
       setUnitsOfMeasure(mockUnits);

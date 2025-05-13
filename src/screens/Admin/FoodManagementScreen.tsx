@@ -33,8 +33,8 @@ export const AdminFoodManagementScreen = () => {
 
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  // Chọn một trạng thái mặc định, ví dụ: PUBLISHED
   const [selectedStatusFilter, setSelectedStatusFilter] = useState(RecipeStatus.PUBLIC);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const [recipes, setRecipes] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -42,19 +42,23 @@ export const AdminFoodManagementScreen = () => {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
-  const fetchRecipes = async (query = "", status: RecipeStatus, currentOffset = 0)=> {
+  const fetchRecipes = async (query = "", status: RecipeStatus, currentOffset = 0) => {
     try {
       setLoading(true);
       const params: any = {
-        query: query || undefined,
-        status: status, // Luôn gửi một trạng thái cụ thể
+        status: status,
         offset: currentOffset,
         limit,
       };
+      
+      if (query && query.trim() !== '') {
+        params.query = query.trim();
+      }
+
       console.log("Fetching recipes with params:", params);
       const response = await api.get('/admin/recipes/search', { params });
       const { data, total } = response.data;
-      console.log("recipes",data)
+      console.log("recipes", JSON.stringify(data, null, 2));
       return { data: data || [], total: total || 0 };
     } catch (error) {
       console.error('Error fetching recipes:', error);
@@ -67,36 +71,37 @@ export const AdminFoodManagementScreen = () => {
 
   const loadRecipes = async (reset = false) => {
     if (loading || (!hasMore && !reset)) return;
-
-    const currentOffset = reset ? 0 : offset;
-    const { data: newRecipes, total } = await fetchRecipes(searchQuery, selectedStatusFilter, currentOffset);
-
-    if (reset) {
+    try {
+      const newOffset = reset ? 0 : offset;
+      const { data, total } = await fetchRecipes(searchQuery, selectedStatusFilter, newOffset);
+      const newRecipes = reset ? data : [...recipes, ...data];
       setRecipes(newRecipes);
-    } else {
-      setRecipes((prevRecipes) => [...prevRecipes, ...newRecipes]);
+      setOffset(newOffset + data.length);
+      setHasMore(newRecipes.length < total);
+    } catch (error) {
+      console.error('Error loading recipes:', error);
+      setLoading(false);
     }
-    setOffset(currentOffset + newRecipes.length);
-    setHasMore((reset ? newRecipes.length : recipes.length + newRecipes.length) < total);
   };
 
   const debouncedSearch = useCallback(
-    debounce((text: string) => {
-      setSearchQuery(text);
-      setRecipes([]);
-      setOffset(0);
-      setHasMore(true);
+    debounce((query) => {
+      setSearchQuery(query);
     }, 500),
     []
   );
 
+  // Load dữ liệu khi searchQuery hoặc selectedStatusFilter thay đổi
   useEffect(() => {
-    setRecipes([]);
-    setOffset(0);
-    setHasMore(true);
     loadRecipes(true);
   }, [searchQuery, selectedStatusFilter]);
 
+  // Xử lý nút xóa bộ lọc/tìm kiếm
+  const handleClearFilters = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    setSelectedStatusFilter(RecipeStatus.PUBLIC);
+  };
   const handleDelete = async (id: string) => {
     try {
       await api.delete(`/admin/recipes/delete/${id}`);
@@ -211,14 +216,13 @@ export const AdminFoodManagementScreen = () => {
             <Ionicons name="search" size={20} color="#88131b" />
           </View>
           {searchInput ? (
-            <TouchableOpacity
+            <TouchableOpacity 
               onPress={() => {
                 setSearchInput('');
                 setSearchQuery('');
               }}
-              className="absolute right-4 top-3"
             >
-              <Ionicons name="close-circle" size={20} color="#88131b" />
+              <Ionicons name="close-circle" size={20} color="#454442" />
             </TouchableOpacity>
           ) : null}
         </View>
