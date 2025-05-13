@@ -30,6 +30,7 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
   useEffect(() => {
     const loadRecipe = async () => {
       if (!recipeId) {
+        // Reset form khi không có recipeId (trường hợp Add)
         resetForm();
         setCurrentRecipe(null);
         return;
@@ -41,29 +42,47 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
 
         const response = await api.get(`/admin/recipes/get-recipe/${recipeId}`);
         const recipe = response.data;
-        console.log("\nRECIPE GET",recipe);
+        console.log('\nRECIPE GET', recipe);
         if (!recipe) {
           setError('Không tìm thấy công thức');
           return;
         }
-
-        // Cập nhật form với dữ liệu công thức
-        updateBasicInfo({
+        const preparedBasicInfo: Partial<Recipe> = {
           name: recipe.name,
           description: recipe.description,
-          protein: recipe.protein,
-          fat: recipe.fat,
-          calories: recipe.calories,
-          carbohydrates: recipe.carbohydrates,
+          // Quan trọng: Chuyển đổi kiểu nếu cần (ví dụ: API trả về string cho number)
+          protein:
+            recipe.protein === null || recipe.protein === undefined
+              ? null
+              : parseFloat(recipe.protein as any),
+          fat:
+            recipe.fat === null || recipe.fat === undefined
+              ? null
+              : parseFloat(recipe.fat as any),
+          calories:
+            recipe.calories === null || recipe.calories === undefined
+              ? null
+              : parseInt(recipe.calories as any, 10),
+          carbohydrates:
+            recipe.carbohydrates === null || recipe.carbohydrates === undefined
+              ? null
+              : parseFloat(recipe.carbohydrates as any),
           imageUrl: recipe.imageUrl,
-          preparationTimeMinutes: recipe.preparationTimeMinutes,
+          preparationTimeMinutes:
+            recipe.preparationTimeMinutes === null ||
+            recipe.preparationTimeMinutes === undefined
+              ? null
+              : parseInt(recipe.preparationTimeMinutes as any, 10),
           videoUrl: recipe.videoUrl,
-          status: recipe.status,
-        });
-        
+          status: recipe.status, // Giả sử recipe.status đã đúng kiểu RecipeStatus
+        };
+        updateBasicInfo(preparedBasicInfo);
+
         // Cập nhật danh mục
         if (recipe.categoryMappings) {
-          updateCategories(recipe.categoryMappings.map(mapping => mapping.recipeCategory));
+          updateCategories(
+            recipe.categoryMappings.map((mapping) => mapping.recipeCategory)
+          );
         }
 
         // Cập nhật nguyên liệu

@@ -28,9 +28,13 @@ const statusOptions = [
   { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
   { label: 'Công khai', value: RecipeStatus.PUBLIC },
 ];
-type EditFoodScreenRouteProp = RouteProp<AdminFoodStackParamList,"EditFoodScreen">
+type EditFoodScreenRouteProp = RouteProp<
+  AdminFoodStackParamList,
+  'EditFoodScreen'
+>;
 export const EditFoodScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
   const route = useRoute<EditFoodScreenRouteProp>();
   const { foodId } = route.params as { foodId: string };
 
@@ -65,7 +69,7 @@ export const EditFoodScreen = () => {
       setIsLoadingUnits(true);
       setErrorUnits(null);
       try {
-        const response = await api.get("/admin/unit-of-measure/all");
+        const response = await api.get('/admin/unit-of-measure/all');
         setUnitsOfMeasure(response.data);
       } catch (e: any) {
         setErrorUnits(e.message || 'An unknown error occurred');
@@ -103,7 +107,10 @@ export const EditFoodScreen = () => {
 
   // Add new step
   const addStep = () => {
-    const newId = steps.length > 0 ? Number.parseInt(steps[steps.length - 1].id.toString()) + 1 : 1;
+    const newId =
+      steps.length > 0
+        ? Number.parseInt(steps[steps.length - 1].id.toString()) + 1
+        : 1;
 
     updateSteps([
       ...steps,
@@ -157,7 +164,7 @@ export const EditFoodScreen = () => {
           {
             text: 'OK',
             onPress: () => {
-              navigation.goBack();
+              navigation.navigate('AdminFoodManagementScreen')
             },
           },
         ]);
@@ -174,8 +181,12 @@ export const EditFoodScreen = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
-      >
-        <ScrollView className="flex-1 px-4 py-4">
+      >{isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#941D23" />
+            <Text className="mt-2 text-gray-600">Đang tải thông tin...</Text>
+          </View>
+        ) :(        <ScrollView className="flex-1 px-4 py-4">
           {/* Basic Information */}
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
             <Text className="text-lg font-bold mb-4">Thông tin cơ bản</Text>
@@ -403,13 +414,20 @@ export const EditFoodScreen = () => {
                     </View>
                   </View>
 
-                  <View className="flex-row">
-                    <View className="flex-1 mr-2">
+                  <View className="flex-row items-start">
+                    {/* Số lượng */}
+                    <View style={{ width: 80 }} className="mr-2">
                       <Text className="text-gray-700 mb-1">Số lượng *</Text>
                       <TextInput
                         className="border border-gray-300 rounded-lg px-3 py-2"
                         placeholder="Nhập số lượng"
-                        value={ingredient.quantity?.toString()}
+                        value={
+                          ingredient.quantity != null
+                            ? Number(ingredient.quantity) % 1 === 0
+                              ? String(Number(ingredient.quantity))
+                              : String(ingredient.quantity)
+                            : ''
+                        }
                         onChangeText={(value) =>
                           updateIngredient(
                             ingredient.ingredientId,
@@ -420,18 +438,32 @@ export const EditFoodScreen = () => {
                         keyboardType="numeric"
                       />
                     </View>
+
+                    {/* Đơn vị */}
                     <View className="flex-1 ml-2">
                       <Text className="text-gray-700 mb-1">Đơn vị *</Text>
                       {isLoadingUnits ? (
-                        <ActivityIndicator size="small" color="#941D23" className="mt-2"/>
+                        <ActivityIndicator
+                          size="small"
+                          color="#941D23"
+                          className="mt-2"
+                        />
                       ) : errorUnits ? (
-                         <Text className="text-red-500 text-xs mt-1">Lỗi tải đơn vị</Text>
-                      ): (
-                        <View className="border border-gray-300 rounded-lg">
+                        <Text className="text-red-500 text-xs mt-1">
+                          Lỗi tải đơn vị
+                        </Text>
+                      ) : (
+                        <View
+                          className="border border-gray-300 rounded-lg px-2"
+                          style={{ height: 44, justifyContent: 'center' }}
+                        >
                           <Picker
                             selectedValue={ingredient.unitId}
                             onValueChange={(itemValue) => {
-                              if (itemValue !== null && itemValue !== undefined) {
+                              if (
+                                itemValue !== null &&
+                                itemValue !== undefined
+                              ) {
                                 updateIngredient(
                                   ingredient.ingredientId,
                                   'unitId',
@@ -439,15 +471,25 @@ export const EditFoodScreen = () => {
                                 );
                               }
                             }}
-                            prompt="Chọn đơn vị"
-                            style={{ height: 44, justifyContent: 'center' }}
-                            itemStyle={{ height: 44, fontSize: 16 }}
+                            style={{
+                              height: 44,
+                              fontSize: 16,
+                            }}
+                            dropdownIconColor="#000"
                           >
-                            <Picker.Item label="-- Chọn đơn vị --" value={null} style={{color: '#9CA3AF'}}/>
+                            <Picker.Item
+                              label="-- Chọn đơn vị --"
+                              value={null}
+                              style={{ color: '#9CA3AF' }}
+                            />
                             {unitsOfMeasure.map((unit) => (
                               <Picker.Item
                                 key={unit.id}
-                                label={unit.symbol ? `${unit.unitName} (${unit.symbol})` : unit.unitName}
+                                label={
+                                  unit.symbol
+                                    ? `${unit.unitName} (${unit.symbol})`
+                                    : unit.unitName
+                                }
                                 value={unit.id}
                               />
                             ))}
@@ -539,7 +581,9 @@ export const EditFoodScreen = () => {
           {/* Submit Button */}
           <View className="mb-6">
             {error && (
-              <Text className="text-red-500 mb-2 text-center text-xl">{error}</Text>
+              <Text className="text-red-500 mb-2 text-center text-xl">
+                {error}
+              </Text>
             )}
 
             <View className="flex-row space-x-2">
@@ -554,9 +598,9 @@ export const EditFoodScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </ScrollView>
+        </ScrollView>)
+      }
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
-

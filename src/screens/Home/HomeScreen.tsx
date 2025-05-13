@@ -7,56 +7,67 @@ import {
   Image,
   TouchableOpacity,
   ImageBackground,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { mockData } from '../../MockData/Data';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useState, useEffect } from 'react';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useHomeData } from 'src/hooks/useHomeData';
 
 const backgroundImage = require('@assets/background.png');
 
 const HomeScreen = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [categories, setCategories] = useState(mockData.categories);
-  const [activeCategoryId, setActiveCategoryId] = useState('1');
-  const [featuredItems, setFeaturedItems] = useState(
-    mockData.featuredByCategory['1']
-  );
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const {
+    isLoading,
+    error,
+    homeData,
+    activeCategoryId,
+    toggleFavorite,
+    handleCategoryPress,
+    isAuthenticated
+  } = useHomeData();
 
   const handleProfilePress = async () => {
-    const token = await AsyncStorage.getItem('accessToken');
-    if (token) {
+    if (isAuthenticated) {
       navigation.navigate('ProfileScreen');
     } else {
       navigation.navigate('Login');
     }
   };
 
-  useEffect(() => {
-    setFeaturedItems(mockData.featuredByCategory[activeCategoryId] || []);
-  }, [activeCategoryId]);
-
-  const handleCategoryPress = (categoryId) => {
-    setActiveCategoryId(categoryId);
-    const updatedCategories = categories.map((category) => ({
-      ...category,
-      isActive: category.id === categoryId,
-    }));
-    setCategories(updatedCategories);
+  const handleFavoritePress = async (itemId: string, type: 'recipe' | 'featured') => {
+    if (!isAuthenticated) {
+      navigation.navigate('Login');
+      return;
+    }
+    await toggleFavorite(itemId, type);
   };
 
-  const toggleFavorite = (itemId) => {
-    setFeaturedItems(
-      featuredItems.map((item) =>
-        item.id === itemId ? { ...item, isFavorite: !item.isFavorite } : item
-      )
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#941D23" />
+      </View>
     );
-  };
+  }
+
+  if (error || !homeData) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-red-600 text-center px-4">{error || 'Có lỗi xảy ra'}</Text>
+        <TouchableOpacity
+          className="mt-4 bg-red-600 px-4 py-2 rounded-full"
+          onPress={() => handleCategoryPress(activeCategoryId)}
+        >
+          <Text className="text-white">Thử lại</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground
@@ -68,21 +79,40 @@ const HomeScreen = () => {
         <ScrollView className="flex-1">
           {/* Header */}
           <View className="flex-row items-center justify-between mb-2 px-5 py-4">
-            <TouchableOpacity
-              onPress={handleProfilePress}
-              className="flex-row items-center"
-            >
-              <Image
-                source={{ uri: mockData.user.avatar }}
-                className="w-20 h-20 rounded-full mr-3"
-              />
-              <View>
-                <Text className="text-[#454442] italic">Chào buổi sáng,</Text>
-                <Text className="text-[#454442] text-2xl font-bold">
-                  {mockData.user.name}
-                </Text>
-              </View>
-            </TouchableOpacity>
+            {isAuthenticated ? (
+              // Header khi đã đăng nhập
+              <TouchableOpacity
+                onPress={handleProfilePress}
+                className="flex-row items-center"
+              >
+                <Image
+                  source={{ uri: homeData.user?.avatar }}
+                  className="w-20 h-20 rounded-full mr-3"
+                />
+                <View>
+                  <Text className="text-[#454442] italic">Chào buổi sáng,</Text>
+                  <Text className="text-[#454442] text-2xl font-bold">
+                    {homeData.user?.name}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ) : (
+              // Header khi chưa đăng nhập
+              <TouchableOpacity
+                onPress={handleProfilePress}
+                className="flex-row items-center"
+              >
+                <View className="w-20 h-20 rounded-full mr-3 bg-gray-200 items-center justify-center">
+                  <Ionicons name="person-outline" size={40} color="#454442" />
+                </View>
+                <View>
+                  <Text className="text-[#454442] italic">Xin chào,</Text>
+                  <Text className="text-[#454442] text-2xl font-bold">
+                    Đăng nhập ngay
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity>
               <Ionicons name="search-outline" size={24} color="#454442" />
@@ -95,7 +125,6 @@ const HomeScreen = () => {
             style={{ backgroundColor: '#941D23' }}
             activeOpacity={0.9}
           >
-            {/* Nội dung bên trái */}
             <View className="flex-1 pr-3">
               <Text className="text-white text-base font-medium leading-[22px]">
                 Phở bò là một phần của{' '}
@@ -110,9 +139,8 @@ const HomeScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Hình ảnh */}
             <Image
-              source={{ uri: mockData.banner.image }}
+              source={{ uri: homeData.banner.image }}
               className="w-44 h-44 rounded-full"
               resizeMode="cover"
             />
@@ -130,7 +158,7 @@ const HomeScreen = () => {
             className="px-4 mb-4"
             contentContainerStyle={{ paddingRight: 16 }}
           >
-            {mockData.recipes.map((recipe) => (
+            {homeData.recipes.map((recipe) => (
               <TouchableOpacity
                 key={recipe.id}
                 onPress={() =>
@@ -140,18 +168,18 @@ const HomeScreen = () => {
                 }
                 className="mr-4 w-64 h-56 relative overflow-hidden rounded-xl"
               >
-                {/* Background Image */}
                 <Image
                   source={{ uri: recipe.image }}
                   className="absolute w-full h-full"
                   resizeMode="cover"
                 />
 
-                {/* Dark Overlay for better text visibility */}
                 <View className="absolute w-full h-full bg-black/30" />
 
-                {/* Favorite Button */}
-                <TouchableOpacity className="absolute top-2 right-2 bg-white/80 rounded-full p-1.5 z-10">
+                <TouchableOpacity 
+                  className="absolute top-2 right-2 bg-white/80 rounded-full p-1.5 z-10"
+                  onPress={() => handleFavoritePress(recipe.id, 'recipe')}
+                >
                   <Ionicons
                     name={recipe.isFavorite ? 'heart' : 'heart-outline'}
                     size={18}
@@ -159,16 +187,13 @@ const HomeScreen = () => {
                   />
                 </TouchableOpacity>
 
-                {/* Content Container - at the bottom */}
                 <View className="absolute bottom-0 left-0 right-0 p-3">
-                  {/* Recipe Title */}
                   <Text className="text-white font-bold text-base mb-2">
                     {recipe.description.length > 25
                       ? recipe.description.substring(0, 25) + '...'
                       : recipe.description}
                   </Text>
 
-                  {/* Author and Time */}
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center">
                       {recipe.authorAvatar ? (
@@ -214,7 +239,7 @@ const HomeScreen = () => {
             showsHorizontalScrollIndicator={false}
             className="px-4 py-4"
           >
-            {categories.map((category) => (
+            {homeData.categories.map((category) => (
               <TouchableOpacity
                 key={category.id}
                 onPress={() => handleCategoryPress(category.id)}
@@ -248,7 +273,7 @@ const HomeScreen = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingRight: 15, paddingTop: 40 }}
             >
-              {featuredItems.map((item) => (
+              {homeData.featuredByCategory[activeCategoryId]?.map((item) => (
                 <TouchableOpacity
                   key={item.id}
                   onPress={() =>
@@ -259,7 +284,6 @@ const HomeScreen = () => {
                   className="bg-white rounded-2xl mb-4 mr-5 shadow-xl relative"
                   style={{ width: 160, height: 170 }}
                 >
-                  {/* Top circular image with absolute positioning */}
                   <View className="absolute top-[-40px] left-0 right-0 items-center">
                     <Image
                       source={{ uri: item.image }}
@@ -268,13 +292,11 @@ const HomeScreen = () => {
                     />
                   </View>
 
-                  {/* Content below image */}
                   <View className="pt-32">
                     <Text className="text-center font-bold text-xl mb-2 px-1">
                       {item.name}
                     </Text>
-                    {/* Bottom row with time and favorite */}
-                    <View className="flex-row items-center justify-between  px-3 pb-3">
+                    <View className="flex-row items-center justify-between px-3 pb-3">
                       <View className="flex-row items-center">
                         <Ionicons name="time-outline" size={14} color="gray" />
                         <Text className="text-gray-500 text-xs ml-1">
@@ -282,7 +304,7 @@ const HomeScreen = () => {
                         </Text>
                       </View>
 
-                      <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+                      <TouchableOpacity onPress={() => handleFavoritePress(item.id, 'featured')}>
                         <Ionicons
                           name={item.isFavorite ? 'heart' : 'heart-outline'}
                           size={16}

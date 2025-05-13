@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from 'src/api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Category {
   id: string;
@@ -34,7 +35,7 @@ interface HomeData {
   user: {
     name: string;
     avatar: string;
-  };
+  } | null;
   banner: {
     image: string;
   };
@@ -45,6 +46,19 @@ export const useHomeData = () => {
   const [error, setError] = useState<string | null>(null);
   const [homeData, setHomeData] = useState<HomeData | null>(null);
   const [activeCategoryId, setActiveCategoryId] = useState('1');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check authentication status
+  const checkAuth = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      setIsAuthenticated(!!token);
+      return !!token;
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      return false;
+    }
+  };
 
   // Fetch all necessary data
   const fetchHomeData = async () => {
@@ -52,8 +66,10 @@ export const useHomeData = () => {
       setIsLoading(true);
       setError(null);
 
+      const isAuth = await checkAuth();
+
       // Fetch categories
-      const categoriesResponse = await api.get('/categories');
+      const categoriesResponse = await api.get('/recipe-categories/random');
       const categories = categoriesResponse.data.data.map((cat: any) => ({
         id: cat.id,
         name: cat.name,
@@ -61,8 +77,8 @@ export const useHomeData = () => {
         isActive: cat.id === '1'
       }));
 
-      // Fetch recipes
-      const recipesResponse = await api.get('/recipes');
+      // Fetch popular recipes
+      const recipesResponse = await api.get('/recipes/popular');
       const recipes = recipesResponse.data.data.map((recipe: any) => ({
         id: recipe.id,
         name: recipe.name,
@@ -71,38 +87,40 @@ export const useHomeData = () => {
         author: recipe.account?.name || 'Unknown',
         authorAvatar: recipe.account?.avatarUrl,
         time: `${recipe.cookingTime} phút`,
-        isFavorite: false
+        isFavorite: isAuth ? (recipe.isFavorite || false) : false
       }));
 
       // Fetch featured recipes by category
-      const featuredResponse = await api.get('/recipes/featured');
-      const featuredByCategory = featuredResponse.data.data.reduce((acc: any, recipe: any) => {
-        const categoryId = recipe.categoryMappings?.[0]?.recipeCategoryId || '1';
-        if (!acc[categoryId]) {
-          acc[categoryId] = [];
-        }
-        acc[categoryId].push({
+      const featuredResponse = await api.get(`/recipes/category/${activeCategoryId}/top`);
+      const featuredByCategory = {
+        [activeCategoryId]: featuredResponse.data.data.map((recipe: any) => ({
           id: recipe.id,
           name: recipe.name,
           image: recipe.imageUrl,
           time: `${recipe.cookingTime} phút`,
-          isFavorite: false
-        });
-        return acc;
-      }, {});
-
-      // Fetch user profile
-      const userResponse = await api.get('/accounts/profile');
-      const user = {
-        name: userResponse.data.data.name,
-        avatar: userResponse.data.data.avatarUrl
+          isFavorite: isAuth ? (recipe.isFavorite || false) : false
+        }))
       };
 
       // Fetch banner
-      const bannerResponse = await api.get('/banners/active');
+      const bannerResponse = await api.get('/recipes/banner');
       const banner = {
         image: bannerResponse.data.data.imageUrl
       };
+
+      // Fetch user profile only if authenticated
+      let user = null;
+      if (isAuth) {
+        try {
+          const userResponse = await api.get('/accounts/profile');
+          user = {
+            name: userResponse.data.data.name,
+            avatar: userResponse.data.data.avatarUrl
+          };
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        }
+      }
 
       setHomeData({
         categories,
@@ -120,31 +138,46 @@ export const useHomeData = () => {
   };
 
   // Toggle favorite status
-  const toggleFavorite = (itemId: string, type: 'recipe' | 'featured') => {
-    if (!homeData) return;
+  const toggleFavorite = async (itemId: string, type: 'recipe' | 'featured') => {
+    if (!homeData || !isAuthenticated) {
+      // Nếu chưa đăng nhập, chuyển hướng đến trang login
+      return false;
+    }
 
-    if (type === 'recipe') {
-      setHomeData(prev => ({
-        ...prev!,
-        recipes: prev!.recipes.map(item =>
-          item.id === itemId ? { ...item, isFavorite: !item.isFavorite } : item
-        )
-      }));
-    } else {
-      setHomeData(prev => ({
-        ...prev!,
-        featuredByCategory: {
-          ...prev!.featuredByCategory,
-          [activeCategoryId]: prev!.featuredByCategory[activeCategoryId].map(item =>
-            item.id === itemId ? { ...item, isFavorite: !item.isFavorite } : item
+    try {
+      const response = await api.post('/favorite-recipes/toggle', {
+        recipeId: itemId
+      });
+
+      const isFavorite = response.data.isFavorite;
+
+      if (type === 'recipe') {
+        setHomeData(prev => ({
+          ...prev!,
+          recipes: prev!.recipes.map(item =>
+            item.id === itemId ? { ...item, isFavorite } : item
           )
-        }
-      }));
+        }));
+      } else {
+        setHomeData(prev => ({
+          ...prev!,
+          featuredByCategory: {
+            ...prev!.featuredByCategory,
+            [activeCategoryId]: prev!.featuredByCategory[activeCategoryId].map(item =>
+              item.id === itemId ? { ...item, isFavorite } : item
+            )
+          }
+        }));
+      }
+      return true;
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      return false;
     }
   };
 
   // Handle category change
-  const handleCategoryPress = (categoryId: string) => {
+  const handleCategoryPress = async (categoryId: string) => {
     setActiveCategoryId(categoryId);
     setHomeData(prev => ({
       ...prev!,
@@ -153,6 +186,26 @@ export const useHomeData = () => {
         isActive: category.id === categoryId
       }))
     }));
+
+    // Fetch new featured recipes for the selected category
+    try {
+      const featuredResponse = await api.get(`/recipes/category/${categoryId}/top`);
+      setHomeData(prev => ({
+        ...prev!,
+        featuredByCategory: {
+          ...prev!.featuredByCategory,
+          [categoryId]: featuredResponse.data.data.map((recipe: any) => ({
+            id: recipe.id,
+            name: recipe.name,
+            image: recipe.imageUrl,
+            time: `${recipe.cookingTime} phút`,
+            isFavorite: isAuthenticated ? (recipe.isFavorite || false) : false
+          }))
+        }
+      }));
+    } catch (error) {
+      console.error('Error fetching featured recipes:', error);
+    }
   };
 
   useEffect(() => {
@@ -166,6 +219,7 @@ export const useHomeData = () => {
     activeCategoryId,
     toggleFavorite,
     handleCategoryPress,
-    refreshData: fetchHomeData
+    refreshData: fetchHomeData,
+    isAuthenticated
   };
-}; 
+};

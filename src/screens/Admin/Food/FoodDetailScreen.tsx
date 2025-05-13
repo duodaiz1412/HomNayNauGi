@@ -27,7 +27,7 @@ export const FoodDetailScreen = () => {
           throw new Error('Không tìm thấy công thức');
         }
         
-        console.log("\nRecipe data:", recipeData);
+        console.log("\nRecipe data:", JSON.stringify(recipeData,null,2));
         setRecipe(recipeData);
       } catch (e) {
         console.error('Error fetching recipe:', e);
@@ -148,9 +148,9 @@ export const FoodDetailScreen = () => {
           <Text className="text-lg font-bold mb-2">Nguyên liệu</Text>
           {recipe.recipeIngredients?.map((ingredient, index) => (
             <View key={index} className="flex-row justify-between py-2 border-b border-gray-100">
-              <Text className="text-gray-700">ID: {ingredient.ingredientId}</Text>
+              <Text className="text-gray-700">{ingredient.ingredient.name}</Text>
               <Text className="text-gray-500">
-                {ingredient.quantity} {ingredient.unitId}
+                {ingredient.quantity} {ingredient.unit.symbol}
               </Text>
             </View>
           ))}
@@ -181,9 +181,15 @@ export const FoodDetailScreen = () => {
             <Text className="text-gray-700">{recipe.status}</Text>
           </View>
           <View className="flex-row justify-between py-2 border-b border-gray-100">
+            <Text className="text-gray-500">Id Người tạo</Text>
+            <View className="flex-row items-center">
+              <Text className="text-gray-700">{recipe.accountId}</Text>
+            </View>
+          </View>
+          <View className="flex-row justify-between py-2 border-b border-gray-100">
             <Text className="text-gray-500">Người tạo</Text>
             <View className="flex-row items-center">
-              <Text className="text-gray-700">{recipe.account?.name}</Text>
+              <Text className="text-gray-700">{recipe.account?.userProfile.fullName}</Text>
             </View>
           </View>
           <View className="flex-row justify-between py-2 border-b border-gray-100">

@@ -34,6 +34,7 @@ export interface Account {
   createdAt: string
   updatedAt: string
   avatar: string | null
+  userProfile: UserProfile | null
 }
 
 // Interface cho hồ sơ người dùng
@@ -170,4 +171,32 @@ export interface AccountPantryItem {
   accountId: string
   ingredientId: string
   addedAt: string
+}
+
+export interface ClientCreateRecipePayload {
+  id?: string; // Optional id for update operation
+  name: string;
+  description?: string;
+  protein?: number;
+  fat?: number;
+  calories?: number;
+  carbohydrates?: number;
+  preparationTimeMinutes?: number;
+  videoUrl?: string;
+  hasNewRecipeImageFile?: boolean;
+  status: RecipeStatus;
+  categoryIds: number[];
+  ingredients: {
+    ingredientId: string;
+    quantity?: number;
+    unitId?: number;
+  }[];
+  steps: {
+    stepOrder: number;
+    instruction: string;
+    imageUrl?: string | null;
+    hasNewImageFile?: boolean;
+  }[];
+  recipeImageFile?: any;
+  stepImageFiles?: any[];
 }
