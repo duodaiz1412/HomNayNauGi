@@ -28,8 +28,9 @@ import { AdminDrawerNavigator } from './AdminDrawerNavigator';
 import ScanIngredientScreen from '../screens/ScanIngredient/ScanIngredientScreen';
 
 interface Ingredient {
+  id: string;
   name: string;
-  image: string;
+  imageUrl?: string;
 }
 
 export type RootStackParamList = {
