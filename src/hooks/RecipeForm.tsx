@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useFoodManagement } from 'src/context/FoodManagementContext';
 import { Recipe, RecipeStatus } from 'src/types';
+import api from 'src/api/api';
 
 interface UseRecipeFormProps {
   recipeId?: string; // Nếu có, sẽ tải dữ liệu công thức hiện có
@@ -29,6 +30,7 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
   useEffect(() => {
     const loadRecipe = async () => {
       if (!recipeId) {
+        // Reset form khi không có recipeId (trường hợp Add)
         resetForm();
         setCurrentRecipe(null);
         return;
@@ -38,45 +40,65 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
         setIsLoading(true);
         setError(null);
 
-        const recipe = await getRecipe(recipeId);
+        const response = await api.get(`/admin/recipes/get-recipe/${recipeId}`);
+        const recipe = response.data;
+        console.log('\nRECIPE GET', recipe);
         if (!recipe) {
-          setError('Recipe not found');
+          setError('Không tìm thấy công thức');
           return;
         }
-
-        // Cập nhật form với dữ liệu công thức
-        updateBasicInfo({
+        const preparedBasicInfo: Partial<Recipe> = {
           name: recipe.name,
           description: recipe.description,
-          protein: recipe.protein,
-          fat: recipe.fat,
-          calories: recipe.calories,
-          carbohydrates: recipe.carbohydrates,
+          // Quan trọng: Chuyển đổi kiểu nếu cần (ví dụ: API trả về string cho number)
+          protein:
+            recipe.protein === null || recipe.protein === undefined
+              ? null
+              : parseFloat(recipe.protein as any),
+          fat:
+            recipe.fat === null || recipe.fat === undefined
+              ? null
+              : parseFloat(recipe.fat as any),
+          calories:
+            recipe.calories === null || recipe.calories === undefined
+              ? null
+              : parseInt(recipe.calories as any, 10),
+          carbohydrates:
+            recipe.carbohydrates === null || recipe.carbohydrates === undefined
+              ? null
+              : parseFloat(recipe.carbohydrates as any),
           imageUrl: recipe.imageUrl,
-          preparationTimeMinutes: recipe.preparationTimeMinutes,
+          preparationTimeMinutes:
+            recipe.preparationTimeMinutes === null ||
+            recipe.preparationTimeMinutes === undefined
+              ? null
+              : parseInt(recipe.preparationTimeMinutes as any, 10),
           videoUrl: recipe.videoUrl,
-          status: recipe.status,
-        });
+          status: recipe.status, // Giả sử recipe.status đã đúng kiểu RecipeStatus
+        };
+        updateBasicInfo(preparedBasicInfo);
 
         // Cập nhật danh mục
-        if (recipe.categories) {
-          updateCategories(recipe.categories);
+        if (recipe.categoryMappings) {
+          updateCategories(
+            recipe.categoryMappings.map((mapping) => mapping.recipeCategory)
+          );
         }
 
         // Cập nhật nguyên liệu
-        if (recipe.ingredients) {
-          updateIngredients(recipe.ingredients);
+        if (recipe.recipeIngredients) {
+          updateIngredients(recipe.recipeIngredients);
         }
 
         // Cập nhật các bước
-        if (recipe.steps) {
-          updateSteps(recipe.steps);
+        if (recipe.cookingSteps) {
+          updateSteps(recipe.cookingSteps);
         }
 
         // Lưu công thức hiện tại
         setCurrentRecipe(recipe);
       } catch (err) {
-        setError('Failed to load recipe');
+        setError('Không thể tải thông tin công thức');
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -88,67 +110,67 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
 
   // Xử lý lưu form
   const handleSave = async (): Promise<Recipe | null> => {
-
     try {
-
       setIsLoading(true);
       setError(null);
 
       const { basicInfo, categories, ingredients, steps } = recipeForm;
 
       // --- VALIDATION CƠ BẢN (luôn thực hiện) ---
-      if (!basicInfo.name || basicInfo.name.trim() === "") {
-        setError("Tên món ăn là bắt buộc.");
+      if (!basicInfo.name || basicInfo.name.trim() === '') {
+        setError('Tên món ăn là bắt buộc.');
         setIsLoading(false); // Quan trọng: reset loading
         return null;
       }
-          if (!categories || categories.length === 0) {
-      setError("Vui lòng chọn ít nhất một danh mục."); // Áp dụng cho cả nháp
-      setIsLoading(false);
-      return null;
-    }
-    if (!ingredients || ingredients.length === 0) {
-      setError("Vui lòng thêm ít nhất một nguyên liệu."); // Áp dụng cho cả nháp
-      setIsLoading(false);
-      return null;
-    }
-        const hasInvalidIngredientForDraft = ingredients.some(
-      (ing) => !ing.ingredientId // Tối thiểu phải có ingredientId
-    );
-    if (hasInvalidIngredientForDraft) {
-        setError("Thông tin nguyên liệu không hợp lệ.");
-        setIsLoading(false); return null;
-    }
-        if (!steps || steps.length === 0) {
-      setError("Vui lòng thêm ít nhất một bước nấu ăn."); // Áp dụng cho cả nháp
-      setIsLoading(false);
-      return null;
-    }
-    // Kiểm tra chi tiết hơn cho steps nếu cần (ví dụ: instruction)
-    // Ví dụ:
-    const hasEmptyStepInstructionForDraft = steps.some(
-      (step) => !step.instruction || step.instruction.trim() === ""
-    );
-    if (hasEmptyStepInstructionForDraft) {
-        setError("Vui lòng điền mô tả cho tất cả các bước nấu ăn.");
-        setIsLoading(false); return null;
-    }
+      if (!categories || categories.length === 0) {
+        setError('Vui lòng chọn ít nhất một danh mục.'); // Áp dụng cho cả nháp
+        setIsLoading(false);
+        return null;
+      }
+      const hasInvalidIngredientForDraft = ingredients.some(
+        (ing) =>
+          !ing.ingredientId || // Chưa chọn nguyên liệu
+          ing.quantity == null ||
+          ing.quantity <= 0 || // Chưa nhập số lượng
+          !ing.unitId // Chưa chọn đơn vị
+      );
+      if (hasInvalidIngredientForDraft) {
+        setError('Mỗi nguyên liệu cần có tên, số lượng và đơn vị.');
+        setIsLoading(false);
+        return null;
+      }
+      if (!steps || steps.length === 0) {
+        setError('Vui lòng thêm ít nhất một bước nấu ăn.'); // Áp dụng cho cả nháp
+        setIsLoading(false);
+        return null;
+      }
+      // Kiểm tra chi tiết hơn cho steps nếu cần (ví dụ: instruction)
+      // Ví dụ:
+      const hasEmptyStepInstructionForDraft = steps.some(
+        (step) => !step.instruction || step.instruction.trim() === ''
+      );
+      if (hasEmptyStepInstructionForDraft) {
+        setError('Vui lòng điền mô tả cho tất cả các bước nấu ăn.');
+        setIsLoading(false);
+        return null;
+      }
       // --- VALIDATION CHI TIẾT KHI STATUS LÀ PUBLISHED ---
-if (basicInfo.status === RecipeStatus.PUBLIC) {
-        if (!basicInfo.description || basicInfo.description.trim() === "") {
-          setError("Mô tả món ăn là bắt buộc khi công khai.");
+      if (basicInfo.status === RecipeStatus.PUBLIC) {
+        if (!basicInfo.description || basicInfo.description.trim() === '') {
+          setError('Mô tả món ăn là bắt buộc khi công khai.');
           setIsLoading(false);
           return null;
         }
         if (!categories || categories.length === 0) {
-          setError("Vui lòng chọn ít nhất một danh mục khi công khai.");
+          setError('Vui lòng chọn ít nhất một danh mục khi công khai.');
           setIsLoading(false);
           return null;
         }
 
         // === KIỂM TRA ẢNH CHÍNH ===
-        if (!basicInfo.imageUrl) { // basicInfo.imageUrl sẽ là URI từ ImagePicker
-          setError("Hình ảnh món ăn là bắt buộc khi công khai.");
+        if (!basicInfo.imageUrl) {
+          // basicInfo.imageUrl sẽ là URI từ ImagePicker
+          setError('Hình ảnh món ăn là bắt buộc khi công khai.');
           setIsLoading(false);
           return null;
         }
@@ -156,37 +178,53 @@ if (basicInfo.status === RecipeStatus.PUBLIC) {
         // hoặc phải là một URL http/https nếu là sửa và không thay đổi ảnh.
         // Hiện tại, chỉ cần có giá trị là đủ cho bước này.
 
-        if (basicInfo.protein === null || basicInfo.protein === undefined ||
-            basicInfo.fat === null || basicInfo.fat === undefined ||
-            basicInfo.carbohydrates === null || basicInfo.carbohydrates === undefined ||
-            basicInfo.calories === null || basicInfo.calories === undefined) {
-          setError("Vui lòng điền đầy đủ thông tin dinh dưỡng (Protein, Fat, Carb, Calories) khi công khai.");
+        if (
+          basicInfo.protein === null ||
+          basicInfo.protein === undefined ||
+          basicInfo.fat === null ||
+          basicInfo.fat === undefined ||
+          basicInfo.carbohydrates === null ||
+          basicInfo.carbohydrates === undefined ||
+          basicInfo.calories === null ||
+          basicInfo.calories === undefined
+        ) {
+          setError(
+            'Vui lòng điền đầy đủ thông tin dinh dưỡng (Protein, Fat, Carb, Calories) khi công khai.'
+          );
           setIsLoading(false);
           return null;
         }
         if (!ingredients || ingredients.length === 0) {
-          setError("Vui lòng thêm ít nhất một nguyên liệu khi công khai.");
+          setError('Vui lòng thêm ít nhất một nguyên liệu khi công khai.');
           setIsLoading(false);
           return null;
         }
         const hasEmptyIngredientQuantity = ingredients.some(
-          (ing) => ing.quantity === null || ing.quantity === undefined || ing.quantity <= 0 || !ing.unitId
+          (ing) =>
+            ing.quantity === null ||
+            ing.quantity === undefined ||
+            ing.quantity <= 0 ||
+            !ing.unitId
         );
         if (hasEmptyIngredientQuantity) {
-          setError("Vui lòng điền đầy đủ số lượng và đơn vị cho tất cả nguyên liệu khi công khai.");
+          setError(
+            'Vui lòng điền đầy đủ số lượng và đơn vị cho tất cả nguyên liệu khi công khai.'
+          );
           setIsLoading(false);
           return null;
         }
         if (!steps || steps.length === 0) {
-          setError("Vui lòng thêm ít nhất một bước nấu ăn khi công khai.");
+          setError('Vui lòng thêm ít nhất một bước nấu ăn khi công khai.');
           setIsLoading(false);
           return null;
         }
         const hasEmptyStepInstruction = steps.some(
-          (step) => !step.instruction || step.instruction.trim() === ""
+          (step) => !step.instruction || step.instruction.trim() === ''
         );
         if (hasEmptyStepInstruction) {
-          setError("Vui lòng điền đầy đủ mô tả cho tất cả các bước nấu ăn khi công khai.");
+          setError(
+            'Vui lòng điền đầy đủ mô tả cho tất cả các bước nấu ăn khi công khai.'
+          );
           setIsLoading(false);
           return null;
         }
