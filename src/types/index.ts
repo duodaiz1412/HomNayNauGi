@@ -144,6 +144,12 @@ export interface Recipe {
   totalFavorites: number
 }
 
+// Interface cho chi tiết công thức (dùng cho màn hình chi tiết)
+export interface RecipeDetailTypes extends Recipe {
+  isFavorite: boolean;
+  isLiked: boolean;
+}
+
 // Interface cho lượt thích công thức
 export interface RecipeLike {
   accountId: string

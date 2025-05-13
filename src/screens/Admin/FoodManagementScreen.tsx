@@ -32,8 +32,8 @@ export const AdminFoodManagementScreen = () => {
 
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  // Chọn một trạng thái mặc định, ví dụ: PUBLISHED
   const [selectedStatusFilter, setSelectedStatusFilter] = useState(RecipeStatus.PUBLIC);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const [recipes, setRecipes] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -41,19 +41,23 @@ export const AdminFoodManagementScreen = () => {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
-  const fetchRecipes = async (query = "", status: RecipeStatus, currentOffset = 0)=> {
+  const fetchRecipes = async (query = "", status: RecipeStatus, currentOffset = 0) => {
     try {
       setLoading(true);
       const params: any = {
-        query: query || undefined,
-        status: status, // Luôn gửi một trạng thái cụ thể
+        status: status,
         offset: currentOffset,
         limit,
       };
-      // console.log("Fetching recipes with params:", params);
+      
+      if (query && query.trim() !== '') {
+        params.query = query.trim();
+      }
+
+      console.log("Fetching recipes with params:", params);
       const response = await api.get('/admin/recipes/search', { params });
       const { data, total } = response.data;
-      console.log("recipes",data)
+      console.log("recipes", JSON.stringify(data, null, 2));
       return { data: data || [], total: total || 0 };
     } catch (error) {
       console.error('Error fetching recipes:', error);
@@ -66,36 +70,37 @@ export const AdminFoodManagementScreen = () => {
 
   const loadRecipes = async (reset = false) => {
     if (loading || (!hasMore && !reset)) return;
-
-    const currentOffset = reset ? 0 : offset;
-    const { data: newRecipes, total } = await fetchRecipes(searchQuery, selectedStatusFilter, currentOffset);
-
-    if (reset) {
+    try {
+      const newOffset = reset ? 0 : offset;
+      const { data, total } = await fetchRecipes(searchQuery, selectedStatusFilter, newOffset);
+      const newRecipes = reset ? data : [...recipes, ...data];
       setRecipes(newRecipes);
-    } else {
-      setRecipes((prevRecipes) => [...prevRecipes, ...newRecipes]);
+      setOffset(newOffset + data.length);
+      setHasMore(newRecipes.length < total);
+    } catch (error) {
+      console.error('Error loading recipes:', error);
+      setLoading(false);
     }
-    setOffset(currentOffset + newRecipes.length);
-    setHasMore((reset ? newRecipes.length : recipes.length + newRecipes.length) < total);
   };
 
   const debouncedSearch = useCallback(
-    debounce((text: string) => {
-      setSearchQuery(text);
-      setRecipes([]);
-      setOffset(0);
-      setHasMore(true);
+    debounce((query) => {
+      setSearchQuery(query);
     }, 500),
     []
   );
 
+  // Load dữ liệu khi searchQuery hoặc selectedStatusFilter thay đổi
   useEffect(() => {
-    setRecipes([]);
-    setOffset(0);
-    setHasMore(true);
     loadRecipes(true);
   }, [searchQuery, selectedStatusFilter]);
 
+  // Xử lý nút xóa bộ lọc/tìm kiếm
+  const handleClearFilters = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    setSelectedStatusFilter(RecipeStatus.PUBLIC);
+  };
 
 const renderFoodItem = ({ item }) => {
   const statusInfo = STATUS_FILTERS.find(sf => sf.value === item.status);
@@ -216,38 +221,40 @@ return (
             }}
           />
           {searchInput ? (
-            <TouchableOpacity onPress={() => { setSearchInput(''); debouncedSearch(''); }}>
+            <TouchableOpacity 
+              onPress={() => {
+                setSearchInput('');
+                setSearchQuery('');
+              }}
+            >
               <Ionicons name="close-circle" size={20} color="#454442" />
             </TouchableOpacity>
           ) : null}
         </View>
 
         <View>
-            <Text className="text-gray-600 text-sm font-medium mb-1.5">Trạng thái:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} >
-            {/* Sử dụng STATUS_FILTERS đã định nghĩa ở trên */}
+          <Text className="text-gray-600 text-sm font-medium mb-1.5">Trạng thái:</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {STATUS_FILTERS.map((filter) => (
-                <TouchableOpacity
-                key={filter.value} // value giờ là RecipeStatus, không có 'all'
+              <TouchableOpacity
+                key={filter.value}
                 className={`px-3.5 py-1.5 rounded-full mr-2 border ${
-                    selectedStatusFilter === filter.value
+                  selectedStatusFilter === filter.value
                     ? 'bg-[#941D23] border-[#941D23]'
                     : 'bg-white border-gray-300'
                 }`}
-                onPress={() => {
-                    setSelectedStatusFilter(filter.value);
-                }}
-                >
+                onPress={() => setSelectedStatusFilter(filter.value)}
+              >
                 <Text
-                    className={`${
+                  className={`${
                     selectedStatusFilter === filter.value ? 'text-white' : 'text-gray-700'
-                    } text-sm`}
+                  } text-sm`}
                 >
-                    {filter.label}
+                  {filter.label}
                 </Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
             ))}
-            </ScrollView>
+          </ScrollView>
         </View>
       </View>
 
@@ -259,26 +266,22 @@ return (
         onEndReached={() => loadRecipes(false)}
         onEndReachedThreshold={0.5}
         ListFooterComponent={
-          loading && recipes.length > 0 ? (
+          loading ? (
             <View className="items-center justify-center py-4">
               <ActivityIndicator size="small" color="#941D23" />
             </View>
           ) : null
         }
         ListEmptyComponent={
-          !loading && recipes.length === 0 ? (
+          !loading ? (
             <View className="flex-1 items-center justify-center mt-10">
               <Ionicons name="leaf-outline" size={48} color="gray" />
               <Text className="text-gray-500 mt-2">Không có món ăn nào.</Text>
-              { (searchQuery || selectedStatusFilter !== RecipeStatus.PUBLIC) && // So sánh với trạng thái mặc định
-                <TouchableOpacity onPress={() => {
-                    setSearchInput('');
-                    setSearchQuery('');
-                    setSelectedStatusFilter(RecipeStatus.PUBLIC); // Reset về trạng thái mặc định
-                }}>
-                    <Text className="text-blue-500 mt-1">Xóa bộ lọc/tìm kiếm</Text>
+              {(searchQuery || selectedStatusFilter !== RecipeStatus.PUBLIC) && (
+                <TouchableOpacity onPress={handleClearFilters}>
+                  <Text className="text-blue-500 mt-1">Xóa bộ lọc/tìm kiếm</Text>
                 </TouchableOpacity>
-              }
+              )}
             </View>
           ) : null
         }
