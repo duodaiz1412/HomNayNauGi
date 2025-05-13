@@ -26,8 +26,9 @@ import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
 import { AdminDrawerNavigator } from './AdminDrawerNavigator';
 interface Ingredient {
+  id: string;
   name: string;
-  image: string;
+  imageUrl?: string;
 }
 
 export type RootStackParamList = {
