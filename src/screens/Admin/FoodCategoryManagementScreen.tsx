@@ -7,8 +7,6 @@ import {
   TextInput,
   FlatList,
   Alert,
-  ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -85,40 +83,49 @@ export const AdminFoodCategoryManagementScreen = () => {
   }, [searchQuery]);
 
   const renderCategoryItem = ({ item }) => (
-    <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center flex-1">
-          <View className="bg-red-100 p-2 rounded-full mr-3">
+    <View className="bg-white mb-3 mx-4 rounded-2xl overflow-hidden shadow-sm">
+      <View className="p-4">
+        <View className="flex-row items-center">
+          <View className="relative">
             <Image
               source={{ uri: item.imageUrl }}
-              className="w-12 h-12 rounded-full"
+              className="w-20 h-20 rounded-xl"
               resizeMode="cover"
             />
+            {/* <View className="absolute -bottom-1 -right-1 bg-[#88131b] px-2 py-0.5 rounded-lg">
+              <Text className="text-white text-xs font-medium">Danh mục</Text>
+            </View> */}
           </View>
-          <View className="flex-1">
-            <Text className="font-bold text-base">{item.name}</Text> 
+          <View className="flex-1 ml-4">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-lg font-bold text-gray-800 flex-1 mr-2">{item.name}</Text>
+              <View className="flex-row">
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('EditFoodCategoryScreen', { categoryId: item.id })}
+                  className="w-8 h-8 items-center justify-center rounded-full bg-[#88131b]/5 mr-2"
+                >
+                  <Ionicons name="create-outline" size={18} color="#88131b" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    Alert.alert('Xác nhận', `Bạn có chắc muốn xóa ${item.name}?`, [
+                      { text: 'Hủy', style: 'cancel' },
+                      { text: 'Xóa', onPress: () => deleteCategory(item.id) },
+                    ])
+                  }
+                  className="w-8 h-8 items-center justify-center rounded-full bg-red-50"
+                >
+                  <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+                </TouchableOpacity>
+              </View>
+            </View> 
+            <View className="flex-row items-center mt-2">
+              <View className="flex-row items-center bg-[#88131b]/5 px-3 py-1 rounded-full">
+                <Ionicons name="restaurant-outline" size={14} color="#88131b" />
+                <Text className="text-xs text-[#88131b] ml-1 font-medium">Danh mục món ăn</Text>
+              </View>
+            </View>
           </View>
-        </View>
-        <View className="flex-row">
-          <TouchableOpacity
-            className="mr-2 bg-blue-100 px-3 py-1.5 rounded-full flex-row items-center"
-            onPress={() => navigation.navigate('EditFoodCategoryScreen', { categoryId: item.id })}
-          >
-            <Ionicons name="create-outline" size={14} color="#007AFF" />
-            <Text className="text-blue-600 text-xs ml-1">Sửa</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-red-100 px-3 py-1.5 rounded-full flex-row items-center"
-            onPress={() =>
-              Alert.alert('Xác nhận', `Bạn có chắc muốn xóa ${item.name}?`, [
-                { text: 'Hủy', style: 'cancel' },
-                { text: 'Xóa', onPress: () => deleteCategory(item.id) },
-              ])
-            }
-          >
-            <Ionicons name="trash-outline" size={14} color="#FF3B30" />
-            <Text className="text-red-600 text-xs ml-1">Xóa</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -129,27 +136,31 @@ export const AdminFoodCategoryManagementScreen = () => {
       {/* Header */}
       <AdminHeader title="Quản lý danh mục món ăn" />
 
-      {/* Search and Filter */}
-      <View className="px-4 py-3">
-        <View className="flex-row items-center bg-white rounded-lg px-3 mb-3 shadow-sm">
-          <Ionicons name="search" size={20} color="#454442" />
+      {/* Search Section */}
+      <View className="px-4 pt-4">
+        <View className="relative">
           <TextInput
-            className="flex-1 py-2 px-2"
+            className="bg-white h-12 rounded-2xl pl-12 pr-4 text-base shadow-sm"
             placeholder="Tìm kiếm danh mục món ăn..."
             value={searchInput}
             onChangeText={(text) => {
               setSearchInput(text);
               debouncedSearch(text);
             }}
+            placeholderTextColor="#9CA3AF"
           />
+          <View className="absolute left-4 top-3">
+            <Ionicons name="search" size={20} color="#88131b" />
+          </View>
           {searchInput ? (
             <TouchableOpacity
               onPress={() => {
                 setSearchInput('');
                 setSearchQuery('');
               }}
+              className="absolute right-4 top-3"
             >
-              <Ionicons name="close-circle" size={20} color="#454442" />
+              <Ionicons name="close-circle" size={20} color="#88131b" />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -160,22 +171,42 @@ export const AdminFoodCategoryManagementScreen = () => {
         data={categories}
         renderItem={renderCategoryItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ paddingVertical: 16 }}
         onEndReached={() => loadCategories(false)}
-        onEndReachedThreshold={0.5} 
+        onEndReachedThreshold={0.5}
+        ListHeaderComponent={
+          <View className="px-4 mb-6">
+            <Text className="text-2xl font-bold text-gray-800">Danh mục món ăn</Text>
+            <Text className="text-base text-gray-500 mt-1">
+              Quản lý và tổ chức các danh mục món ăn trong hệ thống
+            </Text>
+          </View>
+        }
         ListFooterComponent={
           loading ? (
-            <View className="items-center justify-center py-4">
-              <ActivityIndicator size="small" color="#941D23" />
-              <Text className="text-gray-500 mt-2">Đang tải...</Text>
+            <View className="items-center justify-center py-8">
+              <View className="w-10 h-10 border-3 border-[#88131b] border-t-transparent rounded-full animate-spin" />
+              <Text className="text-gray-500 mt-4 font-medium">Đang tải danh mục...</Text>
             </View>
           ) : null
         }
         ListEmptyComponent={
           !loading ? (
-            <View className="items-center justify-center py-8">
-              <Ionicons name="restaurant-outline" size={48} color="#CCCCCC" />
-              <Text className="text-gray-500 mt-2">Không tìm thấy danh mục nào</Text>
+            <View className="items-center justify-center py-16 px-4">
+              <View className="w-24 h-24 bg-[#88131b]/5 rounded-full items-center justify-center mb-6">
+                <Ionicons name="restaurant-outline" size={40} color="#88131b" />
+              </View>
+              <Text className="text-xl font-bold text-gray-800 mb-2">Không tìm thấy danh mục</Text>
+              <Text className="text-base text-gray-500 text-center">
+                Hãy thử tìm kiếm với từ khóa khác hoặc thêm danh mục mới vào hệ thống
+              </Text>
+              <TouchableOpacity
+                className="mt-6 bg-[#88131b] px-6 py-3 rounded-full flex-row items-center"
+                onPress={() => navigation.navigate('AddFoodCategoryScreen')}
+              >
+                <Ionicons name="add" size={20} color="white" />
+                <Text className="text-white font-medium ml-2">Thêm danh mục mới</Text>
+              </TouchableOpacity>
             </View>
           ) : null
         }
@@ -183,12 +214,18 @@ export const AdminFoodCategoryManagementScreen = () => {
 
       {/* Add Button */}
       <TouchableOpacity
-        className="absolute bottom-6 right-6 bg-[#941D23] w-14 h-14 rounded-full items-center justify-center shadow-lg"
+        className="absolute bottom-6 right-6 bg-[#88131b] w-14 h-14 rounded-full items-center justify-center"
         onPress={() => navigation.navigate('AddFoodCategoryScreen')}
+        style={{
+          shadowColor: '#88131b',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.25,
+          shadowRadius: 12,
+          elevation: 8,
+        }}
       >
-        <Ionicons name="add" size={30} color="white" />
+        <Ionicons name="add" size={28} color="white" />
       </TouchableOpacity>
-      
     </SafeAreaView>
   );
 };
