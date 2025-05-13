@@ -7,6 +7,8 @@ import {
   TextInput,
   FlatList,
   Alert,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -83,38 +85,41 @@ export const AdminFoodCategoryManagementScreen = () => {
   }, [searchQuery]);
 
   const renderCategoryItem = ({ item }) => (
-    <View className="bg-white rounded-xl p-4 shadow-sm mb-4 flex-row items-center">
-      <View className="bg-red-800 p-3 rounded-full mr-5">
-        <Image
-          source={{ uri: item.imageUrl }}
-          className="w-14 h-14 rounded-full"
-          resizeMode="cover"
-        />
-      </View>
-      <View className="flex-1">
-        <Text className="text-xl font-bold">{item.name}</Text>
-      </View>
-      <View className="flex-row">
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('EditFoodCategoryScreen', {
-              categoryId: item.id,
-            })
-          }
-          className="mr-3"
-        >
-          <Ionicons name="create-outline" size={24} color="#454442" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            Alert.alert('Xác nhận', `Bạn có chắc muốn xóa ${item.name}?`, [
-              { text: 'Hủy', style: 'cancel' },
-              { text: 'Xóa', onPress: () => deleteCategory(item.id) },
-            ])
-          }
-        >
-          <Ionicons name="trash-outline" size={24} color="#FF3B30" />
-        </TouchableOpacity>
+    <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
+      <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center flex-1">
+          <View className="bg-red-100 p-2 rounded-full mr-3">
+            <Image
+              source={{ uri: item.imageUrl }}
+              className="w-12 h-12 rounded-full"
+              resizeMode="cover"
+            />
+          </View>
+          <View className="flex-1">
+            <Text className="font-bold text-base">{item.name}</Text> 
+          </View>
+        </View>
+        <View className="flex-row">
+          <TouchableOpacity
+            className="mr-2 bg-blue-100 px-3 py-1.5 rounded-full flex-row items-center"
+            onPress={() => navigation.navigate('EditFoodCategoryScreen', { categoryId: item.id })}
+          >
+            <Ionicons name="create-outline" size={14} color="#007AFF" />
+            <Text className="text-blue-600 text-xs ml-1">Sửa</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="bg-red-100 px-3 py-1.5 rounded-full flex-row items-center"
+            onPress={() =>
+              Alert.alert('Xác nhận', `Bạn có chắc muốn xóa ${item.name}?`, [
+                { text: 'Hủy', style: 'cancel' },
+                { text: 'Xóa', onPress: () => deleteCategory(item.id) },
+              ])
+            }
+          >
+            <Ionicons name="trash-outline" size={14} color="#FF3B30" />
+            <Text className="text-red-600 text-xs ml-1">Xóa</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -124,12 +129,12 @@ export const AdminFoodCategoryManagementScreen = () => {
       {/* Header */}
       <AdminHeader title="Quản lý danh mục món ăn" />
 
-      {/* Search */}
-      <View className="mt-4 px-4 py-3">
-        <View className="flex-row items-center bg-white rounded-lg px-3 shadow-sm">
-          <Ionicons name="search" size={24} color="#454442" />
+      {/* Search and Filter */}
+      <View className="px-4 py-3">
+        <View className="flex-row items-center bg-white rounded-lg px-3 mb-3 shadow-sm">
+          <Ionicons name="search" size={20} color="#454442" />
           <TextInput
-            className="flex-1 text-lg py-2 px-2"
+            className="flex-1 py-2 px-2"
             placeholder="Tìm kiếm danh mục món ăn..."
             value={searchInput}
             onChangeText={(text) => {
@@ -144,7 +149,7 @@ export const AdminFoodCategoryManagementScreen = () => {
                 setSearchQuery('');
               }}
             >
-              <Ionicons name="close-circle" size={24} color="#454442" />
+              <Ionicons name="close-circle" size={20} color="#454442" />
             </TouchableOpacity>
           ) : null}
         </View>
