@@ -162,10 +162,22 @@ export const AdminFoodCategoryManagementScreen = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 16 }}
         onEndReached={() => loadCategories(false)}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <Text>Đang tải...</Text> : null}
+        onEndReachedThreshold={0.5} 
+        ListFooterComponent={
+          loading ? (
+            <View className="items-center justify-center py-4">
+              <ActivityIndicator size="small" color="#941D23" />
+              <Text className="text-gray-500 mt-2">Đang tải...</Text>
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
-          !loading ? <Text className="text-center">Không tìm thấy danh mục</Text> : null
+          !loading ? (
+            <View className="items-center justify-center py-8">
+              <Ionicons name="restaurant-outline" size={48} color="#CCCCCC" />
+              <Text className="text-gray-500 mt-2">Không tìm thấy danh mục nào</Text>
+            </View>
+          ) : null
         }
       />
 
@@ -176,6 +188,7 @@ export const AdminFoodCategoryManagementScreen = () => {
       >
         <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>
+      
     </SafeAreaView>
   );
 };
