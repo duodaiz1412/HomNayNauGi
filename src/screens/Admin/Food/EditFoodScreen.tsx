@@ -472,7 +472,7 @@ export const EditFoodScreen = () => {
                               }
                             }}
                             style={{
-                              height: 44,
+                              height: 50,
                               fontSize: 16,
                             }}
                             dropdownIconColor="#000"
