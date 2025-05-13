@@ -82,6 +82,11 @@ export const useHomeData = () => {
         isActive: index === 0 // ✅ phần tử đầu tiên active
       }));
 
+      // Set activeCategoryId to the first category's ID immediately
+      if (categories.length > 0) {
+        setActiveCategoryId(categories[0].id);
+      }
+
       // Fetch popular recipes
       const recipesResponse = await api.get('/recipes/popular');
       const recipesData = recipesResponse.data.data || [];
