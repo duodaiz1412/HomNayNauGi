@@ -432,7 +432,7 @@
 // };
 
 // export default SearchByIngredientsScreen;
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -442,18 +442,18 @@ import {
   StyleSheet,
   Image,
   Modal,
-  Pressable,
+  Pressable, Alert, ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 // import { RootStackParamList } from '../../navigation/AppNavigator';
 import { mockData } from '../../MockData/Data';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-
-const units = ['gram', 'kg', 'ml', 'lit', 'cái'];
-const quantities = ['200 gram', '300 gram', '400 gram', '500 gram', '600 gram'];
+import api from "../../api/api";
+import {Picker} from "@react-native-picker/picker";
 
 const IngredientsScreen = () => {
 
@@ -464,44 +464,32 @@ const { ingredients } = route.params;
   const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [ingredientData, setIngredientData] = useState(
-    // mockData.recipes[0].ingredients.map(item => ({ ...item, quantity: '' }))
-    (ingredients || []).map(item => ({ ...item, quantity: '' }))
+    (ingredients || []).map(item => ({ ...item, quantity: '', unit: '' }))
   );
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [unitOfMeasures, setUnitOfMeasures] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleQuantitySelect = (index: number) => {
-    setSelectedIndex(index);
-    setShowDropdown(true);
+  useEffect(() => {
+    fetchUnits();
+  }, []);
+
+  const fetchUnits = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/units');
+      setUnitOfMeasures(response.data);
+      console.log('Danh sách units', response.data);
+    } catch (error) {
+      console.error('Error fetching units:', error);
+      Alert.alert('Lỗi', 'Không thể tải danh sách units');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const setQuantity = (value: string) => {
-    if (selectedIndex === null) return;
-    const newData = [...ingredientData];
-    newData[selectedIndex].quantity = value;
-    setIngredientData(newData);
-    setShowDropdown(false);
-  };
-
-  const renderDropdown = () => (
-    <Modal
-      visible={showDropdown}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setShowDropdown(false)}>
-      <Pressable
-        style={styles.modalBackground}
-        onPress={() => setShowDropdown(false)}>
-        <View style={styles.dropdownWrapper}>
-          {quantities.map((qty, index) => (
-            <TouchableOpacity key={index} onPress={() => setQuantity(qty)}>
-              <Text style={styles.dropdownItem}>{qty}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </Pressable>
-    </Modal>
-  );
+  const handleSubmit = () => {
+    console.log(ingredientData)
+  }
 
   return (
     <View style={styles.container}>
@@ -526,26 +514,62 @@ const { ingredients } = route.params;
       <FlatList
         data={ingredientData}
         keyExtractor={(item) => item.name}
+        ListFooterComponent={
+          loading ? (
+            <View className="py-4 items-center">
+              <ActivityIndicator size="small" color="#941D23" />
+              <Text className="text-gray-500 mt-2">Đang tải...</Text>
+            </View>
+          ) : null
+        }
+        ListEmptyComponent={
+          !loading ? (
+            <View className="py-8 items-center">
+              <Text className="text-gray-500">
+                Không tìm thấy nguyên liệu
+              </Text>
+            </View>
+          ) : null
+        }
         renderItem={({ item, index }) => (
           <View style={styles.itemContainer}>
-            <Image source={{ uri: item.image }} style={styles.image} />
+            <Image source={{ uri: item.imageUrl }} style={styles.image} />
             <Text style={styles.name}>{item.name}</Text>
-            <TouchableOpacity
-              onPress={() => handleQuantitySelect(index)}
-              style={styles.quantityInput}
+            <TextInput
+              className="text-lg py-2 px-2"
+              style={{width: 80}}
+              keyboardType={'numeric'}
+              placeholder="Số lượng"
+              onChangeText={(value) => {
+                const editedIngredients = [...ingredients];
+                const editIngredient = editedIngredients.find(x => x.id === item.id);
+                editIngredient.quantity = value;
+                setIngredientData(editedIngredients)
+              }}
+            />
+
+            <Picker
+              style={{width: 120}}
+              selectedValue={ingredientData.find(x => x.id === item.id)?.unit || ''}
+              onValueChange={(value, index) => {
+                const editedIngredients = [...ingredients];
+                const editIngredient = editedIngredients.find(x => x.id === item.id);
+                editIngredient.unit = value
+                setIngredientData(editedIngredients);
+              }}
             >
-              <Text>{item.quantity || 'Khối lượng'}</Text>
-            </TouchableOpacity>
+              {unitOfMeasures.map((item => (
+                <Picker.Item label={item.unitName} value={item.id} key={item.id} />
+              )))}
+            </Picker>
           </View>
         )}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Tìm món ngay 🍜</Text>
       </TouchableOpacity>
-
-      {renderDropdown()}
     </View>
   );
 };
@@ -595,10 +619,10 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   name: {
-    flex: 1,
     fontSize: 16,
     fontWeight: '500',
     color: '#333',
+    width: 100,
   },
   quantityInput: {
     backgroundColor: '#fff',
