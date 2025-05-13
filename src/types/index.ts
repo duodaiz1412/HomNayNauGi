@@ -153,3 +153,15 @@ export interface ViewHistory {
   recipeId: string
   viewedAt: string
 }
+
+// Enum cho unit
+export enum Unit {
+  GRAM = "gram",
+  KILOGRAM = "kilogram",
+  MILLILIT = "millit",
+  LIT = "lit",
+  CAI = "cái",
+  THIA_CA_PHE = "thìa cà phê",
+  THIA_CANH = "thìa canh"
+}
+
