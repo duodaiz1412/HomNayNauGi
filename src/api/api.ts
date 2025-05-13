@@ -1,13 +1,17 @@
 // api.ts
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+import * as ImageManipulator from 'expo-image-manipulator';
 
+const BASE_URL = 'http://192.168.1.57:3001';
 
 const api = axios.create({
-  baseURL:  "http://192.168.100.87:3001",
-  // headers: {
-  //   'Content-Type': 'application/json',
-  // },
+  baseURL: BASE_URL,
+  timeout: 50000,
+  headers: {
+    'Accept': 'application/json',
+  }
 });
 
 // Interceptor cho request
@@ -78,6 +82,53 @@ export const logout = async () => {
   } finally {
     // Xóa tokens khỏi AsyncStorage
     await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+  }
+};
+
+// Hàm scan nguyên liệu từ ảnh
+export const scanIngredient = async (imageUri: string) => {
+  try {
+    console.log('Bắt đầu scan ảnh với URI:', imageUri);
+    
+    // Nén ảnh trước khi upload
+    const compressedImage = await ImageManipulator.manipulateAsync(
+      imageUri,
+      [{ resize: { width: 1024 } }], // Giảm kích thước xuống 1024px width
+      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // Nén 70%
+    );
+    
+    console.log('Ảnh sau khi nén:', compressedImage.uri);
+    
+    const formData = new FormData();
+    
+    // Tạo file object từ URI của ảnh đã nén
+    const filename = compressedImage.uri.split('/').pop() || 'photo.jpg';
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : 'image/jpeg';
+    
+    formData.append('file', {
+      uri: Platform.OS === 'android' ? compressedImage.uri : compressedImage.uri.replace('file://', ''),
+      name: filename,
+      type: type
+    } as any);
+    
+    console.log('FormData đã được tạo:', formData);
+    
+    const response = await api.post('/api/extract-ingredients', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json'
+      },
+      transformRequest: (data, headers) => {
+        return formData;
+      },
+    });
+    
+    console.log('Response từ API:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Chi tiết lỗi scan ingredient:', error.response?.data || error.message);
+    throw error;
   }
 };
 
