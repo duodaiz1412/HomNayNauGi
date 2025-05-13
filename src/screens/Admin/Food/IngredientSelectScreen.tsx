@@ -78,9 +78,15 @@ export const IngredientSelectScreen = () => {
   const toggleIngredientSelection = (ingredient) => {
     if (selectedIngredients.some((item) => item.ingredientId === ingredient.id)) {
       setSelectedIngredients(selectedIngredients.filter((item) => item.ingredientId !== ingredient.id));
-      
     } else {
-      setSelectedIngredients([...selectedIngredients, { recipeId: '', ingredientId: ingredient.id, quantity: null, unitId: null, ingredient }]);
+      setSelectedIngredients([...selectedIngredients, {
+        recipeId: '',
+        ingredientId: ingredient.id,
+        quantity: null,
+        unitId: null,
+        ingredient: ingredient,
+        unit: null
+      }]);
     }
   };
 
