@@ -7,7 +7,8 @@ import { AdminFoodStackParamList } from "@navigation/AdminFoodStack"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { AdminHeader } from "@components/AdminHeader/AdminHeader"
 import api from "src/api/api"
-import { Recipe } from "src/types"
+import { Recipe } from "src/types" 
+import LikeSolid from '@components/icons/LikeSolid';
 
 export const FoodDetailScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>()
@@ -93,7 +94,7 @@ export const FoodDetailScreen = () => {
         <View className="flex-row justify-around bg-white py-4 shadow-sm">
           <View className="items-center">
             <View className="flex-row items-center">
-              <Ionicons name="heart" size={18} color="#FF3B30" />
+              <LikeSolid size={18} color="#FFA500" />
               <Text className="text-gray-700 font-bold ml-1">{recipe.totalLikes}</Text>
             </View>
             <Text className="text-gray-500 text-xs mt-1">Lượt thích</Text>
@@ -107,7 +108,7 @@ export const FoodDetailScreen = () => {
           </View>
           <View className="items-center">
             <View className="flex-row items-center">
-              <Ionicons name="bookmark" size={18} color="#34C759" />
+              <Ionicons name="heart" size={18} color="#FF3B30" />
               <Text className="text-gray-700 font-bold ml-1">{recipe.totalFavorites}</Text>
             </View>
             <Text className="text-gray-500 text-xs mt-1">Lưu</Text>
