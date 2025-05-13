@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -23,7 +25,7 @@ import { RecipeStatus, UnitOfMeasure } from 'src/types';
 import { useFoodManagement } from 'src/context/FoodManagementContext';
 import { useEffect, useState } from 'react';
 import api from 'src/api/api';
-import { Picker } from '@react-native-picker/picker';
+
 const statusOptions = [
   { label: 'Nháp', value: RecipeStatus.DRAFT },
   { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
@@ -47,14 +49,15 @@ export const AddFoodScreen = () => {
   const [unitsOfMeasure, setUnitsOfMeasure] = useState<UnitOfMeasure[]>([]);
   const [isLoadingUnits, setIsLoadingUnits] = useState(false);
   const [errorUnits, setErrorUnits] = useState<string | null>(null);
-  // Destructure form data
+  const [showUnitModal, setShowUnitModal] = useState(false);
+  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
+  
   const {
     basicInfo,
     categories,
     ingredients: selectedIngredients,
     steps,
   } = form;
-  // Fetch danh sách đơn vị đo lường khi component được mount
   useEffect(() => {
     const fetchUnitsOfMeasure = async () => {
       setIsLoadingUnits(true);
@@ -75,7 +78,6 @@ export const AddFoodScreen = () => {
     fetchUnitsOfMeasure();
   }, []);
 
-  // Pick image from gallery
   const pickImage = async (type, stepId = null) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -98,7 +100,6 @@ export const AddFoodScreen = () => {
     }
   };
 
-  // Add new step
   const addStep = () => {
     const newId =
       steps.length > 0
@@ -117,7 +118,6 @@ export const AddFoodScreen = () => {
     ]);
   };
 
-  // Remove step
   const removeStep = (id) => {
     if (steps.length > 1) {
       updateSteps(steps.filter((item) => item.id !== id));
@@ -126,27 +126,42 @@ export const AddFoodScreen = () => {
     }
   };
 
-  // Update step
   const updateStep = (id, field, value) => {
     updateSteps(
       steps.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
   };
 
-  // Remove ingredient
   const removeIngredient = (id) => {
     updateIngredients(
       selectedIngredients.filter((item) => item.ingredientId !== id)
     );
   };
 
-  // Update ingredient
   const updateIngredient = (id, field, value) => {
     updateIngredients(
       selectedIngredients.map((item) =>
         item.ingredientId === id ? { ...item, [field]: value } : item
       )
     );
+  };
+  
+  const openUnitModal = (ingredientId) => {
+    setSelectedIngredientId(ingredientId);
+    setShowUnitModal(true);
+  };
+  
+  const selectUnit = (unitId) => {
+    if (selectedIngredientId) {
+      updateIngredient(selectedIngredientId, 'unitId', unitId);
+    }
+    setShowUnitModal(false);
+  };
+  
+  const getUnitName = (unitId) => {
+    const unit = unitsOfMeasure.find(u => u.id === unitId);
+    if (!unit) return '-- Chọn đơn vị --';
+    return unit.symbol ? `${unit.unitName} (${unit.symbol})` : unit.unitName;
   };
 
   const handleSubmit = async () => {
@@ -429,7 +444,7 @@ export const AddFoodScreen = () => {
                       <View style={{ width: 80 }} className="mr-2">
                         <Text className="text-gray-700 mb-1">Số lượng *</Text>
                         <TextInput
-                          className="border border-gray-300 rounded-lg px-3 py-2"
+                          className="border border-gray-300 rounded-lg px-3 py-3"
                           placeholder="Nhập số lượng"
                           value={
                             ingredient.quantity != null
@@ -446,10 +461,11 @@ export const AddFoodScreen = () => {
                             )
                           }
                           keyboardType="numeric"
+                          style={{ height: 46 }}
                         />
                       </View>
 
-                      {/* Đơn vị */}
+                      {/* Đơn vị - Replace Picker with TouchableOpacity */}
                       <View className="flex-1 ml-2">
                         <Text className="text-gray-700 mb-1">Đơn vị *</Text>
                         {isLoadingUnits ? (
@@ -463,48 +479,18 @@ export const AddFoodScreen = () => {
                             Lỗi tải đơn vị
                           </Text>
                         ) : (
-                          <View
-                            className="border border-gray-300 rounded-lg px-2"
-                            style={{ height: 44, justifyContent: 'center' }}
+                          <TouchableOpacity
+                            onPress={() => openUnitModal(ingredient.ingredientId)}
+                            className="border border-gray-300 rounded-lg px-3 flex-row justify-between items-center"
+                            style={{ height: 46 }}
                           >
-                            <Picker
-                              selectedValue={ingredient.unitId}
-                              onValueChange={(itemValue) => {
-                                if (
-                                  itemValue !== null &&
-                                  itemValue !== undefined
-                                ) {
-                                  updateIngredient(
-                                    ingredient.ingredientId,
-                                    'unitId',
-                                    itemValue
-                                  );
-                                }
-                              }}
-                              style={{
-                                height: 44,
-                                fontSize: 16,
-                              }}
-                              dropdownIconColor="#000"
-                            >
-                              <Picker.Item
-                                label="-- Chọn đơn vị --"
-                                value={null}
-                                style={{ color: '#9CA3AF' }}
-                              />
-                              {unitsOfMeasure.map((unit) => (
-                                <Picker.Item
-                                  key={unit.id}
-                                  label={
-                                    unit.symbol
-                                      ? `${unit.unitName} (${unit.symbol})`
-                                      : unit.unitName
-                                  }
-                                  value={unit.id}
-                                />
-                              ))}
-                            </Picker>
-                          </View>
+                            <Text className={ingredient.unitId ? "text-gray-700" : "text-gray-400"}>
+                              {ingredient.unitId 
+                                ? getUnitName(ingredient.unitId) 
+                                : "-- Chọn đơn vị --"}
+                            </Text>
+                            <Ionicons name="chevron-down" size={16} color="#454442" />
+                          </TouchableOpacity>
                         )}
                       </View>
                     </View>
@@ -615,6 +601,60 @@ export const AddFoodScreen = () => {
           </ScrollView>
         )}
       </KeyboardAvoidingView>
+      
+      {/* Unit Selection Modal */}
+      <Modal
+        visible={showUnitModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowUnitModal(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/30">
+          <View className="bg-white rounded-2xl w-5/6 overflow-hidden ">
+
+            {/* Header modal */}
+            <View className="bg-red-800 px-4 py-4 flex-row justify-between items-center">
+              <Text className="text-lg font-bold text-white">Chọn đơn vị đo lường</Text>
+              <TouchableOpacity 
+                onPress={() => setShowUnitModal(false)}
+                className="w-8 h-8 rounded-full items-center justify-center"
+                style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}
+              >
+                <Ionicons name="close" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+            
+            {/* List units */}
+            <FlatList
+              data={unitsOfMeasure}
+              keyExtractor={(item) => item.id.toString()}
+              style={{ maxHeight: 300 }}
+              contentContainerStyle={{ paddingHorizontal: 8 }}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  className="py-4 px-4 border-b border-gray-100 flex-row items-center"
+                  onPress={() => selectUnit(item.id)}
+                >
+                  <View className="w-9 h-9 rounded-full bg-red-100 items-center justify-center mr-3">
+                    {/* <Text className="text-red-800 font-bold">{item.symbol || item.unitName.charAt(0)}</Text> */}
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-gray-800 font-medium text-base">
+                      {item.unitName}
+                    </Text>
+                    {item.symbol && (
+                      <Text className="text-gray-500 text-xs mt-1">
+                        Ký hiệu: {item.symbol}
+                      </Text>
+                    )}
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color="#941D23" />
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

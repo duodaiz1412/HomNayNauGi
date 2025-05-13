@@ -74,7 +74,8 @@ export const useHomeData = () => {
 
       // Fetch categories
       const categoriesResponse = await api.get('/recipe-categories/random');
-      const categories = categoriesResponse.data.data.map((cat: any, index: number) => ({
+      const categoriesData = categoriesResponse.data.data || [];
+      const categories = categoriesData.map((cat: any, index: number) => ({
         id: cat.id,
         name: cat.name,
         icon: cat.imageUrl,
@@ -83,50 +84,80 @@ export const useHomeData = () => {
 
       // Fetch popular recipes
       const recipesResponse = await api.get('/recipes/popular');
-      const recipes = recipesResponse.data.data.map((recipe: any) => ({
+      const recipesData = recipesResponse.data.data || [];
+      const recipes = recipesData.map((recipe: any) => ({
         id: recipe.id,
         name: recipe.name,
         description: recipe.description,
         image: recipe.imageUrl,
-        author: recipe.account?.userProfile.fullName,
+        author: recipe.account?.userProfile?.fullName || 'Ẩn danh',
         authorAvatar: recipe.account?.userProfile?.avatarUrl,
-        time: `${recipe.preparationTimeMinutes} phút`,
+        time: `${recipe.preparationTimeMinutes || 0} phút`,
         // isFavorite: isAuth ? (recipe.isFavorite || false) : false
       }));
 
+      // Set default activeCategoryId if categories exist
+      if (categories.length > 0 && !activeCategoryId) {
+        setActiveCategoryId(categories[0].id);
+      }
+
+      const categoryIdToFetch = categories.length > 0 ? categories[0].id : activeCategoryId;
+
       // Fetch featured recipes by category
-      const featuredResponse = await api.get(`/recipes/category/${activeCategoryId}/top`);
+      const featuredResponse = await api.get(`/recipes/category/${categoryIdToFetch}/top`);
+      const featuredData = featuredResponse.data.data || [];
       const featuredByCategory = {
-        [activeCategoryId]: featuredResponse.data.data.map((recipe: any) => ({
+        [categoryIdToFetch]: featuredData.map((recipe: any) => ({
           id: recipe.id,
           name: recipe.name,
           image: recipe.imageUrl,
-          time: `${recipe.preparationTimeMinutes} phút`,
-          avataUrl: recipe.account.userProfile.avatarUrl,
-          author:recipe.account.userProfile.fullName,
+          time: `${recipe.preparationTimeMinutes || 0} phút`,
+          avataUrl: recipe.account?.userProfile?.avatarUrl,
+          author: recipe.account?.userProfile?.fullName || 'Ẩn danh',
           // isFavorite: isAuth ? (recipe.isFavorite || false) : false
         }))
       };
 
       // Fetch banner
-      const bannerResponse = await api.get('/recipes/banner');
-      const banner = {
-        id:bannerResponse.data.data.id,
-        image: bannerResponse.data.data.imageUrl,
-        description: bannerResponse.data.data.description
+      let banner = {
+        id: '',
+        image: 'https://via.placeholder.com/150',
+        description: 'Khám phá các món ăn hấp dẫn'
       };
+      
+      try {
+        const bannerResponse = await api.get('/recipes/banner');
+        if (bannerResponse.data && bannerResponse.data.data) {
+          banner = {
+            id: bannerResponse.data.data.id,
+            image: bannerResponse.data.data.imageUrl,
+            description: bannerResponse.data.data.description
+          };
+        }
+      } catch (bannerError: any) {
+        // Xử lý lỗi 404 một cách "im lặng" - không log lỗi ra console
+        if (bannerError.response && bannerError.response.status !== 404) {
+          console.error('Error fetching banner:', bannerError);
+        }
+        // Sử dụng banner mặc định đã khai báo ở trên
+      }
 
       // Fetch user profile only if authenticated
       let user = null;
       if (isAuth) {
         try {
           const userResponse = await api.get('/accounts/profile');
-          user = {
-            name: userResponse.data.data.name,
-            avatar: userResponse.data.data.avatarUrl
-          };
-        } catch (error) {
-          console.error('Error fetching user profile:', error);
+          if (userResponse.data && userResponse.data.data) {
+            user = {
+              name: userResponse.data.data.name || 'Người dùng',
+              avatar: userResponse.data.data.avatarUrl || 'https://ui-avatars.com/api/?name=User'
+            };
+          }
+        } catch (error: any) {
+          // Xử lý lỗi 404 một cách "im lặng" - không log lỗi ra console
+          if (error.response && error.response.status !== 404) {
+            console.error('Error fetching user profile:', error);
+          }
         }
       }
 
@@ -186,33 +217,55 @@ export const useHomeData = () => {
 
   // Handle category change
   const handleCategoryPress = async (categoryId: string) => {
+    if (!categoryId || !homeData) return;
+
     setActiveCategoryId(categoryId);
-    setHomeData(prev => ({
-      ...prev!,
-      categories: prev!.categories.map(category => ({
-        ...category,
-        isActive: category.id === categoryId
-      }))
-    }));
+    setHomeData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        categories: prev.categories.map(category => ({
+          ...category,
+          isActive: category.id === categoryId
+        }))
+      };
+    });
 
     // Fetch new featured recipes for the selected category
     try {
       const featuredResponse = await api.get(`/recipes/category/${categoryId}/top`);
-      setHomeData(prev => ({
-        ...prev!,
-        featuredByCategory: {
-          ...prev!.featuredByCategory,
-          [categoryId]: featuredResponse.data.data.map((recipe: any) => ({
-            id: recipe.id,
-            name: recipe.name,
-            image: recipe.imageUrl,
-            time: `${recipe.cookingTime} phút`,
-            // isFavorite: isAuthenticated ? (recipe.isFavorite || false) : false
-          }))
-        }
-      }));
+      const featuredData = featuredResponse.data.data || [];
+      setHomeData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          featuredByCategory: {
+            ...prev.featuredByCategory,
+            [categoryId]: featuredData.map((recipe: any) => ({
+              id: recipe.id,
+              name: recipe.name,
+              image: recipe.imageUrl,
+              time: `${recipe.preparationTimeMinutes || recipe.cookingTime || 0} phút`,
+              avataUrl: recipe.account?.userProfile?.avatarUrl,
+              author: recipe.account?.userProfile?.fullName || 'Ẩn danh',
+              // isFavorite: isAuthenticated ? (recipe.isFavorite || false) : false
+            }))
+          }
+        };
+      });
     } catch (error) {
       console.error('Error fetching featured recipes:', error);
+      // Thêm mảng rỗng cho categoryId
+      setHomeData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          featuredByCategory: {
+            ...prev.featuredByCategory,
+            [categoryId]: []
+          }
+        };
+      });
     }
   };
 
