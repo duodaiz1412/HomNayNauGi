@@ -45,7 +45,7 @@ export const IngredientSelectScreen = () => {
   const fetchIngredients = async (query = '', categoryIds = [], offset = 0, limit = 10) => {
     try {
       setLoading(true);
-      const response = await api.get('/ingredients/search', {
+      const response = await api.get('/admin/ingredients/search', {
         params: { query, ...(categoryIds.length > 0 && { categoryIds: categoryIds.join(',') }), offset, limit },
       });
       const { data, total } = response.data;
