@@ -25,8 +25,8 @@ interface FeaturedItem {
   name: string;
   image: string;
   time: string;
-  author:string,
-  avataUrl:string,
+  author: string,
+  avataUrl: string,
   isFavorite: boolean;
 }
 
@@ -39,16 +39,26 @@ interface HomeData {
     avatar: string;
   } | null;
   banner: {
-    id:string;
+    id: string;
     image: string;
-     description: string;
+    description: string;
   };
 }
 
 export const useHomeData = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [homeData, setHomeData] = useState<HomeData | null>(null);
+  const [homeData, setHomeData] = useState<HomeData>({
+    categories: [],
+    recipes: [],
+    featuredByCategory: {},
+    user: null,
+    banner: {
+      id: '',
+      image: '',
+      description: ''
+    }
+  });
   const [activeCategoryId, setActiveCategoryId] = useState('1');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -79,7 +89,7 @@ export const useHomeData = () => {
         id: cat.id,
         name: cat.name,
         icon: cat.imageUrl,
-        isActive: index === 0 // ✅ phần tử đầu tiên active
+        isActive: index === 0
       }));
 
       // Set activeCategoryId to the first category's ID immediately
@@ -95,10 +105,10 @@ export const useHomeData = () => {
         name: recipe.name,
         description: recipe.description,
         image: recipe.imageUrl,
-        author: recipe.account?.userProfile?.fullName || 'Ẩn danh',
-        authorAvatar: recipe.account?.userProfile?.avatarUrl,
+        author: recipe.account?.userProfile??.fullName || 'Ẩn danh' || 'Không xác định',
+        authorAvatar: recipe.account?.userProfile?.avatarUrl || '',
         time: `${recipe.preparationTimeMinutes || 0} phút`,
-        // isFavorite: isAuth ? (recipe.isFavorite || false) : false
+        isFavorite: false
       }));
 
       // Set default activeCategoryId if categories exist
@@ -181,45 +191,6 @@ export const useHomeData = () => {
     }
   };
 
-  // // Toggle favorite status
-  // const toggleFavorite = async (itemId: string, type: 'recipe' | 'featured') => {
-  //   if (!homeData || !isAuthenticated) {
-  //     // Nếu chưa đăng nhập, chuyển hướng đến trang login
-  //     return false;
-  //   }
-
-  //   try {
-  //     const response = await api.post('/favorite-recipes/toggle', {
-  //       recipeId: itemId
-  //     });
-
-  //     const isFavorite = response.data.isFavorite;
-
-  //     if (type === 'recipe') {
-  //       setHomeData(prev => ({
-  //         ...prev!,
-  //         recipes: prev!.recipes.map(item =>
-  //           item.id === itemId ? { ...item, isFavorite } : item
-  //         )
-  //       }));
-  //     } else {
-  //       setHomeData(prev => ({
-  //         ...prev!,
-  //         featuredByCategory: {
-  //           ...prev!.featuredByCategory,
-  //           [activeCategoryId]: prev!.featuredByCategory[activeCategoryId].map(item =>
-  //             item.id === itemId ? { ...item, isFavorite } : item
-  //           )
-  //         }
-  //       }));
-  //     }
-  //     return true;
-  //   } catch (error) {
-  //     console.error('Error toggling favorite:', error);
-  //     return false;
-  //   }
-  // };
-
   // Handle category change
   const handleCategoryPress = async (categoryId: string) => {
     if (!categoryId || !homeData) return;
@@ -274,6 +245,7 @@ export const useHomeData = () => {
     }
   };
 
+  // Initial data fetch
   useEffect(() => {
     fetchHomeData();
   }, []);
@@ -283,9 +255,7 @@ export const useHomeData = () => {
     error,
     homeData,
     activeCategoryId,
-    // toggleFavorite,
     handleCategoryPress,
-    refreshData: fetchHomeData,
     isAuthenticated
   };
 };

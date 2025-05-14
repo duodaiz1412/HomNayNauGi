@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { ImageBackground } from 'react-native';
 import { mockData } from '../../MockData/Data';
+import api from 'src/api/api';
+import debounce from 'lodash.debounce';
+
+
+
 
 interface Recipe {
   id: string;
@@ -61,27 +66,100 @@ const RecipeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Phở');
-  const [Recipes, setRecipes] = useState<Recipe[]>(mockData.recipes);
   const [FeaturedByCategory, setFeaturedByCategory] = useState<FeaturedByCategory>(mockData.featuredByCategory);
 
   const background = require('../../assets/background.png');
 
   const selectedCategoryIndex = mockData.categories.find(cat => cat.name === selectedCategory)?.id;
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [recipes, setRecipes] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [results, setResults] = useState([]);
+  const handleSearch = async (keyword: string) => {
+    if (!searchText.trim()) return;
 
-  const filtered = selectedCategoryIndex
-    ? mockData.recipes.filter(r =>
-        r.name.toLowerCase().includes(selectedCategory.toLowerCase())
-      ).map(r => ({
-        id: r.id,
-        name: r.name,
-        description: r.description,
-        image: r.image,
-        time: r.time,
-        isFavorite: r.isFavorite,
-        author: r.author,
-        authorAvatar: r.authorAvatar,
-      }))
-    : [];
+    try {
+      const response = await api.get('/recipe-category-mappings/search-recipes', {
+        params: { query: searchText.trim() },
+      });
+      setResults(response.data.data || []);
+    } catch (error) {
+      console.error('Lỗi tìm kiếm:', error);
+    }
+  };
+
+  useEffect(() => {
+  const debouncedSearch = debounce(() => {
+    if (search.trim()) {
+      handleSearch(search);
+    }
+  }, 300); // đợi 300ms sau khi người dùng ngừng gõ
+
+  debouncedSearch();
+
+  return () => {
+    debouncedSearch.cancel(); // hủy nếu user vẫn tiếp tục gõ
+  };
+}, [search]);
+
+  
+  const fetchCategories = async () => {
+  try {
+    setLoading(true);
+    const response = await api.get('/recipe-categories/search', {
+      params: {
+        query: '',
+        offset: 0,
+        limit: 20,
+      },
+    });
+    const categoriesData = response.data.data || [];
+
+    setCategories(categoriesData);
+
+    if (categoriesData.length > 0) {
+      // ✅ chọn category đầu tiên làm mặc định
+      setSelectedCategory(categoriesData[0].name);
+      setSelectedCategoryId(categoriesData[0].id);
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy danh mục:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  useEffect(() => {
+    if (selectedCategoryId !== null) {
+      fetchRecipesByCategory(selectedCategoryId);
+    }
+  }, [selectedCategoryId]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // const fetchRecipesByCategory = async (id: number) => {
+  //   const res = await api.get(`/recipe-categories/seach/${id}`);
+  //   setRecipes(res.data.data.recipes || []);
+  //   console.log(res.data.data);
+  // };
+
+  // const filteredRecipes = recipes.filter(r =>
+  //   r.name.toLowerCase().includes(searchText.toLowerCase())
+  // );
+
+    const fetchRecipesByCategory = async (id: number) => {
+    const res = await api.get(`/recipe-category-mappings/search-recipes?categoryId=${id}`);
+    setRecipes(res.data.data);
+  };
+
+  const filteredRecipes = recipes.filter(r =>
+    r.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
 
   return (
     <ImageBackground source={background} style={{ flex: 1 }} resizeMode="cover">
@@ -105,13 +183,16 @@ const RecipeScreen = () => {
         </View>
 
         <View style={styles.categoryWrap}>
-          {mockData.categories.map((cat, index) => (
+          {categories.map((cat, index) => (
             <TouchableOpacity
               key={index}
               style={[styles.categoryItem, selectedCategory === cat.name && styles.categoryItemActive]}
-              onPress={() => setSelectedCategory(cat.name)}
+              onPress={() => {
+                setSelectedCategory(cat.name);
+                setSelectedCategoryId(cat.id); 
+              }}
             >
-              <Image source={{ uri: cat.icon }} style={styles.categoryIcon} />
+              <Image source={{ uri: cat.imageUrl }} style={styles.categoryIcon} />
               <Text style={[styles.categoryText, selectedCategory === cat.name && styles.categoryTextActive]}>
                 {cat.name}
               </Text>
@@ -120,16 +201,16 @@ const RecipeScreen = () => {
         </View>
 
         <FlatList
-          data={filtered}
+          data={recipes}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             
             <TouchableOpacity style={styles.recipeCard} 
             key = {item.id}
-            onPress={() => navigation.navigate('RecipeDetail', { recipeId: parseInt(item.id) })}>
-              <Image source={{ uri: item.image }} style={styles.recipeImage} />
+            onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}>
+              <Image source={{ uri: item.imageUrl }} style={styles.recipeImage} />
               <View style={styles.recipeInfo}>
-                <Text style={styles.recipeDescription}>{item.description}</Text>
+                <Text style={styles.recipeDescription}>{item.name}</Text>
                 <View style={styles.authorRow}>
                 <Image source={{ uri: item.authorAvatar }} style={styles.authorAvatar} />
                 <Text style={styles.authorName}>{item.author}</Text>

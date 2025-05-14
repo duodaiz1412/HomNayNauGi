@@ -94,13 +94,15 @@ const HomeScreen = () => {
                 className="flex-row items-center"
               >
                 <Image
-                  source={{ uri: homeData.user?.avatar }}
+                  source={{ 
+                    uri: homeData.user?.avatar || 'https://via.placeholder.com/200'
+                  }}
                   className="w-20 h-20 rounded-full mr-3"
                 />
                 <View>
                   <Text className="text-[#4B4B4B] italic">Chào buổi sáng,</Text>
                   <Text className="text-[#4B4B4B] text-2xl font-bold">
-                    {homeData.user?.name}
+                    {homeData.user?.name || 'Người dùng'}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -155,7 +157,9 @@ const HomeScreen = () => {
             </View>
 
             <Image
-              source={{ uri: homeData.banner.image }}
+              source={{ 
+                uri: homeData.banner?.image || 'https://via.placeholder.com/200'
+              }}
               className="w-44 h-44 rounded-full"
               resizeMode="cover"
             />
