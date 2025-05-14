@@ -7,10 +7,11 @@ import {
   Image,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getIngredientCategories } from 'src/api/api';
+import { getIngredientCategories, addToPantry } from 'src/api/api';
 
 const INGREDIENT_CATEGORIES = [
   'Tất cả',
@@ -61,6 +62,7 @@ const AddIngredientScreen = ({ navigation, route }) => {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10; // Số lượng loại nguyên liệu mỗi lần load
   const isMultiSelect = route.params?.isMultiSelect ?? false;
+  const [isAdding, setIsAdding] = useState(false);
 
   // Fetch ingredients khi chọn category hoặc search thay đổi
   useEffect(() => {
@@ -129,11 +131,42 @@ const AddIngredientScreen = ({ navigation, route }) => {
     }
   };
 
-  const handleAddIngredient = () => {
-    if (selected.length > 0) {
-      route.params?.onSelect?.(selected[0]);
+  const handleAddIngredient = async () => {
+    if (selected.length === 0) {
+      Alert.alert('Thông báo', 'Vui lòng chọn ít nhất một nguyên liệu');
+      return;
     }
-    navigation.goBack();
+
+    if (route.params?.onSelect) {
+      route.params.onSelect(selected[0]);
+      navigation.goBack();
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const ingredientIds = selected.map(item => item.id);
+      const result = await addToPantry(ingredientIds);
+      
+      const addedCount = result.addedIngredients.length;
+      const skippedCount = result.skippedIngredients.length;
+      
+      let message = '';
+      if (addedCount > 0 && skippedCount > 0) {
+        message = `Đã thêm ${addedCount} nguyên liệu mới vào kho.\n${skippedCount} nguyên liệu đã có trong kho được bỏ qua.`;
+      } else if (addedCount > 0) {
+        message = `Đã thêm ${addedCount} nguyên liệu vào kho.`;
+      } else {
+        message = 'Tất cả nguyên liệu đã có trong kho.';
+      }
+
+      Alert.alert('Thông báo', message);
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể thêm nguyên liệu. Vui lòng thử lại sau');
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   if (isLoading && ingredients.length === 0) {
@@ -247,9 +280,18 @@ const AddIngredientScreen = ({ navigation, route }) => {
       <View className="absolute bottom-5 left-0 right-0 px-7">
         <TouchableOpacity
           onPress={handleAddIngredient}
-          className="bg-red-900 rounded-full py-4 items-center w-3/5 self-center"
+          disabled={isAdding || selected.length === 0}
+          className={`rounded-full py-4 items-center w-3/5 self-center ${
+            isAdding || selected.length === 0 ? 'bg-gray-400' : 'bg-red-900'
+          }`}
         >
-          <Text className="text-white font-bold text-lg">Thêm nguyên liệu</Text>
+          {isAdding ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-bold text-lg">
+              {selected.length > 0 ? `Thêm (${selected.length})` : 'Thêm nguyên liệu'}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

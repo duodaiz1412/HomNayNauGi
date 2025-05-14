@@ -181,4 +181,21 @@ export const getIngredientCategories = async (
   }
 };
 
+// Thêm nguyên liệu vào pantry
+export const addToPantry = async (ingredientIds: string[]) => {
+  try {
+    console.log('Thêm nguyên liệu vào pantry:', ingredientIds);
+    
+    const response = await api.post('/pantry/add', {
+      ingredientIds
+    });
+    
+    console.log('Kết quả thêm vào pantry:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm vào pantry:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export default api;
