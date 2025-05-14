@@ -177,69 +177,73 @@ const HomeScreen = () => {
             className="px-4 mb-4"
             contentContainerStyle={{ paddingRight: 16 }}
           >
-            {homeData.recipes.map((recipe) => (
-              <TouchableOpacity
-                key={recipe.id}
-                onPress={() =>
-                  navigation.navigate('RecipeDetail', {
-                    recipeId: recipe.id,
-                  })
-                }
-                className="mr-4 w-64 h-56 relative overflow-hidden rounded-xl"
-              >
-                <Image
-                  source={{ 
-                    uri: recipe.image || 'https://via.placeholder.com/200'
-                  }}
-                  className="absolute w-full h-full"
-                  resizeMode="cover"
-                />
-
-                <View className="absolute w-full h-full bg-black/30" />
-
-                {/* <TouchableOpacity
-                  className="absolute top-2 right-2 bg-white/80 rounded-full p-1.5 z-10"
-                  onPress={() => handleFavoritePress(recipe.id, 'recipe')}
+            {homeData.recipes && homeData.recipes.length > 0 ? (
+              homeData.recipes.map((recipe) => (
+                <TouchableOpacity
+                  key={recipe.id}
+                  onPress={() =>
+                    navigation.navigate('RecipeDetail', {
+                      recipeId: recipe.id,
+                    })
+                  }
+                  className="mr-4 w-64 h-56 relative overflow-hidden rounded-xl"
                 >
-                  <Ionicons
-                    name={recipe.isFavorite ? 'heart' : 'heart-outline'}
-                    size={18}
-                    color={recipe.isFavorite ? '#FF3B30' : '#000'}
+                  <Image
+                    source={{ uri: recipe.image }}
+                    className="absolute w-full h-full"
+                    resizeMode="cover"
                   />
-                </TouchableOpacity> */}
 
-                <View className="absolute bottom-0 left-0 right-0 p-3">
-                  <Text className="text-white font-bold text-base mb-2">
-                    {recipe.description.length > 25
-                      ? recipe.description.substring(0, 25) + '...'
-                      : recipe.description}
-                  </Text>
+                  <View className="absolute w-full h-full bg-black/30" />
 
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-row items-center">
-                      {recipe.author ? (
-                        <Image
-                          source={{ uri: recipe.authorAvatar }}
-                          className="w-5 h-5 rounded-full mr-1"
-                        />
-                      ) : (
-                        <View className="w-5 h-5 rounded-full bg-gray-300 mr-1" />
-                      )}
-                      <Text className="text-white text-xs">
-                        {recipe.author}
-                      </Text>
-                    </View>
+                  {/* <TouchableOpacity
+                    className="absolute top-2 right-2 bg-white/80 rounded-full p-1.5 z-10"
+                    onPress={() => handleFavoritePress(recipe.id, 'recipe')}
+                  >
+                    <Ionicons
+                      name={recipe.isFavorite ? 'heart' : 'heart-outline'}
+                      size={18}
+                      color={recipe.isFavorite ? '#FF3B30' : '#000'}
+                    />
+                  </TouchableOpacity> */}
 
-                    <View className="flex-row items-center">
-                      <Ionicons name="time-outline" size={14} color="white" />
-                      <Text className="text-white text-xs ml-1">
-                        {recipe.time}
-                      </Text>
+                  <View className="absolute bottom-0 left-0 right-0 p-3">
+                    <Text className="text-white font-bold text-base mb-2">
+                      {recipe.description.length > 25
+                        ? recipe.description.substring(0, 25) + '...'
+                        : recipe.description}
+                    </Text>
+
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-row items-center">
+                        {recipe.author ? (
+                          <Image
+                            source={{ uri: recipe.authorAvatar }}
+                            className="w-5 h-5 rounded-full mr-1"
+                          />
+                        ) : (
+                          <View className="w-5 h-5 rounded-full bg-gray-300 mr-1" />
+                        )}
+                        <Text className="text-white text-xs">
+                          {recipe.author}
+                        </Text>
+                      </View>
+
+                      <View className="flex-row items-center">
+                        <Ionicons name="time-outline" size={14} color="white" />
+                        <Text className="text-white text-xs ml-1">
+                          {recipe.time}
+                        </Text>
+                      </View>
                     </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View className="flex-1 justify-center items-center my-4">
+                <Text className="text-gray-500">Không có công thức nào</Text>
+              </View>
+            )}
           </ScrollView>
 
           {/* Popular Dishes Section */}
@@ -263,27 +267,33 @@ const HomeScreen = () => {
             showsHorizontalScrollIndicator={false}
             className="px-4 py-4"
           >
-            {homeData.categories.map((category) => (
-              <TouchableOpacity
-                key={category.id}
-                onPress={() => handleCategoryPress(category.id)}
-                className={`flex-row items-center rounded-full px-3 py-1.5 mr-2 border ${
-                  category.isActive ? 'bg-[#941D23] border-[#941D23]' : 'border-[#454442]'
-                }`}
-                style={{ minWidth: 90 }}
-              >
-                <Image
-                  source={{ uri: category.icon }}
-                  className="w-10 h-10 mr-1.5 rounded-full"
-                  resizeMode="cover"
-                />
-                <Text
-                  className={`${category.isActive ? 'text-white' : 'text-[#4B4B4B]'} font-bold text-base`}
+            {homeData.categories && homeData.categories.length > 0 ? (
+              homeData.categories.map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  onPress={() => handleCategoryPress(category.id)}
+                  className={`flex-row items-center rounded-full px-3 py-1.5 mr-2 border ${
+                    category.isActive ? 'bg-[#941D23] border-[#941D23]' : 'border-[#454442]'
+                  }`}
+                  style={{ minWidth: 90 }}
                 >
-                  {category.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Image
+                    source={{ uri: category.icon }}
+                    className="w-10 h-10 mr-1.5 rounded-full"
+                    resizeMode="cover"
+                  />
+                  <Text
+                    className={`${category.isActive ? 'text-white' : 'text-[#4B4B4B]'} font-bold text-base`}
+                  >
+                    {category.name}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View className="justify-center items-center py-2">
+                <Text className="text-gray-500">Không có danh mục nào</Text>
+              </View>
+            )}
           </ScrollView>
 
           {/* Featured Dishes Section */}
@@ -297,45 +307,51 @@ const HomeScreen = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingRight: 15, paddingTop: 40 }}
             >
-              {homeData.featuredByCategory[activeCategoryId]?.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={() =>
-                    navigation.navigate('RecipeDetail', {
-                      recipeId: item.id,
-                    })
-                  }
-                  className="bg-white rounded-2xl mb-4 mr-5 shadow-2xl relative"
-                  style={{ width: 160, height: 150 }}
-                >
-                  <View className="absolute top-[-40px] left-0 right-0 items-center">
-                    <Image
-                      source={{ 
-                        uri: item.image || 'https://via.placeholder.com/200'
-                      }}
-                      className="w-40 h-40 rounded-full border-4 border-white"
-                      resizeMode="cover"
-                    />
-                  </View>
+              {homeData.featuredByCategory && 
+                homeData.featuredByCategory[activeCategoryId] && 
+                homeData.featuredByCategory[activeCategoryId].length > 0 ? (
+                homeData.featuredByCategory[activeCategoryId].map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() =>
+                      navigation.navigate('RecipeDetail', {
+                        recipeId: item.id,
+                      })
+                    }
+                    className="bg-white rounded-2xl mb-4 mr-5 shadow-2xl relative"
+                    style={{ width: 160, height: 150 }}
+                  >
+                    <View className="absolute top-[-40px] left-0 right-0 items-center">
+                      <Image
+                        source={{ uri: item.image }}
+                        className="w-40 h-40 rounded-full border-4 border-white"
+                        resizeMode="cover"
+                      />
+                    </View>
 
-                  <View className="pt-32">
-                    <Text className="text-center font-bold text-xl mb-2 px-1">
-                      {item.name}
-                    </Text>
-                    {/* <View className="flex-row items-center justify-around px-3 pb-3">
-                      <TouchableOpacity
-                        onPress={() => handleFavoritePress(item.id, 'featured')}
-                      >
-                        <Ionicons
-                          name={item.isFavorite ? 'heart' : 'heart-outline'}
-                          size={16}
-                          color={item.isFavorite ? '#FF3B30' : '#4B4B4B'}
-                        />
-                      </TouchableOpacity>
-                    </View> */}
-                  </View>
-                </TouchableOpacity>
-              ))}
+                    <View className="pt-32">
+                      <Text className="text-center font-bold text-xl mb-2 px-1">
+                        {item.name}
+                      </Text>
+                      {/* <View className="flex-row items-center justify-around px-3 pb-3">
+                        <TouchableOpacity
+                          onPress={() => handleFavoritePress(item.id, 'featured')}
+                        >
+                          <Ionicons
+                            name={item.isFavorite ? 'heart' : 'heart-outline'}
+                            size={16}
+                            color={item.isFavorite ? '#FF3B30' : '#4B4B4B'}
+                          />
+                        </TouchableOpacity>
+                      </View> */}
+                    </View>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <View className="flex-1 justify-center items-center mb-4 mt-4 w-full">
+                  <Text className="text-gray-500">Không có món ăn nổi bật nào</Text>
+                </View>
+              )}
             </ScrollView>
           </View>
         </ScrollView>
