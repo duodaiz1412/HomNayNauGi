@@ -25,10 +25,9 @@ const handleLogin = async () => {
       password: password
     });
     
-    const { accessToken, refreshToken, user } = response.data;
-    await AsyncStorage.setItem('auth_token', accessToken);
-    await AsyncStorage.setItem('refresh_token', refreshToken);
-    await AsyncStorage.setItem('accountId', user.id);
+    const { accessToken, refreshToken } = response.data;
+    await AsyncStorage.setItem('accessToken', accessToken);
+    await AsyncStorage.setItem('refreshToken', refreshToken);
     globalThis.isLoggedIn = true;
     // Kiểm tra role để điều hướng
     if (response.data.user.roles.includes('admin')) {
