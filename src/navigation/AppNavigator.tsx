@@ -53,7 +53,7 @@ export type RootStackParamList = {
   };
   IngredientsScreen: { ingredients: Ingredient[] };
   SearchByRecipeScreen: undefined;
-  ListDishesScreen: undefined;
+  ListDishesScreen: { mealId: number };
   FilterScreen: undefined;
   ProfileScreen: undefined;
   FavoritesScreen: undefined;

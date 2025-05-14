@@ -212,7 +212,7 @@ const itemWidth = (screenWidth - 16 * 2 - 16) / 2;
 
 
             key={recipe.id}
-            onPress={() => navigation.navigate('RecipeDetail', { recipeId:parseInt(recipe.id) })}
+            onPress={() => navigation.navigate('RecipeDetail', { recipeId:recipe.id})}
             style={{
                 width: 140,
                 backgroundColor: '#fff',
@@ -274,7 +274,7 @@ const itemWidth = (screenWidth - 16 * 2 - 16) / 2;
         {mealCategories.map((meal) => (
           <TouchableOpacity
             key={meal.id}
-            onPress={() => navigation.navigate('ListDishesScreen')}
+            onPress={() => navigation.navigate('ListDishesScreen', {mealId:meal.id})}
 
             style={styles.card}
           >

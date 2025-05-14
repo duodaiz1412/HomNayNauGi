@@ -432,64 +432,277 @@
 // };
 
 // export default SearchByIngredientsScreen;
-import React, {useEffect, useState} from 'react';
+// import React, {useEffect, useState} from 'react';
+// import {
+//   View,
+//   Text,
+//   FlatList,
+//   TextInput,
+//   TouchableOpacity,
+//   StyleSheet,
+//   Image,
+//   Modal,
+//   Pressable, Alert, ActivityIndicator,
+// } from 'react-native';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
+// import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+// import { useNavigation } from '@react-navigation/native';
+// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+// // import { RootStackParamList } from '../../navigation/AppNavigator';
+// import { mockData } from '../../MockData/Data';
+// import { RouteProp, useRoute } from '@react-navigation/native';
+// import { RootStackParamList } from '../../navigation/AppNavigator';
+// import api from "../../api/api";
+// import {Picker} from "@react-native-picker/picker";
+
+// const IngredientsScreen = () => {
+
+//   // const route = useRoute();
+//   // const { ingredients } = route.params || {};
+//   const route = useRoute<RouteProp<RootStackParamList, 'IngredientsScreen'>>();
+// const { ingredients } = route.params;
+//   const navigation =
+//         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+//   const [ingredientData, setIngredientData] = useState(
+//     (ingredients || []).map(item => ({ ...item, quantity: '', unit: '' }))
+//   );
+//   const [unitOfMeasures, setUnitOfMeasures] = useState([]);
+//   const [loading, setLoading] = useState(false);
+
+  // useEffect(() => {
+  //   fetchUnits();
+  // }, []);
+
+  // const fetchUnits = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await api.get('/unit-of-measure/all');
+  //     setUnitOfMeasures(response.data);
+  //     console.log('Danh sách units', response.data);
+  //   } catch (error) {
+  //     console.error('Error fetching units:', error);
+  //     Alert.alert('Lỗi', 'Không thể tải danh sách units');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+//   const handleSubmit = () => {
+//     console.log(ingredientData)
+//   }
+
+//   return (
+//     <View style={styles.container}>
+//       <View style={styles.header}>
+//         <TouchableOpacity onPress={() => navigation.goBack()}>
+//           <Ionicons name="arrow-back" size={24} color="#941D23" />
+//         </TouchableOpacity>
+//         <Text style={styles.headerTitle}>Nguyên liệu</Text>
+//         <View style={styles.headerIcons}>
+//           <TouchableOpacity onPress={() => navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData })}>
+//             <Ionicons name="create-outline" size={22} color="#333" />
+//           </TouchableOpacity>
+//           <TouchableOpacity onPress={() => navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData })}>
+//             <Ionicons name="add-circle-outline" size={22} color="#333" style={{ marginLeft: 12 }} />
+//           </TouchableOpacity>
+//         </View>
+//       </View>
+
+//       <Text style={styles.subtitle}>Các nguyên liệu</Text>
+//       <Text style={styles.count}>{ingredientData.length} nguyên liệu</Text>
+
+//       <FlatList
+//         data={ingredientData}
+//         keyExtractor={(item) => item.name}
+//         ListFooterComponent={
+//           loading ? (
+//             <View className="py-4 items-center">
+//               <ActivityIndicator size="small" color="#941D23" />
+//               <Text className="text-gray-500 mt-2">Đang tải...</Text>
+//             </View>
+//           ) : null
+//         }
+//         ListEmptyComponent={
+//           !loading ? (
+//             <View className="py-8 items-center">
+//               <Text className="text-gray-500">
+//                 Không tìm thấy nguyên liệu
+//               </Text>
+//             </View>
+//           ) : null
+//         }
+//         renderItem={({ item, index }) => (
+//           <View style={styles.itemContainer}>
+//             <Image source={{ uri: item.imageUrl }} style={styles.image} />
+//             <Text style={styles.name}>{item.name}</Text>
+//             {/* <TextInput
+//               className="text-lg py-2 px-2"
+//               style={{width: 80}}
+//               // keyboardType={'numeric'}
+//               // placeholder="Số lượng"
+//               onChangeText={(value) => {
+//                 const editedIngredients = [...ingredients];
+//                 // const editIngredient = editedIngredients.find(x => x.id === item.id);
+//                 // editIngredient.quantity = value;
+//                 setIngredientData(editedIngredients)
+//               }}
+//             /> */}
+
+//             <Picker
+//               style={{width: 120}}
+//               // selectedValue={ingredientData.find(x => x.id === item.id)?.unit || ''}
+//               onValueChange={(value, index) => {
+//                 const editedIngredients = [...ingredients];
+//                 const editIngredient = editedIngredients.find(x => x.id === item.id);
+//                 // editIngredient.unit = value
+//                 setIngredientData(editedIngredients);
+//               }}
+//             >
+//               {unitOfMeasures.map((item => (
+//                 <Picker.Item label={item.unitName} value={item.id} key={item.id} />
+//               )))}
+//             </Picker>
+//           </View>
+//         )}
+//         contentContainerStyle={{ paddingBottom: 120 }}
+//       />
+
+//       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+//         <Text style={styles.buttonText}>Tìm món ngay 🍜</Text>
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     paddingHorizontal: 16,
+//     paddingTop: 40,
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'space-between',
+//   },
+//   headerTitle: {
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     color: '#941D23',
+//   },
+//   headerIcons: {
+//     flexDirection: 'row',
+//   },
+//   subtitle: {
+//     marginTop: 16,
+//     fontSize: 16,
+//     fontWeight: '600',
+//   },
+//   count: {
+//     fontSize: 14,
+//     color: '#333',
+//     marginBottom: 16,
+//   },
+//   itemContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: '#f9f9f9',
+//     borderRadius: 12,
+//     padding: 12,
+//     marginBottom: 12,
+//   },
+//   image: {
+//     width: 40,
+//     height: 40,
+//     borderRadius: 8,
+//     marginRight: 12,
+//   },
+//   name: {
+//     fontSize: 16,
+//     fontWeight: '500',
+//     color: '#333',
+//     width: 100,
+//   },
+//   quantityInput: {
+//     backgroundColor: '#fff',
+//     borderRadius: 8,
+//     paddingHorizontal: 10,
+//     paddingVertical: 6,
+//     borderWidth: 1,
+//     borderColor: '#ccc',
+//     minWidth: 80,
+//     alignItems: 'center',
+//   },
+//   button: {
+//     position: 'absolute',
+//     bottom: 24,
+//     left: 16,
+//     right: 16,
+//     backgroundColor: '#941D23',
+//     height: 48,
+//     borderRadius: 24,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   buttonText: {
+//     color: '#fff',
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//   },
+//   modalBackground: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: 'rgba(0,0,0,0.3)',
+//   },
+//   dropdownWrapper: {
+//     backgroundColor: '#fff',
+//     borderRadius: 8,
+//     padding: 16,
+//     width: 200,
+//   },
+//   dropdownItem: {
+//     paddingVertical: 8,
+//     fontSize: 16,
+//     color: '#333',
+//   },
+// });
+
+// export default IngredientsScreen;
+import React, { useState } from 'react';
 import {
   View,
   Text,
   FlatList,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Image,
-  Modal,
-  Pressable, Alert, ActivityIndicator,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-// import { RootStackParamList } from '../../navigation/AppNavigator';
-import { mockData } from '../../MockData/Data';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import api from "../../api/api";
-import {Picker} from "@react-native-picker/picker";
 
 const IngredientsScreen = () => {
-
-  // const route = useRoute();
-  // const { ingredients } = route.params || {};
   const route = useRoute<RouteProp<RootStackParamList, 'IngredientsScreen'>>();
-const { ingredients } = route.params;
+  const { ingredients } = route.params;
+
   const navigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const [ingredientData, setIngredientData] = useState(
-    (ingredients || []).map(item => ({ ...item, quantity: '', unit: '' }))
+    (ingredients || []).map(item => ({ ...item }))
   );
-  const [unitOfMeasures, setUnitOfMeasures] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchUnits();
-  }, []);
-
-  const fetchUnits = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/units');
-      setUnitOfMeasures(response.data);
-      console.log('Danh sách units', response.data);
-    } catch (error) {
-      console.error('Error fetching units:', error);
-      Alert.alert('Lỗi', 'Không thể tải danh sách units');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = () => {
-    console.log(ingredientData)
-  }
+    console.log('Nguyên liệu để tìm món:', ingredientData);
+    navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData });
+  };
 
   return (
     <View style={styles.container}>
@@ -499,10 +712,10 @@ const { ingredients } = route.params;
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Nguyên liệu</Text>
         <View style={styles.headerIcons}>
-          <TouchableOpacity onPress={() => navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData })}>
+          <TouchableOpacity onPress={handleSubmit}>
             <Ionicons name="create-outline" size={22} color="#333" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData })}>
+          <TouchableOpacity onPress={handleSubmit}>
             <Ionicons name="add-circle-outline" size={22} color="#333" style={{ marginLeft: 12 }} />
           </TouchableOpacity>
         </View>
@@ -513,55 +726,55 @@ const { ingredients } = route.params;
 
       <FlatList
         data={ingredientData}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item) => item.id?.toString() || item.name}
         ListFooterComponent={
           loading ? (
-            <View className="py-4 items-center">
+            <View style={{ paddingVertical: 16, alignItems: 'center' }}>
               <ActivityIndicator size="small" color="#941D23" />
-              <Text className="text-gray-500 mt-2">Đang tải...</Text>
+              <Text style={{ color: '#666', marginTop: 8 }}>Đang tải...</Text>
             </View>
           ) : null
         }
         ListEmptyComponent={
           !loading ? (
-            <View className="py-8 items-center">
-              <Text className="text-gray-500">
-                Không tìm thấy nguyên liệu
-              </Text>
+            <View style={{ paddingVertical: 32, alignItems: 'center' }}>
+              <Text style={{ color: '#999' }}>Không tìm thấy nguyên liệu</Text>
             </View>
           ) : null
         }
-        renderItem={({ item, index }) => (
+        renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Image source={{ uri: item.imageUrl }} style={styles.image} />
             <Text style={styles.name}>{item.name}</Text>
+
+            {/* Tạm thời bỏ phần nhập số lượng và đơn vị */}
+            {/* 
             <TextInput
-              className="text-lg py-2 px-2"
-              style={{width: 80}}
-              keyboardType={'numeric'}
+              style={styles.quantityInput}
+              keyboardType="numeric"
               placeholder="Số lượng"
               onChangeText={(value) => {
-                const editedIngredients = [...ingredients];
-                const editIngredient = editedIngredients.find(x => x.id === item.id);
-                editIngredient.quantity = value;
-                setIngredientData(editedIngredients)
+                const updated = [...ingredientData];
+                const current = updated.find(x => x.id === item.id);
+                if (current) current.quantity = value;
+                setIngredientData(updated);
               }}
             />
-
             <Picker
-              style={{width: 120}}
-              selectedValue={ingredientData.find(x => x.id === item.id)?.unit || ''}
-              onValueChange={(value, index) => {
-                const editedIngredients = [...ingredients];
-                const editIngredient = editedIngredients.find(x => x.id === item.id);
-                editIngredient.unit = value
-                setIngredientData(editedIngredients);
+              style={{ width: 120 }}
+              selectedValue={item.unit}
+              onValueChange={(value) => {
+                const updated = [...ingredientData];
+                const current = updated.find(x => x.id === item.id);
+                if (current) current.unit = value;
+                setIngredientData(updated);
               }}
             >
-              {unitOfMeasures.map((item => (
-                <Picker.Item label={item.unitName} value={item.id} key={item.id} />
-              )))}
+              {unitOfMeasures.map(unit => (
+                <Picker.Item label={unit.unitName} value={unit.id} key={unit.id} />
+              ))}
             </Picker>
+            */}
           </View>
         )}
         contentContainerStyle={{ paddingBottom: 120 }}
@@ -622,7 +835,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#333',
-    width: 100,
+    flex: 1,
   },
   quantityInput: {
     backgroundColor: '#fff',
@@ -632,7 +845,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     minWidth: 80,
-    alignItems: 'center',
+    marginRight: 12,
   },
   button: {
     position: 'absolute',
@@ -649,23 +862,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-  dropdownWrapper: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    width: 200,
-  },
-  dropdownItem: {
-    paddingVertical: 8,
-    fontSize: 16,
-    color: '#333',
   },
 });
 
