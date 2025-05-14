@@ -185,7 +185,7 @@ export const AdminFoodManagementScreen = () => {
                   </View>
                   <View className="flex-row items-center bg-[#FFA500]/5 px-2.5 py-1 rounded-full ml-3">
                     <LikeSolid size={14} color="#FFA500" />
-                    <Text className="text-xs text-[#FFA500] ml-1.5 font-medium">{item.totalLikes || 0}</Text>
+                    <Text className="text-xs text-[#FFA500] ml-1.5 font-medium">{item.likeCount || 0}</Text>
                   </View>
                 </View>
               </View>
