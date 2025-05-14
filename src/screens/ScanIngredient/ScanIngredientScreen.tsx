@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,18 +6,17 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  TextInput,
   ImageBackground,
   Modal,
-  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { scanIngredient } from '../../api/api';
-import { Unit } from '../../types';
+import { findRecipesByIngredients, scanIngredient } from '../../api/api';
+import SuggestDish from '../../components/SuggestDish/index';
 
 type ScanIngredientRouteProp = RouteProp<RootStackParamList, 'ScanIngredient'>;
 
@@ -25,19 +24,7 @@ interface DetectedIngredient {
   id: string;
   name: string;
   image?: string;
-  quantity?: number;
-  unit?: string;
 }
-
-const UNITS = [
-  Unit.GRAM,
-  Unit.KILOGRAM,
-  Unit.MILLILIT,
-  Unit.LIT,
-  Unit.CAI,
-  Unit.THIA_CA_PHE,
-  Unit.THIA_CANH
-];
 
 const ScanIngredientScreen = () => {
   const navigation =
@@ -48,6 +35,9 @@ const ScanIngredientScreen = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [ingredients, setIngredients] = useState<DetectedIngredient[]>([]);
+  const [showSuggestDish, setShowSuggestDish] = useState(false);
+  const [suggestedDishes, setSuggestedDishes] = useState([]);
+  const [isLoadingDishes, setIsLoadingDishes] = useState(false);
 
   useEffect(() => {
     const extractIngredients = async () => {
@@ -56,20 +46,15 @@ const ScanIngredientScreen = () => {
           setIsLoading(true);
           console.log('Bắt đầu quá trình scan với ảnh:', imageUri);
 
-          // Gọi API để nhận diện và tìm kiếm nguyên liệu
           const response = await scanIngredient(imageUri);
-
           console.log('Kết quả nhận được:', response);
 
           if (response.success && response.ingredients) {
-            // Chuyển đổi kết quả thành định dạng DetectedIngredient
             setIngredients(
               response.ingredients.map((item: any) => ({
                 id: item.id,
                 name: item.name,
                 image: item.imageUrl,
-                quantity: 0,
-                unit: item.unit,
               }))
             );
           }
@@ -85,58 +70,41 @@ const ScanIngredientScreen = () => {
     extractIngredients();
   }, [imageUri]);
 
-  const [showUnitPicker, setShowUnitPicker] = useState(false);
-  const [selectedIngredientId, setSelectedIngredientId] = useState<
-    string | null
-  >(null);
-
-  const handleQuantityChange = (id: string, value: string) => {
-    setIngredients(
-      ingredients.map((ingredient) =>
-        ingredient.id === id ? { ...ingredient, quantity: value ? parseFloat(value) : 0 } : ingredient
-      )
-    );
-  };
-
-  const handleUnitChange = (id: string, unit: string) => {
-    setIngredients(
-      ingredients.map((ingredient) =>
-        ingredient.id === id ? { ...ingredient, unit: unit } : ingredient
-      )
-    );
-    setShowUnitPicker(false);
-  };
-
-  const openUnitPicker = (id: string) => {
-    setSelectedIngredientId(id);
-    setShowUnitPicker(true);
-  };
-
   const handleAddNewIngredient = () => {
-    // Chức năng thêm nguyên liệu mới
     Alert.alert(
       'Thông báo',
       'Chức năng thêm nguyên liệu sẽ được phát triển sau'
     );
   };
 
-  const handleFindRecipe = () => {
-    // Chức năng tìm món ăn từ các nguyên liệu đã chọn
-    const ingredientsWithQuantity = ingredients.filter((i) => i.quantity);
-    if (ingredientsWithQuantity.length > 0) {
-      navigation.navigate('SearchByIngredientScreen', {
-        ingredients: ingredientsWithQuantity.map((item) => ({
-          id: item.id,
-          name: item.name,
-          image: item.image || '',
-        })),
-      });
+  const handleFindRecipe = async () => {
+    if (ingredients.length > 0) {
+      setIsLoadingDishes(true);
+      try {
+        const searchIngredients = ingredients.map(ing => ({
+          id: ing.id
+        }));
+        
+        const response = await findRecipesByIngredients(searchIngredients);
+        console.log('Kết quả tìm kiếm món ăn:', response);
+        setSuggestedDishes(response.data);
+        setShowSuggestDish(true);
+      } catch (error) {
+        Alert.alert('Lỗi', 'Không thể tìm kiếm món ăn. Vui lòng thử lại.');
+      } finally {
+        setIsLoadingDishes(false);
+      }
     } else {
       Alert.alert(
         'Thông báo',
-        'Vui lòng nhập số lượng cho ít nhất một nguyên liệu'
+        'Vui lòng có ít nhất một nguyên liệu để tìm kiếm'
       );
     }
+  };
+
+  const handleDishPress = (id: string) => {
+    setShowSuggestDish(false);
+    navigation.navigate('RecipeDetail', { recipeId: id });
   };
 
   const handleEdit = () => {
@@ -155,10 +123,10 @@ const ScanIngredientScreen = () => {
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
-            <Text className="text-lg text-[#941D23] mb-2">
+            <ActivityIndicator size="large" color="#941D23" />
+            <Text className="text-lg text-[#941D23] mt-4">
               Đang nhận dạng nguyên liệu...
             </Text>
-            {/* Thêm ActivityIndicator nếu muốn */}
           </View>
         ) : (
           <>
@@ -204,31 +172,6 @@ const ScanIngredientScreen = () => {
                   <Text className="flex-1 text-base font-medium text-[#333]">
                     {ingredient.name}
                   </Text>
-                  <View className="flex-row items-center">
-                    <TextInput
-                      className="bg-white border border-[#ddd] rounded-l px-2 py-1 w-[60px] text-center text-sm"
-                      value={ingredient.quantity ? ingredient.quantity.toString() : ''}
-                      onChangeText={(value) =>
-                        handleQuantityChange(ingredient.id, value)
-                      }
-                      placeholder="Nhập"
-                      placeholderTextColor="#999"
-                      keyboardType="number-pad"
-                    />
-                    <TouchableOpacity
-                      onPress={() => openUnitPicker(ingredient.id)}
-                      className="bg-white border border-[#ddd] border-l-0 rounded-r px-2 py-1 min-w-[70px] flex-row items-center justify-between"
-                    >
-                      <Text className="text-sm text-[#333] flex-1 text-center">
-                        {ingredient.unit || 'Đơn vị'}
-                      </Text>
-                      <Ionicons
-                        name="chevron-down-outline"
-                        size={14}
-                        color="#666"
-                      />
-                    </TouchableOpacity>
-                  </View>
                 </View>
               ))}
             </ScrollView>
@@ -244,41 +187,34 @@ const ScanIngredientScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        {/* Unit Picker Modal */}
+        {/* Modal hiển thị SuggestDish */}
         <Modal
-          visible={showUnitPicker}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowUnitPicker(false)}
+          visible={showSuggestDish}
+          animationType="slide"
+          onRequestClose={() => setShowSuggestDish(false)}
         >
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => setShowUnitPicker(false)}
-            className="flex-1 justify-center items-center bg-black/30"
-          >
-            <View className="bg-white w-[250px] rounded-lg overflow-hidden">
-              <View className="border-b border-gray-200 py-2 px-4">
-                <Text className="text-center font-medium text-base">
-                  Đơn vị
+          <SafeAreaView className="flex-1 bg-white mt-10 p-2">
+            <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
+              <Text className="text-xl font-bold text-[#941D23]">Gợi ý món ăn</Text>
+              <TouchableOpacity onPress={() => setShowSuggestDish(false)}>
+                <Ionicons name="close" size={24} color="#941D23" />
+              </TouchableOpacity>
+            </View>
+
+            {isLoadingDishes ? (
+              <View className="flex-1 items-center justify-center">
+                <ActivityIndicator size="large" color="#941D23" />
+                <Text className="text-lg text-[#941D23] mt-4">
+                  Đang tìm kiếm món ăn phù hợp...
                 </Text>
               </View>
-              <FlatList
-                data={UNITS}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    className="py-3 px-4 border-b border-gray-100"
-                    onPress={() =>
-                      selectedIngredientId &&
-                      handleUnitChange(selectedIngredientId, item)
-                    }
-                  >
-                    <Text className="text-center">{item}</Text>
-                  </TouchableOpacity>
-                )}
+            ) : (
+              <SuggestDish
+                dishes={suggestedDishes}
+                onDishPress={handleDishPress}
               />
-            </View>
-          </TouchableOpacity>
+            )}
+          </SafeAreaView>
         </Modal>
       </SafeAreaView>
     </ImageBackground>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { IngredientSearch } from '../types';
 
 const BASE_URL = 'http://192.168.1.57:3001';
 
@@ -88,6 +89,23 @@ export const logout = async () => {
     // Xóa tokens khỏi AsyncStorage
     await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
     globalThis.isLoggedIn = false;
+  }
+};
+
+// Hàm tìm công thức theo danh sách nguyên liệu
+export const findRecipesByIngredients = async (ingredients: IngredientSearch[]) => {
+  try {
+    console.log('Tìm công thức với nguyên liệu:', ingredients);
+    
+    const response = await api.post('/recipe-ingredients/find-recipes', {
+      ingredients
+    });
+    
+    console.log('Kết quả tìm công thức:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi tìm công thức:', error.response?.data || error.message);
+    throw error;
   }
 };
 
