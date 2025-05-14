@@ -25,8 +25,8 @@ interface FeaturedItem {
   name: string;
   image: string;
   time: string;
-  author:string,
-  avataUrl:string,
+  author: string,
+  avataUrl: string,
   isFavorite: boolean;
 }
 
@@ -39,16 +39,26 @@ interface HomeData {
     avatar: string;
   } | null;
   banner: {
-    id:string;
+    id: string;
     image: string;
-     description: string;
+    description: string;
   };
 }
 
 export const useHomeData = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [homeData, setHomeData] = useState<HomeData | null>(null);
+  const [homeData, setHomeData] = useState<HomeData>({
+    categories: [],
+    recipes: [],
+    featuredByCategory: {},
+    user: null,
+    banner: {
+      id: '',
+      image: '',
+      description: ''
+    }
+  });
   const [activeCategoryId, setActiveCategoryId] = useState('1');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -78,7 +88,7 @@ export const useHomeData = () => {
         id: cat.id,
         name: cat.name,
         icon: cat.imageUrl,
-        isActive: index === 0 // ✅ phần tử đầu tiên active
+        isActive: index === 0
       }));
 
       // Fetch popular recipes
@@ -88,10 +98,10 @@ export const useHomeData = () => {
         name: recipe.name,
         description: recipe.description,
         image: recipe.imageUrl,
-        author: recipe.account?.userProfile.fullName,
-        authorAvatar: recipe.account?.userProfile?.avatarUrl,
+        author: recipe.account?.userProfile?.fullName || 'Không xác định',
+        authorAvatar: recipe.account?.userProfile?.avatarUrl || '',
         time: `${recipe.preparationTimeMinutes} phút`,
-        // isFavorite: isAuth ? (recipe.isFavorite || false) : false
+        isFavorite: false
       }));
 
       // Fetch featured recipes by category
@@ -102,18 +112,18 @@ export const useHomeData = () => {
           name: recipe.name,
           image: recipe.imageUrl,
           time: `${recipe.preparationTimeMinutes} phút`,
-          avataUrl: recipe.account.userProfile.avatarUrl,
-          author:recipe.account.userProfile.fullName,
-          // isFavorite: isAuth ? (recipe.isFavorite || false) : false
+          avataUrl: recipe.account?.userProfile?.avatarUrl || '',
+          author: recipe.account?.userProfile?.fullName || 'Không xác định',
+          isFavorite: false
         }))
       };
 
       // Fetch banner
       const bannerResponse = await api.get('/recipes/banner');
       const banner = {
-        id:bannerResponse.data.data.id,
-        image: bannerResponse.data.data.imageUrl,
-        description: bannerResponse.data.data.description
+        id: bannerResponse.data.data?.id || '',
+        image: bannerResponse.data.data?.imageUrl || '',
+        description: bannerResponse.data.data?.description || ''
       };
 
       // Fetch user profile only if authenticated
@@ -121,10 +131,13 @@ export const useHomeData = () => {
       if (isAuth) {
         try {
           const userResponse = await api.get('/accounts/profile');
-          user = {
-            name: userResponse.data.data.name,
-            avatar: userResponse.data.data.avatarUrl
-          };
+          const userData = userResponse.data.data;
+          if (userData) {
+            user = {
+              name: userData.name || '',
+              avatar: userData.avatarUrl || ''
+            };
+          }
         } catch (error) {
           console.error('Error fetching user profile:', error);
         }
@@ -145,51 +158,12 @@ export const useHomeData = () => {
     }
   };
 
-  // // Toggle favorite status
-  // const toggleFavorite = async (itemId: string, type: 'recipe' | 'featured') => {
-  //   if (!homeData || !isAuthenticated) {
-  //     // Nếu chưa đăng nhập, chuyển hướng đến trang login
-  //     return false;
-  //   }
-
-  //   try {
-  //     const response = await api.post('/favorite-recipes/toggle', {
-  //       recipeId: itemId
-  //     });
-
-  //     const isFavorite = response.data.isFavorite;
-
-  //     if (type === 'recipe') {
-  //       setHomeData(prev => ({
-  //         ...prev!,
-  //         recipes: prev!.recipes.map(item =>
-  //           item.id === itemId ? { ...item, isFavorite } : item
-  //         )
-  //       }));
-  //     } else {
-  //       setHomeData(prev => ({
-  //         ...prev!,
-  //         featuredByCategory: {
-  //           ...prev!.featuredByCategory,
-  //           [activeCategoryId]: prev!.featuredByCategory[activeCategoryId].map(item =>
-  //             item.id === itemId ? { ...item, isFavorite } : item
-  //           )
-  //         }
-  //       }));
-  //     }
-  //     return true;
-  //   } catch (error) {
-  //     console.error('Error toggling favorite:', error);
-  //     return false;
-  //   }
-  // };
-
   // Handle category change
   const handleCategoryPress = async (categoryId: string) => {
     setActiveCategoryId(categoryId);
     setHomeData(prev => ({
-      ...prev!,
-      categories: prev!.categories.map(category => ({
+      ...prev,
+      categories: prev.categories.map(category => ({
         ...category,
         isActive: category.id === categoryId
       }))
@@ -198,17 +172,21 @@ export const useHomeData = () => {
     // Fetch new featured recipes for the selected category
     try {
       const featuredResponse = await api.get(`/recipes/category/${categoryId}/top`);
+      const newFeatured = featuredResponse.data.data.map((recipe: any) => ({
+        id: recipe.id,
+        name: recipe.name,
+        image: recipe.imageUrl,
+        time: `${recipe.preparationTimeMinutes} phút`,
+        avataUrl: recipe.account?.userProfile?.avatarUrl || '',
+        author: recipe.account?.userProfile?.fullName || 'Không xác định',
+        isFavorite: false
+      }));
+
       setHomeData(prev => ({
-        ...prev!,
+        ...prev,
         featuredByCategory: {
-          ...prev!.featuredByCategory,
-          [categoryId]: featuredResponse.data.data.map((recipe: any) => ({
-            id: recipe.id,
-            name: recipe.name,
-            image: recipe.imageUrl,
-            time: `${recipe.cookingTime} phút`,
-            // isFavorite: isAuthenticated ? (recipe.isFavorite || false) : false
-          }))
+          ...prev.featuredByCategory,
+          [categoryId]: newFeatured
         }
       }));
     } catch (error) {
@@ -216,6 +194,7 @@ export const useHomeData = () => {
     }
   };
 
+  // Initial data fetch
   useEffect(() => {
     fetchHomeData();
   }, []);
@@ -225,9 +204,7 @@ export const useHomeData = () => {
     error,
     homeData,
     activeCategoryId,
-    // toggleFavorite,
     handleCategoryPress,
-    refreshData: fetchHomeData,
     isAuthenticated
   };
 };

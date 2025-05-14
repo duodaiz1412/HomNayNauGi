@@ -94,13 +94,15 @@ const HomeScreen = () => {
                 className="flex-row items-center"
               >
                 <Image
-                  source={{ uri: homeData.user?.avatar }}
+                  source={{ 
+                    uri: homeData.user?.avatar || 'https://via.placeholder.com/200'
+                  }}
                   className="w-20 h-20 rounded-full mr-3"
                 />
                 <View>
                   <Text className="text-[#4B4B4B] italic">Chào buổi sáng,</Text>
                   <Text className="text-[#4B4B4B] text-2xl font-bold">
-                    {homeData.user?.name}
+                    {homeData.user?.name || 'Người dùng'}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -155,7 +157,9 @@ const HomeScreen = () => {
             </View>
 
             <Image
-              source={{ uri: homeData.banner.image }}
+              source={{ 
+                uri: homeData.banner?.image || 'https://via.placeholder.com/200'
+              }}
               className="w-44 h-44 rounded-full"
               resizeMode="cover"
             />
@@ -184,7 +188,9 @@ const HomeScreen = () => {
                 className="mr-4 w-64 h-56 relative overflow-hidden rounded-xl"
               >
                 <Image
-                  source={{ uri: recipe.image }}
+                  source={{ 
+                    uri: recipe.image || 'https://via.placeholder.com/200'
+                  }}
                   className="absolute w-full h-full"
                   resizeMode="cover"
                 />
@@ -304,7 +310,9 @@ const HomeScreen = () => {
                 >
                   <View className="absolute top-[-40px] left-0 right-0 items-center">
                     <Image
-                      source={{ uri: item.image }}
+                      source={{ 
+                        uri: item.image || 'https://via.placeholder.com/200'
+                      }}
                       className="w-40 h-40 rounded-full border-4 border-white"
                       resizeMode="cover"
                     />
