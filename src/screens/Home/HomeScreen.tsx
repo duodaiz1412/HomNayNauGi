@@ -42,38 +42,38 @@ const HomeScreen = () => {
     }
   };
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem('auth_token');
-      if (!token) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
-      }
-    };
+  // const handleFavoritePress = async (
+  //   itemId: string,
+  //   type: 'recipe' | 'featured'
+  // ) => {
+  //   if (!isAuthenticated) {
+  //     navigation.navigate('Login');
+  //     return;
+  //   }
+  //   await toggleFavorite(itemId, type);
+  // };
 
-    checkLoginStatus();
-  }, [navigation]);
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#941D23" />
+      </View>
+    );
+  }
 
-  useEffect(() => {
-    setFeaturedItems(mockData.featuredByCategory[activeCategoryId] || []);
-  }, [activeCategoryId]);
-
-  const handleCategoryPress = (categoryId) => {
-    setActiveCategoryId(categoryId);
-    const updatedCategories = categories.map((category) => ({
-      ...category,
-      isActive: category.id === categoryId,
-    }));
-    setCategories(updatedCategories);
-  };
-
-  const toggleFavorite = (itemId) => {
-    setFeaturedItems(
-      featuredItems.map((item) =>
-        item.id === itemId ? { ...item, isFavorite: !item.isFavorite } : item
-      )
+  if (error || !homeData) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-red-600 text-center px-4">
+          {error || 'Có lỗi xảy ra'}
+        </Text>
+        <TouchableOpacity
+          className="mt-4 bg-red-600 px-4 py-2 rounded-full"
+          onPress={() => handleCategoryPress(activeCategoryId)}
+        >
+          <Text className="text-white">Thử lại</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
