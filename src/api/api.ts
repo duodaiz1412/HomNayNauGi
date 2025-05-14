@@ -156,4 +156,46 @@ export const scanIngredient = async (imageUri: string) => {
   }
 };
 
+// Hàm tìm kiếm danh mục nguyên liệu với phân trang
+export const getIngredientCategories = async (
+  offset: number = 0,
+  limit: number = 10,
+  query?: string
+) => {
+  try {
+    console.log('Tìm kiếm danh mục nguyên liệu:', { offset, limit, query });
+    
+    const response = await api.get('/ingredient-categories/admin/search', {
+      params: {
+        offset,
+        limit,
+        query
+      }
+    });
+    
+    console.log('Kết quả tìm kiếm danh mục:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi tìm kiếm danh mục:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Thêm nguyên liệu vào pantry
+export const addToPantry = async (ingredientIds: string[]) => {
+  try {
+    console.log('Thêm nguyên liệu vào pantry:', ingredientIds);
+    
+    const response = await api.post('/pantry/add', {
+      ingredientIds
+    });
+    
+    console.log('Kết quả thêm vào pantry:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm vào pantry:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export default api;
