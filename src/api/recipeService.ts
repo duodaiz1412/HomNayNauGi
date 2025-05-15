@@ -42,7 +42,7 @@ const calculateRecipeMatches = (
       );
 
       if (searchIngredient) {
-        const isUnitMatch = recipeIngredient.unitId === searchIngredient.unit;
+        const isUnitMatch = recipeIngredient.unitId === Number(searchIngredient.unit);
         const quantityDiff = Math.abs(
           recipeIngredient.quantity - searchIngredient.quantity
         );
