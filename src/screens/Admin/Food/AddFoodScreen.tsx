@@ -26,6 +26,14 @@ import { useFoodManagement } from 'src/context/FoodManagementContext';
 import { useEffect, useState } from 'react';
 import api from 'src/api/api';
 
+// Add YouTube URL validation function
+const isValidYouTubeUrl = (url) => {
+  if (!url) return true; // Empty URL is considered valid (optional field)
+  
+  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|shorts\/|v\/|)([a-zA-Z0-9_-]{11})$/;
+  return youtubeRegex.test(url);
+};
+
 const statusOptions = [
   { label: 'Nháp', value: RecipeStatus.DRAFT },
   { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
@@ -290,11 +298,21 @@ export const AddFoodScreen = () => {
               <View className="mb-4">
                 <Text className="text-gray-700 mb-1">URL video hướng dẫn</Text>
                 <TextInput
-                  className="border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder="Nhập URL video hướng dẫn"
+                  className={`border ${!isValidYouTubeUrl(basicInfo.videoUrl) ? 'border-red-500' : basicInfo.videoUrl ? 'border-green-500' : 'border-gray-300'} rounded-lg px-3 py-2`}
+                  placeholder="Nhập URL video hướng dẫn (YouTube)"
                   value={basicInfo.videoUrl || ''}
                   onChangeText={(value) => updateBasicInfo({ videoUrl: value })}
                 />
+                {basicInfo.videoUrl && !isValidYouTubeUrl(basicInfo.videoUrl) && (
+                  <Text className="text-red-500 text-xs mt-1">
+                    URL không hợp lệ. Vui lòng nhập URL YouTube hợp lệ.
+                  </Text>
+                )}
+                {basicInfo.videoUrl && isValidYouTubeUrl(basicInfo.videoUrl) && (
+                  <Text className="text-green-500 text-xs mt-1">
+                    URL YouTube hợp lệ.
+                  </Text>
+                )}
               </View>
               <View className="space-y-2">
                 <Text className="text-gray-800 text-base font-semibold">

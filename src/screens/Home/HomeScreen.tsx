@@ -266,15 +266,10 @@ const HomeScreen = () => {
           </ScrollView>
 
           {/* Popular Dishes Section */}
-          <View className="flex-row justify-between px-4 mb-2">
+          <View className="flex-row justify-between px-4 mb-2 mt-1">
             <Text className="text-xl font-bold text-[#4B4B4B]">
-              Món ăn phổ biến
+              Món ăn phổ biến theo thể loại
             </Text>
-            <TouchableOpacity onPress={() => navigation2.navigate('Favorite')}>
-              <Text className="text-red-600 text-base font-bold underline">
-                Xem thêm
-              </Text>
-            </TouchableOpacity>
           </View>
 
           {/* Category Buttons */}
@@ -316,9 +311,6 @@ const HomeScreen = () => {
 
           {/* Featured Dishes Section */}
           <View className="px-4 pt-2 pb-6">
-            <Text className="text-lg font-medium text-[#4B4B4B] mb-6">
-              Món nổi bật theo thể loại
-            </Text>
 
             <ScrollView
               horizontal

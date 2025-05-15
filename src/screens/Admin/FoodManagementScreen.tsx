@@ -135,13 +135,6 @@ export const AdminFoodManagementScreen = () => {
       rejected: { bg: 'bg-red-100', text: 'text-red-700' },
       pending_approval: { bg: 'bg-orange-100', text: 'text-orange-700' },
     }[item.status] || { bg: 'bg-gray-100', text: 'text-gray-700' };
-  if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#941D23" />
-      </View>
-    );
-  }
     return (
       <TouchableOpacity
         onPress={() =>
@@ -157,7 +150,7 @@ export const AdminFoodManagementScreen = () => {
                   source={{
                     uri:
                       item.imageUrl ||
-                      'https://placehold.co/100x100?text=No+Image',
+                      'https://res.cloudinary.com/dq3fcbnk6/image/upload/v1747320973/jmda589ek7qrs1jgihvw.jpg',
                   }}
                   className="w-20 h-20 rounded-xl"
                   resizeMode="cover"
