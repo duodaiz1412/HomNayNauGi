@@ -81,7 +81,7 @@ export const useHomeData = () => {
       setError(null);
 
       const isAuth = await checkAuth();
-
+      console.log("fetch categori")
       // Fetch categories
       const categoriesResponse = await api.get('/recipe-categories/random');
       const categories = categoriesResponse.data.data.map((cat: any, index: number) => ({
@@ -90,7 +90,7 @@ export const useHomeData = () => {
         icon: cat.imageUrl,
         isActive: index === 0
       }));
-
+      console.log("fetch popular recipes")
       // Fetch popular recipes
       const recipesResponse = await api.get('/recipes/popular');
       const recipes = recipesResponse.data.data.map((recipe: any) => ({
@@ -105,6 +105,7 @@ export const useHomeData = () => {
       }));
 
       // Fetch featured recipes by category
+      console.log('Fetching featured recipes by category...');
       const featuredResponse = await api.get(`/recipes/category/${activeCategoryId}/top`);
       const featuredByCategory = {
         [activeCategoryId]: featuredResponse.data.data.map((recipe: any) => ({
@@ -119,6 +120,8 @@ export const useHomeData = () => {
       };
 
       // Fetch banner
+
+      console.log('Fetching banner...');
       const bannerResponse = await api.get('/recipes/banner');
       const banner = {
         id: bannerResponse.data.data?.id || '',
@@ -127,6 +130,7 @@ export const useHomeData = () => {
       };
 
       // Fetch user profile only if authenticated
+      console.log('Fetching user profile...');
       let user = null;
       if (isAuth) {
         try {
