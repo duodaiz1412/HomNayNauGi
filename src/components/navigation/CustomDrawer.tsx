@@ -31,7 +31,7 @@ const handleLogout = () => {
           // Chuyển về màn hình login
           navigation.reset({
             index: 0,
-            routes: [{ name: 'Login' }],
+            routes: [{ name: 'MainTabs' }],
           });
         } catch (error) {
           console.error('Lỗi đăng xuất:', error);
@@ -51,13 +51,13 @@ const handleLogout = () => {
         <View className="flex-row items-center">
           <Image
             source={{
-              uri: 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_1280.png',
+              uri: 'https://res.cloudinary.com/dq3fcbnk6/image/upload/v1747310749/bxme4csc6yqy62t2cznt.jpg',
             }}
             className="w-[60px] h-[60px] rounded-full border-2 border-white"
           />
           <View className="ml-4">
-            <Text className="text-white text-lg font-bold">Quốc Anh</Text>
-            <Text className="text-white/80 text-sm mt-0.5">Quản trị viên</Text>
+            <Text className="text-white text-lg font-bold">Admin</Text>
+            <Text className="text-white/80 text-base mt-0.5">Quản trị viên</Text>
           </View>
         </View>
       </View>

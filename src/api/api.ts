@@ -63,7 +63,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.log('Interceptor: Refresh token failed', refreshError);
         // Nếu refresh token cũng hết hạn, xóa tokens và throw error
-        await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+        await AsyncStorage.multiRemove(['accessToken', 'refreshToken','accountId','accountRole']);
         globalThis.isLoggedIn = false;
         return Promise.reject(refreshError);
       }
@@ -76,13 +76,19 @@ api.interceptors.response.use(
 // Hàm xử lý logout
 export const logout = async () => {
   try {
-    // Gọi API logout để blacklist token
-    await api.post('/auth/logout');
+    // Lấy refresh token trước khi gọi API
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    
+    // Chỉ gọi API logout nếu có refresh token
+    if (refreshToken) {
+      // Gọi API logout để blacklist token
+      await api.post('/auth/logout', { refreshToken });
+    }
   } catch (error) {
     console.error('Logout API error:', error);
   } finally {
     // Xóa tokens khỏi AsyncStorage
-    await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+    await AsyncStorage.multiRemove(['accessToken', 'refreshToken','accountId','accountRole']);
     globalThis.isLoggedIn = false;
   }
 };

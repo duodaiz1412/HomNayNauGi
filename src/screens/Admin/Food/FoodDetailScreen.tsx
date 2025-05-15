@@ -20,6 +20,7 @@ import { Recipe, RecipeStatus } from 'src/types';
 import LikeSolid from '@components/icons/LikeSolid';
 import { formatNumber } from 'src/ultils/formatNumber';
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe';
+import HeartSolid from '@components/icons/HeartSolid';
 
 export const FoodDetailScreen = () => {
   const navigation =
@@ -60,8 +61,7 @@ export const FoodDetailScreen = () => {
     try {
       await api.delete(`/admin/recipes/delete/${id}`);
       Alert.alert('Thành công', 'Đã xóa món ăn.');
-      navigation.navigate("AdminFoodManagementScreen")
-
+      navigation.navigate('AdminFoodManagementScreen');
     } catch (error) {
       console.error('Error deleting recipe:', error);
       Alert.alert('Lỗi', 'Không thể xóa món ăn.');
@@ -133,20 +133,20 @@ export const FoodDetailScreen = () => {
                 recipe.status === RecipeStatus.PUBLIC
                   ? 'bg-green-500'
                   : recipe.status === RecipeStatus.PENDING_APPROVAL
-                  ? 'bg-yellow-500'
-                  : recipe.status === RecipeStatus.DRAFT
-                  ? 'bg-gray-500'
-                  : 'bg-blue-500'
+                    ? 'bg-yellow-500'
+                    : recipe.status === RecipeStatus.DRAFT
+                      ? 'bg-gray-500'
+                      : 'bg-blue-500'
               }`}
             >
               <Text className="text-white text-xs">
                 {recipe.status === RecipeStatus.PUBLIC
                   ? 'Đang hiển thị'
                   : recipe.status === RecipeStatus.PENDING_APPROVAL
-                  ? 'Chờ duyệt'
-                  : recipe.status === RecipeStatus.DRAFT
-                  ? 'Nháp'
-                  : 'Riêng tư'}
+                    ? 'Chờ duyệt'
+                    : recipe.status === RecipeStatus.DRAFT
+                      ? 'Nháp'
+                      : 'Riêng tư'}
               </Text>
             </View>
           </View>
@@ -180,30 +180,31 @@ export const FoodDetailScreen = () => {
         <View className="flex-row justify-around bg-white py-4 shadow-sm">
           <View className="items-center">
             <View className="flex-row items-center">
-              <LikeSolid size={18} color="#FFA500" />
-              <Text className="text-gray-700 font-bold ml-1">
-                {recipe.totalLikes || 0}
-              </Text>
-            </View>
-            <Text className="text-gray-500 text-xs mt-1">Lượt thích</Text>
-          </View>
-          <View className="items-center">
-            <View className="flex-row items-center">
-              <Ionicons name="eye" size={18} color="#007AFF" />
-              <Text className="text-gray-700 font-bold ml-1">
+              <Ionicons name="eye" size={24} color="#4B4B4B" />
+              <Text className="text-gray-700 font-bold ml-2">
                 {recipe.totalViews || 0}
               </Text>
             </View>
-            <Text className="text-gray-500 text-xs mt-1">Lượt xem</Text>
+            <Text className="text-gray-500 text-sm mt-1">Lượt xem</Text>
           </View>
           <View className="items-center">
             <View className="flex-row items-center">
-              <Ionicons name="heart" size={18} color="#FF3B30" />
+              <LikeSolid size={24} color="#007AFF" />
+              <Text className="text-gray-700 font-bold ml-2">
+                {recipe.totalLikes || 0}
+              </Text>
+            </View>
+            <Text className="text-gray-500 text-sm mt-2">Lượt thích</Text>
+          </View>
+
+          <View className="items-center">
+            <View className="flex-row items-center">
+              <HeartSolid size={24} color="#FF3B30" />
               <Text className="text-gray-700 font-bold ml-1">
                 {recipe.totalFavorites || 0}
               </Text>
             </View>
-            <Text className="text-gray-500 text-xs mt-1">Lưu</Text>
+            <Text className="text-gray-500 text-sm mt-1">Yêu thích</Text>
           </View>
         </View>
         <View className="flex-row items-center mb-2 mx-4">
@@ -430,19 +431,19 @@ export const FoodDetailScreen = () => {
                 recipe.status === RecipeStatus.PUBLIC
                   ? 'text-green-600'
                   : recipe.status === RecipeStatus.PENDING_APPROVAL
-                  ? 'text-yellow-600'
-                  : recipe.status === RecipeStatus.DRAFT
-                  ? 'text-gray-600'
-                  : 'text-blue-600'
+                    ? 'text-yellow-600'
+                    : recipe.status === RecipeStatus.DRAFT
+                      ? 'text-gray-600'
+                      : 'text-blue-600'
               }`}
             >
               {recipe.status === RecipeStatus.PUBLIC
                 ? 'Đang hiển thị'
                 : recipe.status === RecipeStatus.PENDING_APPROVAL
-                ? 'Chờ duyệt'
-                : recipe.status === RecipeStatus.DRAFT
-                ? 'Nháp'
-                : 'Riêng tư'}
+                  ? 'Chờ duyệt'
+                  : recipe.status === RecipeStatus.DRAFT
+                    ? 'Nháp'
+                    : 'Riêng tư'}
             </Text>
           </View>
           <View className="flex-row justify-between py-2 border-b border-gray-100">
@@ -490,7 +491,7 @@ export const FoodDetailScreen = () => {
                     text: 'Xóa',
                     style: 'destructive',
                     onPress: () => {
-                      handleDelete(recipe.id)
+                      handleDelete(recipe.id);
                     },
                   },
                 ]

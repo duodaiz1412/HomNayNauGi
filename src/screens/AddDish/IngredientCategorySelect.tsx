@@ -8,6 +8,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Alert,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -18,10 +19,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AdminFoodStackParamList } from '@navigation/AdminFoodStack';
 import { useFoodManagement } from 'src/context/FoodManagementContext';
 import { IngredientCategory } from 'src/types';
+import { RootStackParamList } from '@navigation/AppNavigator';
 // type IngredientCategorySelectScreenRouteProp= RouteProp<AdminFoodStackParamList, 'IngredientCategorySelectScreen'>
 export const IngredientCategorySelectScreen = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   //   const route = useRoute<IngredientCategorySelectScreenRouteProp>()
   const { ingredientCategoryFilters, updateIngredientCategoryFilters } =
     useFoodManagement();
@@ -40,7 +42,7 @@ export const IngredientCategorySelectScreen = () => {
   const fetchCategories = async (query = '', offset = 0, limit = 10) => {
     try {
       setLoading(true);
-      const response = await api.get('/admin/ingredient-categories/search', {
+      const response = await api.get('/ingredient-categories/search', {
         params: { query, offset, limit },
       });
       const { data, total } = response.data;
@@ -107,10 +109,23 @@ export const IngredientCategorySelectScreen = () => {
   // Render category item
   const renderCategoryItem = ({ item }) => (
     <TouchableOpacity
-      className="flex-row items-center justify-between px-4 py-3 border-b border-gray-100"
+      className="flex-row items-center justify-between p-3 border-b border-gray-100"
       onPress={() => toggleCategorySelection(item)}
     >
-      <Text className="text-gray-800">{item.name}</Text>
+      <View className="flex-row items-center flex-1">
+        <View className="w-12 h-12 rounded-full overflow-hidden mr-3 border border-gray-200">
+          {item.imageUrl ? (
+            <Image source={{ uri: item.imageUrl }} className="w-full h-full" resizeMode="cover" />
+          ) : (
+            <View className="w-full h-full bg-gray-200 items-center justify-center">
+              <Ionicons name="nutrition-outline" size={20} color="#9CA3AF" />
+            </View>
+          )}
+        </View>
+        <View className="flex-1">
+          <Text className="text-gray-800 font-medium">{item.name}</Text>
+        </View>
+      </View>
       <Ionicons name="add-circle-outline" size={24} color="#941D23" />
     </TouchableOpacity>
   );
@@ -158,22 +173,38 @@ export const IngredientCategorySelectScreen = () => {
 
       {/* Selected Categories */}
       {selectedCategories.length > 0 && (
-        <View className="px-4 py-2">
-          <Text className="font-medium mb-2">
+        <View className="px-4 py-3 border-b border-gray-200">
+          <Text className="font-medium mb-3">
             Đã chọn ({selectedCategories.length})
           </Text>
-          <View className="flex-row flex-wrap">
-            {selectedCategories.map((category) => (
+          <FlatList
+            data={selectedCategories}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                key={category.id}
-                className="bg-[#941D23] rounded-full px-3 py-1 mr-2 mb-2 flex-row items-center"
-                onPress={() => toggleCategorySelection(category)}
+                className="mr-3 items-center"
+                onPress={() => toggleCategorySelection(item)}
               >
-                <Text className="text-white mr-1">{category.name}</Text>
-                <Ionicons name="close-circle" size={16} color="#FFFFFF" />
+                <View className="relative">
+                  <View className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#941D23]">
+                    {item.imageUrl ? (
+                      <Image source={{ uri: item.imageUrl }} className="w-full h-full" resizeMode="cover" />
+                    ) : (
+                      <View className="w-full h-full bg-gray-200 items-center justify-center">
+                        <Ionicons name="nutrition-outline" size={24} color="#9CA3AF" />
+                      </View>
+                    )}
+                  </View>
+                  <View className="absolute -top-1 -right-1 bg-[#941D23] rounded-full w-6 h-6 items-center justify-center">
+                    <Ionicons name="close" size={14} color="#FFFFFF" />
+                  </View>
+                </View>
+                <Text className="text-xs mt-1 text-center max-w-16" numberOfLines={2}>{item.name}</Text>
               </TouchableOpacity>
-            ))}
-          </View>
+            )}
+          />
         </View>
       )}
 

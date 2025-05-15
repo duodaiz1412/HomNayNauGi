@@ -23,7 +23,7 @@ type IngredientSelectScreenRouteProp = RouteProp<
   'IngredientSelectScreen'
 >;
 
-export const IngredientSelectScreen = () => {
+export const IngredientSelectAdminScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
   const route = useRoute<IngredientSelectScreenRouteProp>();
   const {

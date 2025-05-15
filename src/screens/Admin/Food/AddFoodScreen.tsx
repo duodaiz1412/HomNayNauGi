@@ -309,7 +309,7 @@ export const AddFoodScreen = () => {
                         key={value}
                         onPress={() => updateBasicInfo({ status: value })}
                         className={`px-4 py-1.5 rounded-full mx-0.5
-            ${isActive ? 'bg-red-500' : 'bg-white'}
+            ${isActive ? 'bg-[#941D23]' : 'bg-white'}
           `}
                       >
                         <Text
@@ -609,7 +609,7 @@ export const AddFoodScreen = () => {
         animationType="slide"
         onRequestClose={() => setShowUnitModal(false)}
       >
-        <View className="flex-1 justify-center items-center bg-black/30">
+        <View className="flex-1 justify-center items-center bg-black/40">
           <View className="bg-white rounded-2xl w-5/6 overflow-hidden ">
 
             {/* Header modal */}

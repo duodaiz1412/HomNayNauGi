@@ -30,10 +30,27 @@ interface FeaturedItem {
   isFavorite: boolean;
 }
 
+interface RecipeFeedItem {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description: string;
+  author: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
+  viewCount: number;
+  likeCount: number;
+  favoriteCount: number;
+  createdAt: string;
+}
+
 interface HomeData {
   categories: Category[];
-  recipes: Recipe[];
+  recipesFeatured: Recipe[];
   featuredByCategory: Record<string, FeaturedItem[]>;
+  recipeFeed: RecipeFeedItem[];
   user: {
     name: string;
     avatar: string;
@@ -43,6 +60,7 @@ interface HomeData {
     image: string;
      description: string;
   };
+  recipeFeedHasMore: boolean;
 }
 
 export const useHomeData = () => {
@@ -60,6 +78,35 @@ export const useHomeData = () => {
       return !!token;
     } catch (error) {
       console.error('Error checking auth:', error);
+      return false;
+    }
+  };
+
+  // Fetch recipe feed
+  const fetchRecipeFeed = async (sortBy = 'recommended', offset = 0) => {
+    try {
+      const feedResponse = await api.get(`/recipes/recipeFeed?sortBy=${sortBy}&limit=10&offset=${offset}`);
+      const feedData = feedResponse.data.data || [];
+      const hasMore = feedResponse.data.pagination?.hasMore || false;
+      
+      setHomeData(prev => {
+        if (!prev) return prev;
+        
+        // Nếu offset = 0, thay thế hoàn toàn feed hiện tại
+        // Nếu offset > 0 và có dữ liệu mới, thêm vào feed hiện tại
+        const newRecipeFeed = offset === 0 
+          ? feedData 
+          : [...(prev.recipeFeed || []), ...feedData];
+        
+        return {
+          ...prev,
+          recipeFeed: newRecipeFeed,
+          recipeFeedHasMore: hasMore
+        };
+      });
+      return feedData.length > 0;
+    } catch (error) {
+      console.error('Error fetching recipe feed:', error);
       return false;
     }
   };
@@ -90,7 +137,7 @@ export const useHomeData = () => {
       // Fetch popular recipes
       const recipesResponse = await api.get('/recipes/popular');
       const recipesData = recipesResponse.data.data || [];
-      const recipes = recipesData.map((recipe: any) => ({
+      const recipesFeatured = recipesData.map((recipe: any) => ({
         id: recipe.id,
         name: recipe.name,
         description: recipe.description,
@@ -166,12 +213,18 @@ export const useHomeData = () => {
         }
       }
 
+      // Fetch feed recipes (new)
+      const feedResponse = await api.get('/recipes/recipeFeed?sortBy=recommended&limit=10');
+      const recipeFeed = feedResponse.data.data || [];
+
       setHomeData({
         categories,
-        recipes,
+        recipesFeatured,
         featuredByCategory,
+        recipeFeed,
         user,
-        banner
+        banner,
+        recipeFeedHasMore: false
       });
     } catch (err) {
       console.error('Error fetching home data:', err);
@@ -181,44 +234,6 @@ export const useHomeData = () => {
     }
   };
 
-  // // Toggle favorite status
-  // const toggleFavorite = async (itemId: string, type: 'recipe' | 'featured') => {
-  //   if (!homeData || !isAuthenticated) {
-  //     // Nếu chưa đăng nhập, chuyển hướng đến trang login
-  //     return false;
-  //   }
-
-  //   try {
-  //     const response = await api.post('/favorite-recipes/toggle', {
-  //       recipeId: itemId
-  //     });
-
-  //     const isFavorite = response.data.isFavorite;
-
-  //     if (type === 'recipe') {
-  //       setHomeData(prev => ({
-  //         ...prev!,
-  //         recipes: prev!.recipes.map(item =>
-  //           item.id === itemId ? { ...item, isFavorite } : item
-  //         )
-  //       }));
-  //     } else {
-  //       setHomeData(prev => ({
-  //         ...prev!,
-  //         featuredByCategory: {
-  //           ...prev!.featuredByCategory,
-  //           [activeCategoryId]: prev!.featuredByCategory[activeCategoryId].map(item =>
-  //             item.id === itemId ? { ...item, isFavorite } : item
-  //           )
-  //         }
-  //       }));
-  //     }
-  //     return true;
-  //   } catch (error) {
-  //     console.error('Error toggling favorite:', error);
-  //     return false;
-  //   }
-  // };
 
   // Handle category change
   const handleCategoryPress = async (categoryId: string) => {
@@ -286,6 +301,7 @@ export const useHomeData = () => {
     // toggleFavorite,
     handleCategoryPress,
     refreshData: fetchHomeData,
+    fetchRecipeFeed,
     isAuthenticated
   };
 };

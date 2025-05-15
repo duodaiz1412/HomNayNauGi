@@ -1,4 +1,4 @@
-import { useState,useCallback,useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { RecipeStatus } from 'src/types';
 import debounce from 'lodash.debounce';
 import api from 'src/api/api';
 import LikeSolid from '@components/icons/LikeSolid';
+import HeartSolid from '@components/icons/HeartSolid';
 // Định nghĩa các trạng thái có thể lọc
 const STATUS_FILTERS: { label: string; value: RecipeStatus }[] = [
   { label: 'Công khai', value: RecipeStatus.PUBLIC },
@@ -33,7 +34,9 @@ export const AdminFoodManagementScreen = () => {
 
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState(RecipeStatus.PUBLIC);
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState(
+    RecipeStatus.PUBLIC
+  );
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const [recipes, setRecipes] = useState([]);
@@ -42,7 +45,11 @@ export const AdminFoodManagementScreen = () => {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
-  const fetchRecipes = async (query = "", status: RecipeStatus, currentOffset = 0) => {
+  const fetchRecipes = async (
+    query = '',
+    status: RecipeStatus,
+    currentOffset = 0
+  ) => {
     try {
       setLoading(true);
       const params: any = {
@@ -50,15 +57,15 @@ export const AdminFoodManagementScreen = () => {
         offset: currentOffset,
         limit,
       };
-      
+
       if (query && query.trim() !== '') {
         params.query = query.trim();
       }
 
-      console.log("Fetching recipes with params:", params);
+      console.log('Fetching recipes with params:', params);
       const response = await api.get('/admin/recipes/search', { params });
       const { data, total } = response.data;
-      console.log("recipes", JSON.stringify(data, null, 2));
+      console.log('recipes', JSON.stringify(data, null, 2));
       return { data: data || [], total: total || 0 };
     } catch (error) {
       console.error('Error fetching recipes:', error);
@@ -73,7 +80,11 @@ export const AdminFoodManagementScreen = () => {
     if (loading || (!hasMore && !reset)) return;
     try {
       const newOffset = reset ? 0 : offset;
-      const { data, total } = await fetchRecipes(searchQuery, selectedStatusFilter, newOffset);
+      const { data, total } = await fetchRecipes(
+        searchQuery,
+        selectedStatusFilter,
+        newOffset
+      );
       const newRecipes = reset ? data : [...recipes, ...data];
       setRecipes(newRecipes);
       setOffset(newOffset + data.length);
@@ -105,7 +116,9 @@ export const AdminFoodManagementScreen = () => {
   const handleDelete = async (id: string) => {
     try {
       await api.delete(`/admin/recipes/delete/${id}`);
-      setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe.id !== id));
+      setRecipes((prevRecipes) =>
+        prevRecipes.filter((recipe) => recipe.id !== id)
+      );
       Alert.alert('Thành công', 'Đã xóa món ăn.');
     } catch (error) {
       console.error('Error deleting recipe:', error);
@@ -114,7 +127,7 @@ export const AdminFoodManagementScreen = () => {
   };
 
   const renderFoodItem = ({ item }) => {
-    const statusInfo = STATUS_FILTERS.find(sf => sf.value === item.status);
+    const statusInfo = STATUS_FILTERS.find((sf) => sf.value === item.status);
     const statusColor = {
       public: { bg: 'bg-green-100', text: 'text-green-700' },
       private: { bg: 'bg-blue-100', text: 'text-blue-700' },
@@ -122,10 +135,18 @@ export const AdminFoodManagementScreen = () => {
       rejected: { bg: 'bg-red-100', text: 'text-red-700' },
       pending_approval: { bg: 'bg-orange-100', text: 'text-orange-700' },
     }[item.status] || { bg: 'bg-gray-100', text: 'text-gray-700' };
-
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#941D23" />
+      </View>
+    );
+  }
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('FoodDetailScreen', { foodId: item.id })}
+        onPress={() =>
+          navigation.navigate('FoodDetailScreen', { foodId: item.id })
+        }
         activeOpacity={0.7}
       >
         <View className="bg-white mb-3 mx-4 rounded-2xl overflow-hidden shadow-sm">
@@ -133,11 +154,17 @@ export const AdminFoodManagementScreen = () => {
             <View className="flex-row items-center">
               <View className="relative">
                 <Image
-                  source={{ uri: item.imageUrl || 'https://placehold.co/100x100?text=No+Image' }}
+                  source={{
+                    uri:
+                      item.imageUrl ||
+                      'https://placehold.co/100x100?text=No+Image',
+                  }}
                   className="w-20 h-20 rounded-xl"
                   resizeMode="cover"
                 />
-                <View className={`absolute -bottom-1 -right-1 ${statusColor.bg} px-2 py-0.5 rounded-lg`}>
+                <View
+                  className={`absolute -bottom-1 -right-1 ${statusColor.bg} px-2 py-0.5 rounded-lg`}
+                >
                   <Text className={`text-xs font-medium ${statusColor.text}`}>
                     {statusInfo?.label || item.status}
                   </Text>
@@ -145,47 +172,75 @@ export const AdminFoodManagementScreen = () => {
               </View>
               <View className="flex-1 ml-4">
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-lg font-bold text-gray-800 flex-1 mr-2" numberOfLines={2}>
+                  <Text
+                    className="text-lg font-bold text-gray-800 flex-1 mr-2"
+                    numberOfLines={2}
+                  >
                     {item.name || '(Không có tên)'}
                   </Text>
                   <View className="flex-row">
                     <TouchableOpacity
                       onPress={(e) => {
                         e.stopPropagation();
-                        navigation.navigate('EditFoodScreen', { foodId: item.id });
+                        navigation.navigate('EditFoodScreen', {
+                          foodId: item.id,
+                        });
                       }}
                       className="w-8 h-8 items-center justify-center rounded-full bg-[#88131b]/5 mr-2"
                     >
-                      <Ionicons name="create-outline" size={18} color="#88131b" />
+                      <Ionicons
+                        name="create-outline"
+                        size={18}
+                        color="#88131b"
+                      />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={(e) => {
                         e.stopPropagation();
-                        Alert.alert('Xác nhận xóa', `Bạn có chắc muốn xóa món "${item.name}"?`, [
-                          { text: 'Hủy', style: 'cancel' },
-                          { text: 'Xóa', onPress: () => handleDelete(item.id), style: 'destructive' },
-                        ]);
+                        Alert.alert(
+                          'Xác nhận xóa',
+                          `Bạn có chắc muốn xóa món "${item.name}"?`,
+                          [
+                            { text: 'Hủy', style: 'cancel' },
+                            {
+                              text: 'Xóa',
+                              onPress: () => handleDelete(item.id),
+                              style: 'destructive',
+                            },
+                          ]
+                        );
                       }}
                       className="w-8 h-8 items-center justify-center rounded-full bg-red-50"
                     >
-                      <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+                      <Ionicons
+                        name="trash-outline"
+                        size={18}
+                        color="#FF3B30"
+                      />
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 {/* Interaction Stats */}
                 <View className="flex-row items-center mt-3">
-                  <View className="flex-row items-center bg-[#FF3B30]/5 px-2.5 py-1 rounded-full">
-                    <Ionicons name="heart" size={14} color="#FF3B30" />
-                    <Text className="text-xs text-[#FF3B30] ml-1.5 font-medium">{item.favoriteCount || 0}</Text>
+                  <View className="flex-row items-center px-2.5 py-1 rounded-full ml-3">
+                    <Ionicons name="eye" size={20} color="#4B4B4B" />
+                    <Text className="text-xs  ml-1.5 font-medium">
+                      {item.totalViews || 0}
+                    </Text>
                   </View>
-                  <View className="flex-row items-center bg-[#007AFF]/5 px-2.5 py-1 rounded-full ml-3">
-                    <Ionicons name="eye" size={14} color="#007AFF" />
-                    <Text className="text-xs text-[#007AFF] ml-1.5 font-medium">{item.viewCount || 0}</Text>
+
+                  <View className="flex-row items-center  px-2.5 py-1 rounded-full ml-3">
+                    <LikeSolid size={22} color="#007AFF" />
+                    <Text className="text-xs  ml-1.5 font-medium">
+                      {item.totalLikes || 0}
+                    </Text>
                   </View>
-                  <View className="flex-row items-center bg-[#FFA500]/5 px-2.5 py-1 rounded-full ml-3">
-                    <LikeSolid size={14} color="#FFA500" />
-                    <Text className="text-xs text-[#FFA500] ml-1.5 font-medium">{item.totalLikes || 0}</Text>
+                  <View className="flex-row items-center  px-2.5 py-1 rounded-full">
+                    <HeartSolid size={22} color="#FF3B30" />
+                    <Text className="text-xs  ml-1.5 font-medium">
+                      {item.totalFavorites || 0}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -216,7 +271,7 @@ export const AdminFoodManagementScreen = () => {
             <Ionicons name="search" size={20} color="#88131b" />
           </View>
           {searchInput ? (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => {
                 setSearchInput('');
                 setSearchQuery('');
@@ -229,8 +284,14 @@ export const AdminFoodManagementScreen = () => {
       </View>
 
       <View className="px-4 pt-4">
-        <Text className="text-gray-600 text-sm font-medium mb-2">Trạng thái:</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="pb-2">
+        <Text className="text-gray-600 text-sm font-medium mb-2">
+          Trạng thái:
+        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="pb-2"
+        >
           {STATUS_FILTERS.map((filter) => (
             <TouchableOpacity
               key={filter.value}
@@ -243,7 +304,9 @@ export const AdminFoodManagementScreen = () => {
             >
               <Text
                 className={`${
-                  selectedStatusFilter === filter.value ? 'text-white' : 'text-gray-700'
+                  selectedStatusFilter === filter.value
+                    ? 'text-white'
+                    : 'text-gray-700'
                 } text-sm`}
               >
                 {filter.label}
@@ -262,7 +325,9 @@ export const AdminFoodManagementScreen = () => {
         onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <View className="px-4 mb-6">
-            <Text className="text-2xl font-bold text-gray-800">Danh sách món ăn</Text>
+            <Text className="text-2xl font-bold text-gray-800">
+              Danh sách món ăn
+            </Text>
             <Text className="text-base text-gray-500 mt-1">
               Quản lý và tổ chức các món ăn trong hệ thống
             </Text>
@@ -272,7 +337,9 @@ export const AdminFoodManagementScreen = () => {
           loading ? (
             <View className="items-center justify-center py-8">
               <View className="w-10 h-10 border-3 border-[#88131b] border-t-transparent rounded-full animate-spin" />
-              <Text className="text-gray-500 mt-4 font-medium">Đang tải món ăn...</Text>
+              <Text className="text-gray-500 mt-4 font-medium">
+                Đang tải món ăn...
+              </Text>
             </View>
           ) : null
         }
@@ -282,13 +349,16 @@ export const AdminFoodManagementScreen = () => {
               <View className="w-24 h-24 bg-[#88131b]/5 rounded-full items-center justify-center mb-6">
                 <Ionicons name="restaurant-outline" size={40} color="#88131b" />
               </View>
-              <Text className="text-xl font-bold text-gray-800 mb-2">Không tìm thấy món ăn</Text>
+              <Text className="text-xl font-bold text-gray-800 mb-2">
+                Không tìm thấy món ăn
+              </Text>
               <Text className="text-base text-gray-500 text-center">
                 {searchQuery || selectedStatusFilter !== RecipeStatus.PUBLIC
                   ? 'Hãy thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc'
                   : 'Hãy thêm món ăn mới vào hệ thống'}
               </Text>
-              {(searchQuery || selectedStatusFilter !== RecipeStatus.PUBLIC) && (
+              {(searchQuery ||
+                selectedStatusFilter !== RecipeStatus.PUBLIC) && (
                 <TouchableOpacity
                   onPress={() => {
                     setSearchInput('');
@@ -306,7 +376,9 @@ export const AdminFoodManagementScreen = () => {
                   onPress={() => navigation.navigate('AddFoodScreen')}
                 >
                   <Ionicons name="add" size={20} color="white" />
-                  <Text className="text-white font-medium ml-2">Thêm món ăn mới</Text>
+                  <Text className="text-white font-medium ml-2">
+                    Thêm món ăn mới
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>

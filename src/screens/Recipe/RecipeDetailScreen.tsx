@@ -149,7 +149,6 @@ export default function RecipeDetailScreen() {
       alert('Có lỗi xảy ra khi thích công thức!');
     }
   };
-
   const handleFavorite = async (id: string) => {
     if (!globalThis.isLoggedIn) {
       Alert.alert(
