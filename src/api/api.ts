@@ -4,10 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { IngredientSearch } from '../types';
-const BASE_URL = 'http://192.168.1.158:3001';
+
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: process.env.BASE_URL,
   timeout: 50000,
   headers: {
     'Accept': 'application/json',
