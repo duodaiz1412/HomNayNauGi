@@ -746,35 +746,6 @@ const IngredientsScreen = () => {
           <View style={styles.itemContainer}>
             <Image source={{ uri: item.imageUrl }} style={styles.image} />
             <Text style={styles.name}>{item.name}</Text>
-
-            {/* Tạm thời bỏ phần nhập số lượng và đơn vị */}
-            {/* 
-            <TextInput
-              style={styles.quantityInput}
-              keyboardType="numeric"
-              placeholder="Số lượng"
-              onChangeText={(value) => {
-                const updated = [...ingredientData];
-                const current = updated.find(x => x.id === item.id);
-                if (current) current.quantity = value;
-                setIngredientData(updated);
-              }}
-            />
-            <Picker
-              style={{ width: 120 }}
-              selectedValue={item.unit}
-              onValueChange={(value) => {
-                const updated = [...ingredientData];
-                const current = updated.find(x => x.id === item.id);
-                if (current) current.unit = value;
-                setIngredientData(updated);
-              }}
-            >
-              {unitOfMeasures.map(unit => (
-                <Picker.Item label={unit.unitName} value={unit.id} key={unit.id} />
-              ))}
-            </Picker>
-            */}
           </View>
         )}
         contentContainerStyle={{ paddingBottom: 120 }}

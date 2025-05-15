@@ -254,7 +254,7 @@ const itemWidth = (screenWidth - 16 * 2 - 16) / 2;
         </ScrollView>
     <View style={{ marginTop: 24 }}>
       <View style={{ paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#444' }}>Tìm theo bữa</Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#444' }}>Tìm theo danh mục món ăn</Text>
         <TouchableOpacity onPress={() => navigation.navigate('ListDishesScreen')}>
           <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d11c1c' }}>
             Xem thêm
@@ -286,12 +286,7 @@ const itemWidth = (screenWidth - 16 * 2 - 16) / 2;
           </TouchableOpacity>
         ))}
       </View>
-
-
     </View>
-
-
-
       </ScrollView>
     </SafeAreaView>
     </ImageBackground>
