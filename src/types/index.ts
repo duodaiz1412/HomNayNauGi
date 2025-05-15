@@ -243,10 +243,11 @@ export interface ClientCreateRecipePayload {
 // Interface cho dữ liệu trả về từ API tìm công thức
 export interface RecipeResponse {
   id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  preparationTimeMinutes: number;
+  name?: string;
+  displayName?: string;
+  description?: string;
+  imageUrl?: string;
+  preparationTimeMinutes?: number;
   account: {
     username: string;
     userProfile: {
