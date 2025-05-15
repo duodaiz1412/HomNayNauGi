@@ -4,7 +4,7 @@ import { RecipeResponse } from 'src/types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface SuggestDishProps {
-  dishes: RecipeResponse[];
+  dishes?: RecipeResponse[];
   search?: boolean;
   onDishPress: (id: string) => void;
 }
@@ -14,7 +14,7 @@ export default function SuggestDish({
   dishes,
   onDishPress,
 }: SuggestDishProps) {
-  if (dishes.length === 0) {
+  if (dishes && dishes.length === 0) {
     return (
       <View className="flex-1 items-center justify-center">
         <Text className="text-lg text-gray-500 mb-2">

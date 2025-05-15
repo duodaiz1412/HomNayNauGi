@@ -15,7 +15,7 @@ import { searchRecipesByIngredients } from '../api/recipeService';
 import { SuggestDish } from '../components/SuggestDish';
 
 interface ScannedIngredient {
-  id: number;
+  id: string;
   name: string;
   quantity?: number;
   unit?: Unit;
@@ -27,7 +27,7 @@ export const ScanIngredientScreen: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [searchResults, setSearchResults] = useState<RecipeSearchResult[]>([]);
 
-  const handleQuantityChange = (id: number, quantity: string) => {
+  const handleQuantityChange = (id: string, quantity: string) => {
     setIngredients(prev =>
       prev.map(ing =>
         ing.id === id ? { ...ing, quantity: parseFloat(quantity) || undefined } : ing
@@ -35,7 +35,7 @@ export const ScanIngredientScreen: React.FC = () => {
     );
   };
 
-  const handleUnitChange = (id: number, unit: Unit) => {
+  const handleUnitChange = (id: string, unit: Unit) => {
     setIngredients(prev =>
       prev.map(ing => (ing.id === id ? { ...ing, unit } : ing))
     );
@@ -43,8 +43,8 @@ export const ScanIngredientScreen: React.FC = () => {
 
   const handleSearch = async () => {
     const validIngredients = ingredients.filter(
-      ing => ing.quantity && ing.unit
-    ) as Required<ScannedIngredient>[];
+      ing => ing.quantity !== undefined && ing.unit !== undefined
+    );
 
     if (validIngredients.length === 0) {
       // TODO: Show error message
@@ -53,8 +53,6 @@ export const ScanIngredientScreen: React.FC = () => {
 
     const searchIngredients: IngredientDTO[] = validIngredients.map(ing => ({
       id: ing.id,
-      quantity: ing.quantity,
-      unit: ing.unit,
     }));
 
     setLoading(true);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,7 +7,9 @@ import {
   Image,
   TextInput,
   StyleSheet,
-  ScrollView, ActivityIndicator,
+  ScrollView,
+  ActivityIndicator,
+  Modal,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,16 +19,14 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { Alert } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import {IngredientCategory} from "../../types";
-import api from "../../api/api";
+import { IngredientCategory } from '../../types';
+import api, { findRecipesByIngredients } from '../../api/api';
 import debounce from 'lodash.debounce';
 import Toast from 'react-native-toast-message';
-
+import SuggestDish from '../../components/SuggestDish/index';
 
 // ✅ ADDED
 // import { useNavigation,  } from '@react-navigation/native';
-
-
 
 interface Ingredient {
   id: string;
@@ -35,28 +34,32 @@ interface Ingredient {
   imageUrl: string;
 }
 
-// ✅ ADDED
-type IngredientRouteProp = RouteProp<RootStackParamList, 'SearchByIngredientScreen'>;
+interface SelectedIngredient {
+  id: string;
+  name: string;
+}
 
+type SearchByIngredientRouteProp = RouteProp<RootStackParamList, 'SearchByIngredientScreen'>;
 
-const SearchByIngredientsScreen = () => {
+const SearchByIngredientScreen = () => {
   const navigation =
-      useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-      // ✅ ADDED inside SearchByIngredientsScreen
-  // const route = useRoute<IngredientRouteProp>();
-  const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route =
+    useRoute<SearchByIngredientRouteProp>();
   const initialIngredients = route.params?.ingredients || [];
-  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [selectedIngredients, setSelectedIngredients] = useState<SelectedIngredient[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-
-
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null
+  );
+  const [showModal, setShowModal] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     if (initialIngredients.length > 0) {
-      setSelectedIngredients(initialIngredients.map(i => i.name));
+      setSelectedIngredients(initialIngredients.map((i) => ({name: i.name, id: i.id})));
     }
   }, [initialIngredients]);
 
@@ -65,10 +68,9 @@ const SearchByIngredientsScreen = () => {
   }, []);
 
   useEffect(() => {
-    fetchIngredientsSearch('');
+    fetchIngredientsSearch();
   }, []);
 
-  
   const fetchIngredientsSearch = async () => {
     const query = search.trim();
     try {
@@ -81,10 +83,6 @@ const SearchByIngredientsScreen = () => {
         },
       });
       let data = response.data.data || [];
-      console.log('-----------------------------------------------');
-      console.log(data);
-      console.log('-----------------------------------------------');
-      console.log(selectedCategoryId);
       if (data.length === 0) {
         Toast.show({
           type: 'info',
@@ -97,7 +95,7 @@ const SearchByIngredientsScreen = () => {
       console.error('Lỗi khi tìm nguyên liệu:', error);
     } finally {
       setLoading(false);
-    }
+    } 
   };
 
   const fetchIngredients = async (query = '', offset = 0, limit = 10) => {
@@ -115,40 +113,62 @@ const SearchByIngredientsScreen = () => {
   };
 
   useEffect(() => {
-      const debounced = debounce(() => {
-        fetchIngredientsSearch(search);
-      }, 300);
-      debounced();
-      return () => debounced.cancel();
-    }, [search, selectedCategoryId]);
-  
+    const debounced = debounce(() => {
+      fetchIngredientsSearch();
+    }, 300);
+    debounced();
+    return () => debounced.cancel();
+  }, [search, selectedCategoryId]);
 
-  const toggleIngredient = (name: string) => {
+  const toggleIngredient = (ingredient: Ingredient) => {
     setSelectedIngredients((prev) =>
-      prev.includes(name)
-        ? prev.filter((i) => i !== name)
-        : [...prev, name]
+      prev.some((i) => i.id === ingredient.id)
+        ? prev.filter((i) => i.id !== ingredient.id)
+        : [...prev, { id: ingredient.id, name: ingredient.name }]
     );
   };
 
-  const handleViewResults = () => {
+  const handleDishPress = (id: string) => {
+    setShowModal(false);
+    navigation.navigate('RecipeDetail', { recipeId: id });
+  };
+
+  const handleViewResults = async () => {
     if (!selectedIngredients || selectedIngredients.length === 0) {
-      Alert.alert('Thông báo', 'Hãy chọn nguyên liệu');
+      Alert.alert('Thông báo', 'Hãy chọn nguyên liệu abc');
       return;
     }
-
-    const selectedDetail = ingredients.filter(i => selectedIngredients.includes(i.name));
-    navigation.navigate('IngredientsScreen', { ingredients: selectedDetail });
+    setLoading(true);
+    try {
+      const selectedDetail = selectedIngredients.map((ing) => ({
+        id: ing.id,
+      }));
+      console.log("selectedDetail", selectedDetail)
+      const response = await findRecipesByIngredients(selectedDetail);
+      console.log('Kết quả tìm kiếm món ăn:', response);
+      setSearchResults(response.data);
+      setShowModal(true);
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể tìm kiếm món ăn. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff1ed' }}>
       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16 }}>
         {/* Header */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={24} color="#333" />
-        </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 16,
+          }}
+        >
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="close" size={24} color="#333" />
+          </TouchableOpacity>
 
           <Text className="text-3xl font-bold text-black-800 mx-auto">
             Tìm bằng nguyên liệu
@@ -169,17 +189,31 @@ const SearchByIngredientsScreen = () => {
         </View>
 
         {/* Selected Ingredients */}
-        <Text style={{ marginTop: 24, fontSize: 16, fontWeight: 'bold', color: '#444' }}>
+        <Text
+          style={{
+            marginTop: 24,
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: '#444',
+          }}
+        >
           Nguyên liệu đã chọn
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 12 }}>
-          {selectedIngredients.map((name) => {
-            const item = ingredients.find((i) => i.name === name);
+          {selectedIngredients.map((ingredient) => {
+            const item = ingredients.find((i) => i.id === ingredient.id);
             if (!item) return null;
             return (
-              <View key={name} style={{ alignItems: 'center', marginRight: 12, marginBottom: 12 }}>
+              <View
+                key={ingredient.id}
+                style={{
+                  alignItems: 'center',
+                  marginRight: 12,
+                  marginBottom: 12,
+                }}
+              >
                 <TouchableOpacity
-                  onPress={() => toggleIngredient(name)}
+                  onPress={() => toggleIngredient(item)}
                   style={{
                     width: 64,
                     height: 64,
@@ -195,7 +229,7 @@ const SearchByIngredientsScreen = () => {
                     style={{ width: 64, height: 64, borderRadius: 32 }}
                   />
                   <TouchableOpacity
-                    onPress={() => toggleIngredient(name)}
+                    onPress={() => toggleIngredient(item)}
                     style={{
                       position: 'absolute',
                       top: 4,
@@ -211,7 +245,7 @@ const SearchByIngredientsScreen = () => {
                     <Ionicons name="close" size={12} color="#fff" />
                   </TouchableOpacity>
                 </TouchableOpacity>
-                <Text style={{ marginTop: 4, fontSize: 12 }}>{name}</Text>
+                <Text style={{ marginTop: 4, fontSize: 12 }}>{ingredient.name}</Text>
               </View>
             );
           })}
@@ -241,28 +275,32 @@ const SearchByIngredientsScreen = () => {
             ) : null
           }
           renderItem={({ item }) => {
-            const isSelected = selectedIngredients.includes(item.name);
+            const isSelected = selectedIngredients.some((i) => i.id === item.id);
             return (
               <TouchableOpacity
-                onPress={() => toggleIngredient(item.name)}
+                onPress={() => toggleIngredient(item)}
                 style={{ width: '25%', alignItems: 'center', marginBottom: 20 }}
               >
-                <View style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: 32,
-                  backgroundColor: isSelected ? '#fbcfe8' : '#fff',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: '#ddd',
-                }}>
+                <View
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    backgroundColor: isSelected ? '#fbcfe8' : '#fff',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#ddd',
+                  }}
+                >
                   <Image
                     source={{ uri: item.imageUrl }}
                     style={{ width: 64, height: 64, borderRadius: 32 }}
                   />
                 </View>
-                <Text style={{ marginTop: 6, fontSize: 12, color: '#444' }}>{item.name}</Text>
+                <Text style={{ marginTop: 6, fontSize: 12, color: '#444' }}>
+                  {item.name}
+                </Text>
               </TouchableOpacity>
             );
           }}
@@ -281,18 +319,60 @@ const SearchByIngredientsScreen = () => {
             backgroundColor: '#f43f5e',
             alignItems: 'center',
             justifyContent: 'center',
-          }}>
-          <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Xem kết quả</Text>
+          }}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
+            Xem kết quả
+          </Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={showModal}
+        animationType="slide"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <SafeAreaView className="flex-1 bg-white mt-10 p-2">
+          <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
+            <Text className="text-xl font-bold text-[#941D23]">
+              Gợi ý món ăn
+            </Text>
+            <TouchableOpacity onPress={() => setShowModal(false)}>
+              <Ionicons name="close" size={24} color="#941D23" />
+            </TouchableOpacity>
+          </View>
+
+          {loading ? (
+            <View className="flex-1 items-center justify-center">
+              <ActivityIndicator size="large" color="#941D23" />
+              <Text className="text-lg text-[#941D23] mt-4">
+                Đang tìm kiếm món ăn phù hợp...
+              </Text>
+            </View>
+          ) : (
+            <SuggestDish dishes={searchResults} onDishPress={handleDishPress} />
+          )}
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 60 },
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 16,
+    paddingTop: 60,
+  },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 30 },
-  title: { flex: 1, textAlign: 'center', fontSize: 24, fontWeight: 'bold', color: '#941D23' },
+  title: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#941D23',
+  },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -316,5 +396,10 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 20,
   },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
 });
-export default SearchByIngredientsScreen;
+export default SearchByIngredientScreen;

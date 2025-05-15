@@ -10,8 +10,6 @@ export enum Unit {
 
 export interface IngredientDTO {
   id: string;
-  quantity: number;
-  unit: Unit;
 }
 
 export interface RecipeIngredient {

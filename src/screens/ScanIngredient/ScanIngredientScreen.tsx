@@ -84,9 +84,7 @@ const ScanIngredientScreen = () => {
         const searchIngredients = ingredients.map(ing => ({
           id: ing.id
         }));
-        
         const response = await findRecipesByIngredients(searchIngredients);
-        console.log('Kết quả tìm kiếm món ăn:', response);
         setSuggestedDishes(response.data);
         setShowSuggestDish(true);
       } catch (error) {
