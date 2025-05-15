@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import api, { getUserProfile } from 'src/api/api';
 
-const BASE_URL = 'http://192.168.12.102:3001';
+const BASE_URL = 'http://192.168.1.158:3001';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
