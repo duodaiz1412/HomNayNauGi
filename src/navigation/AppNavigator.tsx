@@ -18,7 +18,7 @@ import FilterScreen from '../screens/Search/FilterScreen';
 import PersonalScreen from '../screens/Profile/PersonalScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import FavoritesScreen from '../screens/Profile/FavoritesScreen';
-import NotificationsScreen from '../screens/Profile/NotificationsScreen';
+import HistoryScreen from '../screens/Profile/HistoryScreen';
 import AchievementsScreen from '../screens/Profile/AchievementsScreen';
 import SettingsScreen from '../screens/Profile/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/Profile/PrivacyPolicyScreen';
@@ -58,7 +58,6 @@ export type RootStackParamList = {
   ProfileScreen: undefined;
   FavoritesScreen: undefined;
   HistoryScreen: undefined;
-  NotificationsScreen: undefined;
   AchievementsScreen: undefined;
   SettingsScreen: undefined;
   PrivacyPolicyScreen: undefined;
@@ -94,8 +93,8 @@ const AppNavigator = () => {
         <Stack.Screen name="PersonalScreen" component={PersonalScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
         <Stack.Screen
-          name="NotificationsScreen"
-          component={NotificationsScreen}
+          name="HistoryScreen"
+          component={HistoryScreen}
         />
         <Stack.Screen
           name="AchievementsScreen"

@@ -59,7 +59,7 @@ const ProfileScreen = () => {
       }
 
       const userData = response.data;
-      console.log('Processed user data:', userData);
+      //console.log('Processed user data:', userData);
 
       setUserData({
         name: userData.fullName || 'Chưa cập nhật tên',
@@ -83,7 +83,7 @@ const ProfileScreen = () => {
 
   const profileOptions = [
     { icon: '❤️', title: 'Yêu thích', onPress: () => navigation.navigate('FavoritesScreen') },
-    { icon: '🔔', title: 'Thông báo', onPress: () => navigation.navigate('NotificationsScreen') },
+    { icon: '🎯', title: 'Lịch sử', onPress: () => navigation.navigate('HistoryScreen') },
     { icon: '💡', title: 'Thành tựu', onPress: () => navigation.navigate('AchievementsScreen') },
   ];
 

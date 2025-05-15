@@ -132,6 +132,8 @@ const HomeScreen = () => {
           </View>
 
           {/* Banner */}
+
+            {homeData.banner && (
           <TouchableOpacity
             className="mx-4 mb-4 rounded-2xl p-4 flex-row items-center"
             style={{ backgroundColor: '#941D23' }}
@@ -146,8 +148,13 @@ const HomeScreen = () => {
                 {homeData.banner.description}
               </Text>
 
-              <TouchableOpacity className="mt-3 border border-white rounded-full px-3 py-1.5 flex-row items-center self-start"
-              onPress={()=> {navigation.navigate('RecipeDetail', {recipeId: homeData.banner.id})}}
+              <TouchableOpacity
+                className="mt-3 border border-white rounded-full px-3 py-1.5 flex-row items-center self-start"
+                onPress={() => {
+                  navigation.navigate('RecipeDetail', {
+                    recipeId: homeData.banner.id,
+                  });
+                }}
               >
                 <Text className="text-white font-medium mr-1">
                   Tìm hiểu ngay
@@ -157,15 +164,13 @@ const HomeScreen = () => {
             </View>
 
             <Image
-              source={{ 
-                uri: homeData.banner?.image || 'https://via.placeholder.com/200'
-              }}
+              source={{ uri: homeData.banner.image }}
               className="w-44 h-44 rounded-full"
               resizeMode="cover"
             />
           </TouchableOpacity>
-
-          {/* Section Title */}
+        )}
+          {/* Sectionr Title */}
           <Text className="text-xl font-bold px-4 mb-4 text-[#4B4B4B]">
             Hôm nay ăn gì?
           </Text>
