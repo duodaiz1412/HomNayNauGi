@@ -1,240 +1,158 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import api, { getUserProfile } from 'src/api/api';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/AppNavigator';
-import { mockData } from '../../MockData/Data';
-const backgroundImage = require('@assets/background.png');
+import { RootStackParamList } from 'src/navigation/AppNavigator';
 
-interface Notification {
+// Giao diện đầy đủ cho Recipe dựa trên JSON mẫu
+interface Recipe {
   id: string;
-  type: 'new_recipe' | 'new_follower' | 'recipe_liked' | 'recipe_updated';
-  user: {
-    name: string;
-    avatar: string;
-  };
-  recipe?: typeof mockData.recipes[0];
-  timestamp: string;
-  isRead: boolean;
+  name: string;
+  description: string;
+  imageUrl: string;
 }
 
-interface NotificationGroup {
-  date: string;
-  notifications: Notification[];
+interface ViewHistoryItem {
+  id: number;
+  recipe: Recipe;
+  viewedAt: string;
 }
 
-const NotificationsScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [searchQuery, setSearchQuery] = useState('');
+type NotificationsNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'NotificationsScreen'
+>;
 
-  // Mock data cho thông báo
-  const [notifications, setNotifications] = useState<NotificationGroup[]>([
-    {
-      date: 'Hôm nay',
-      notifications: [
-        {
-          id: '1',
-          type: 'new_recipe',
-          user: {
-            name: 'Nguyễn Văn A',
-            avatar: 'https://i.pravatar.cc/150?img=1'
-          },
-          recipe: mockData.recipes[0],
-          timestamp: '10:30',
-          isRead: false
-        },
-        {
-          id: '2',
-          type: 'new_follower',
-          user: {
-            name: 'Trần Thị B',
-            avatar: 'https://i.pravatar.cc/150?img=2'
-          },
-          timestamp: '09:15',
-          isRead: false
-        },
-        {
-          id: '3',
-          type: 'recipe_liked',
-          user: {
-            name: 'Lê Văn C',
-            avatar: 'https://i.pravatar.cc/150?img=3'
-          },
-          recipe: mockData.recipes[1],
-          timestamp: '08:45',
-          isRead: true
+const NotificationsScreen: React.FC = () => {
+  const navigation = useNavigation<NotificationsNavProp>();
+  const [viewHistory, setViewHistory] = useState<ViewHistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [accountId, setAccountId] = useState<string | null>(null);
+
+  // Lấy thông tin user để có accountId
+  useEffect(() => {
+    getUserProfile()
+      .then(res => {
+        if (res.data && res.data.id) {
+          setAccountId(res.data.id);
+        } else {
+          setError('Không lấy được thông tin tài khoản.');
         }
-      ]
-    },
-    {
-      date: 'Hôm qua',
-      notifications: [
-        {
-          id: '4',
-          type: 'recipe_updated',
-          user: {
-            name: 'Phạm Thị D',
-            avatar: 'https://i.pravatar.cc/150?img=4'
-          },
-          recipe: mockData.recipes[2],
-          timestamp: '15:30',
-          isRead: true
-        },
-        {
-          id: '5',
-          type: 'new_follower',
-          user: {
-            name: 'Hoàng Văn E',
-            avatar: 'https://i.pravatar.cc/150?img=5'
-          },
-          timestamp: '14:20',
-          isRead: true
+      })
+      .catch(() => setError('Lỗi khi tải hồ sơ người dùng'));
+  }, []);
+
+  // Fetch lịch sử sau khi có accountId
+  useEffect(() => {
+    if (!accountId) return;
+
+    setLoading(true);
+    setError(null);
+
+    api.get(`/view-history/account/${accountId}`)
+      .then(response => {
+        if (Array.isArray(response.data)) {
+          setViewHistory(response.data);
+        } else {
+          setViewHistory([]);
+          setError('Định dạng dữ liệu không hợp lệ.');
         }
-      ]
-    }
-  ]);
+      })
+      .catch(err => {
+        console.error('Lỗi khi tải lịch sử xem:', err);
+        setError('Không thể tải lịch sử xem.');
+      })
+      .finally(() => setLoading(false));
+  }, [accountId]);
 
-  const filteredNotifications = notifications.map(group => ({
-    ...group,
-    notifications: group.notifications.filter(notification =>
-      notification.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (notification.recipe?.name.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
-    ),
-  })).filter(group => group.notifications.length > 0);
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'new_recipe':
-        return '🍳';
-      case 'new_follower':
-        return '👥';
-      case 'recipe_liked':
-        return '❤️';
-      case 'recipe_updated':
-        return '📝';
-      default:
-        return '📢';
-    }
+  const handlePressItem = (recipeId: string) => {
+    navigation.navigate('RecipeDetail', { recipeId });
   };
 
-  const getNotificationText = (notification: Notification) => {
-    switch (notification.type) {
-      case 'new_recipe':
-        return `${notification.user.name} đã đăng tải món ăn mới: ${notification.recipe?.name}`;
-      case 'new_follower':
-        return `${notification.user.name} đã theo dõi bạn`;
-      case 'recipe_liked':
-        return `${notification.user.name} đã thêm món ${notification.recipe?.name} vào yêu thích`;
-      case 'recipe_updated':
-        return `${notification.user.name} đã cập nhật công thức món ${notification.recipe?.name}`;
-      default:
-        return 'Thông báo mới';
-    }
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(group => ({
-        ...group,
-        notifications: group.notifications.map(notification => ({
-          ...notification,
-          isRead: true
-        }))
-      }))
+  if (loading) {
+    return (
+      <View style={styles.centeredView}>
+        <ActivityIndicator size="large" color="#007bff" />
+        <Text style={styles.loadingText}>Đang tải lịch sử...</Text>
+      </View>
     );
-  };
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centeredView}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (viewHistory.length === 0) {
+    return (
+      <View style={styles.centeredView}>
+        <Text style={styles.emptyText}>Bạn chưa xem công thức nào gần đây.</Text>
+      </View>
+    );
+  }
 
   return (
-    <ImageBackground source={backgroundImage} style={{ flex: 1 }} resizeMode="cover">
-      <SafeAreaView className="flex-1">
-        <ScrollView className="flex-1">
-          {/* Header */}
-          <View className="flex-row items-center justify-between p-4">
-            <View className="flex-row items-center">
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text className="text-2xl text-black">⬅️</Text>
-              </TouchableOpacity>
-              <Text className="text-2xl font-bold text-black ml-4">
-                Thông báo
-              </Text>
-            </View>
-            <TouchableOpacity onPress={markAllAsRead}>
-              <Text className="text-black">Đánh dấu đã đọc</Text>
-            </TouchableOpacity>
+    <FlatList
+      contentContainerStyle={styles.listContentContainer}
+      data={viewHistory}
+      keyExtractor={item => item.id.toString()}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() => handlePressItem(item.recipe.id)}
+        >
+          <Image
+            source={{ uri: item.recipe.imageUrl || 'https://via.placeholder.com/80' }}
+            style={styles.itemImage}
+          />
+          <View style={styles.itemTextContainer}>
+            <Text style={styles.itemTitle}>{item.recipe.name}</Text>
+            <Text numberOfLines={2} style={styles.itemDescription}>
+              {item.recipe.description}
+            </Text>
+            <Text style={styles.itemViewedAt}>
+              Đã xem lúc: {new Date(item.viewedAt).toLocaleString('vi-VN')}
+            </Text>
           </View>
-
-          {/* Search Bar */}
-          <View className="px-4 mb-4">
-            <View className="flex-row items-center bg-white rounded-lg px-4 py-2">
-              <Text className="text-xl mr-2">🔍</Text>
-              <TextInput
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                placeholder="Tìm kiếm thông báo"
-                className="flex-1"
-              />
-            </View>
-          </View>
-
-          {/* Notifications List */}
-          <View className="px-4">
-            {filteredNotifications.map((group) => (
-              <View key={group.date} className="mb-6">
-                <Text className="text-lg font-bold mb-2">{group.date}</Text>
-                {group.notifications.map((notification) => (
-                  <TouchableOpacity
-                    key={notification.id}
-                    className={`bg-white rounded-lg mb-4 shadow-sm overflow-hidden ${!notification.isRead ? 'border-l-4 border-red-500' : ''}`}
-                    onPress={() => {
-                      if (notification.recipe) {
-                        navigation.navigate('RecipeDetail', { recipeId: parseInt(notification.recipe.id) });
-                      }
-                    }}
-                  >
-                    <View className="flex-row p-4">
-                      <View className="mr-3">
-                        <Image
-                          source={{ uri: notification.user.avatar }}
-                          className="w-12 h-12 rounded-full"
-                        />
-                      </View>
-                      <View className="flex-1">
-                        <View className="flex-row justify-between items-start">
-                          <Text className="text-lg font-bold flex-1 mr-2">{notification.user.name}</Text>
-                          <Text className="text-black text-sm">{notification.timestamp}</Text>
-                        </View>
-                        <View className="flex-row items-center mb-1">
-                          <Text className="text-sm mr-2">{getNotificationIcon(notification.type)}</Text>
-                          <Text className="text-black text-sm flex-1">
-                            {getNotificationText(notification)}
-                          </Text>
-                        </View>
-                        {notification.recipe && (
-                          <View className="flex-row items-center mt-2">
-                            <Image
-                              source={{ uri: notification.recipe.image }}
-                              className="w-16 h-16 rounded-lg mr-2"
-                            />
-                            <View className="flex-1">
-                              <Text className="font-medium">{notification.recipe.name}</Text>
-                              <Text className="text-black text-sm" numberOfLines={1}>
-                                {notification.recipe.description}
-                              </Text>
-                            </View>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </ImageBackground>
+        </TouchableOpacity>
+      )}
+    />
   );
 };
 
-export default NotificationsScreen; 
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: { marginTop: 10, fontSize: 16, color: '#555' },
+  errorText: { fontSize: 16, color: 'red', textAlign: 'center' },
+  emptyText: { fontSize: 16, color: '#555' },
+  listContentContainer: { paddingVertical: 16, paddingHorizontal: 12 },
+  itemContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    padding: 12,
+  },
+  itemImage: { width: 80, height: 80, borderRadius: 8, marginRight: 12 },
+  itemTextContainer: { flex: 1, justifyContent: 'center' },
+  itemTitle: { fontWeight: 'bold', fontSize: 17, color: '#333', marginBottom: 4 },
+  itemDescription: { fontSize: 14, color: '#555', marginBottom: 6, lineHeight: 20 },
+  itemViewedAt: { fontSize: 12, color: '#777' },
+});
+
+export default NotificationsScreen;
