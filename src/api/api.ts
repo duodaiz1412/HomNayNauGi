@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { IngredientSearch } from '../types';
 
-const BASE_URL = 'http://192.168.1.57:3001';
+const BASE_URL = 'http://172.20.10.3:3001';
 
 const api = axios.create({
   baseURL: BASE_URL,
