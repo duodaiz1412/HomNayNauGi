@@ -52,8 +52,6 @@ const SearchByIngredientsScreen = () => {
   const [search, setSearch] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
-
-
   useEffect(() => {
     if (initialIngredients.length > 0) {
       setSelectedIngredients(initialIngredients.map(i => i.name));
