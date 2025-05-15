@@ -4,8 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { IngredientSearch } from '../types';
-
-const BASE_URL = 'http://192.168.1.57:3001';
+const BASE_URL = 'http://192.168.1.158:3001';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -165,7 +164,7 @@ export const getIngredientCategories = async (
   try {
     console.log('Tìm kiếm danh mục nguyên liệu:', { offset, limit, query });
     
-    const response = await api.get('/ingredient-categories/admin/search', {
+    const response = await api.get('/ingredient-categories/search', {
       params: {
         offset,
         limit,
@@ -197,5 +196,18 @@ export const addToPantry = async (ingredientIds: string[]) => {
     throw error;
   }
 };
+
+// Hàm lấy thông tin người dùng hiện tại
+export const getUserProfile = async () => {
+  try {
+    const response = await api.get('/user-profiles/me');
+    console.log('Thông tin người dùng:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin người dùng:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 
 export default api;
