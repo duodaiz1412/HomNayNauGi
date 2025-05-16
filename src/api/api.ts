@@ -233,7 +233,7 @@ export const addToPantry = async (ingredientIds: string[]) => {
 export const getUserProfile = async () => {
   try {
     const response = await api.get('/user-profiles/me');
-    console.log('Thông tin người dùng:', response.data);
+    //console.log('Thông tin người dùng:', response.data);
     return response.data;
   } catch (error) {
     console.error(

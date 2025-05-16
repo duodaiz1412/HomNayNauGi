@@ -13,9 +13,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import api, { getUserProfile } from 'src/api/api';
-
-const BASE_URL = 'http://192.168.1.158:3001';
+import api, { getUserProfile, BASE_URL } from 'src/api/api';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -50,7 +48,7 @@ const EditProfileScreen = () => {
   }, []);
 
   const getFullAvatarUrl = (url: string) => {
-    return url.startsWith('http') ? url : `${BASE_URL}${url}`;
+    return url.startsWith('http') ? url : `${BASE_URL}/${url}`;
   };
 
   const pickImage = async () => {

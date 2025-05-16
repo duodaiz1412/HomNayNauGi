@@ -49,17 +49,14 @@ const PersonalScreen = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [totalRecipes, setTotalRecipes] = useState(0);
-  const [totalLikes, setTotalLikes] = useState(0);
+  const [totalViewer, setTotalLikes] = useState(0);
   const [totalFavorites, setTotalFavorites] = useState(0);
 
   const fetchUserData = useCallback(async (showLoadingIndicator = true) => {
     if (showLoadingIndicator) setLoading(true);
     try {
       const response = await getUserProfile();
-      console.log(
-        'User Profile API Response:',
-        JSON.stringify(response.data, null, 2)
-      ); // Ghi log phản hồi API
+      //console.log('User Profile API Response:', JSON.stringify(response.data, null, 2)); // Ghi log phản hồi API
       if (response.data) {
         const { fullName, email, phoneNumber, avatarUrl, bio } = response.data;
         setUserData({
@@ -221,7 +218,7 @@ const PersonalScreen = () => {
 
   const handleRecipePress = async (recipeId: string) => {
     try {
-      console.log('Navigate to RecipeDetail with id:', recipeId);
+      //console.log('Navigate to RecipeDetail with id:', recipeId);
       navigation.navigate('RecipeDetail', { recipeId });
     } catch (error) {
       console.error('Error navigating:', error);
@@ -275,12 +272,12 @@ const PersonalScreen = () => {
           <Text className="text-sm text-gray-600">Công thức</Text>
         </View>
         <View className="items-center px-4 border-l border-r border-gray-200">
-          <Text className="text-xl font-bold text-black">{totalLikes}</Text>
+          <Text className="text-xl font-bold text-black">{totalViewer}</Text>
           <Text className="text-sm text-gray-600">Lượt thích</Text>
         </View>
         <View className="items-center px-4">
           <Text className="text-xl font-bold text-black">{totalFavorites}</Text>
-          <Text className="text-sm text-gray-600">Đã lưu</Text>
+          <Text className="text-sm text-gray-600">Yêu thích</Text>
         </View>
       </View>
 
@@ -376,10 +373,10 @@ const PersonalScreen = () => {
                     👁 {item.viewCount}
                   </Text>
                   <Text className="text-xs text-gray-500">
-                    ❤️ {item.likeCount}
+                    👍{item.likeCount}
                   </Text>
                   <Text className="text-xs text-gray-500">
-                    🔖 {item.favoriteCount}
+                    ❤️ {item.favoriteCount}
                   </Text>
                 </View>
               </View>

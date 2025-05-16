@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   Image,
   ScrollView,
   SafeAreaView,
+  StyleSheet,
+  Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
@@ -27,28 +29,48 @@ const AddIngredientScreen = ({ navigation }) => {
   const [type, setType] = useState(foodTypes[0]);
   const [image, setImage] = useState(null);
 
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  // Yêu cầu quyền truy cập ảnh khi component mount
+  useEffect(() => {
+    (async () => {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Quyền truy cập bị từ chối',
+          'Bạn cần cấp quyền truy cập thư viện ảnh để chọn ảnh'
+        );
+      }
+    })();
+  }, []);
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images', // dùng enum đúng
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể mở thư viện ảnh');
+      console.log('ImagePicker error:', error);
     }
   };
 
   const handleSave = () => {
-    // TODO: Implement save functionality
+    // TODO: Thêm xử lý lưu nguyên liệu ở đây
+
     navigation.goBack();
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1">
-        <View className="p-6">
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.innerContainer}>
           {/* Image Upload Section */}
           <TouchableOpacity onPress={pickImage} className="items-center mb-8">
             {image ? (
@@ -62,22 +84,22 @@ const AddIngredientScreen = ({ navigation }) => {
                 </View>
               </View>
             ) : (
-              <View className="w-48 h-48 bg-gray-100 rounded-2xl items-center justify-center border-2 border-dashed border-gray-300">
+              <View style={styles.imagePlaceholder}>
                 <Ionicons name="camera-outline" size={40} color="#9CA3AF" />
-                <Text className="text-gray-500 mt-2">Chọn ảnh</Text>
+                <Text style={styles.imagePlaceholderText}>Chọn ảnh</Text>
               </View>
             )}
           </TouchableOpacity>
 
           {/* Form Fields */}
-          <View className="space-y-6 flex flex-col gap-3">
+          <View style={styles.form}>
             {/* Name Input */}
             <View>
               <Text className="text-gray-700 font-medium mb-2">
                 Tên nguyên liệu
               </Text>
               <TextInput
-                className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                style={styles.input}
                 value={name}
                 onChangeText={setName}
                 placeholder="Nhập tên nguyên liệu"
@@ -94,7 +116,7 @@ const AddIngredientScreen = ({ navigation }) => {
                 <Picker
                   selectedValue={type}
                   onValueChange={(itemValue) => setType(itemValue)}
-                  style={{ height: 50 }}
+                  style={styles.picker}
                 >
                   {foodTypes.map((foodType) => (
                     <Picker.Item
@@ -109,18 +131,107 @@ const AddIngredientScreen = ({ navigation }) => {
           </View>
 
           {/* Save Button */}
-          <TouchableOpacity
-            onPress={handleSave}
-            className="bg-red-800 py-4 rounded-xl mt-8"
-          >
-            <Text className="text-white text-center font-semibold text-lg">
-              Lưu
-            </Text>
+          <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>Lưu</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  innerContainer: {
+    padding: 24,
+    flexGrow: 1,
+  },
+  imagePicker: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  imageWrapper: {
+    position: 'relative',
+  },
+  image: {
+    width: 192,
+    height: 192,
+    borderRadius: 24,
+  },
+  cameraIconWrapper: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'white',
+    padding: 8,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  imagePlaceholder: {
+    width: 192,
+    height: 192,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagePlaceholderText: {
+    marginTop: 8,
+    color: '#6B7280',
+  },
+  form: {
+    gap: 16,
+  },
+  formGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    color: '#374151',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#F9FAFB',
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    color: '#111827',
+  },
+  pickerWrapper: {
+    backgroundColor: '#F9FAFB',
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  saveButton: {
+    marginTop: 32,
+    backgroundColor: '#991B1B',
+    paddingVertical: 16,
+    borderRadius: 20,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+});
 
 export default AddIngredientScreen;

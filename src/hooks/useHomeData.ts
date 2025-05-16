@@ -119,7 +119,7 @@ export const useHomeData = () => {
       setError(null);
 
       const isAuth = await checkAuth();
-
+      console.log('fetch categori');
       // Fetch categories
       const categoriesResponse = await api.get('/recipe-categories/random');
       const categories = categoriesResponse.data.data.map(
@@ -162,6 +162,8 @@ export const useHomeData = () => {
       };
 
       // Fetch banner
+
+      console.log('Fetching banner...');
       const bannerResponse = await api.get('/recipes/banner');
       const banner = {
         id: bannerResponse.data.data?.id || '',
@@ -170,6 +172,7 @@ export const useHomeData = () => {
       };
 
       // Fetch user profile only if authenticated
+      console.log('Fetching user profile...');
       let user = null;
       if (isAuth) {
         try {

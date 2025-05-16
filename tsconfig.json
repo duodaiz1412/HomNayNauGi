@@ -11,7 +11,8 @@
       "@navigation/*": ["./src/navigation/*"],
       "@constants/*": ["./src/constants/*"],
       "@store/*": ["./src/store/*"]
-    }
+    },
+    "lib": ["es2015", "dom"]
   },
   "extends": "expo/tsconfig.base",
   "include": ["**/*.ts", "**/*.tsx", "nativewind.d.ts", "nativewind-env.d.ts"]
