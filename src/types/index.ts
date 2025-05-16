@@ -43,7 +43,7 @@ export interface UserProfile {
   accountId: string
   email: string
   phoneNumber: string | null
-  displayName: string | null
+  displayName?: string
   avatarUrl: string | null
   fullName: string | null
   address: string | null
@@ -119,35 +119,56 @@ export interface CookingStep {
 
 // Interface cho công thức
 export interface Recipe {
-  id: string // UUID
-  accountId: string
-  name: string
-  description: string | null
-  protein: number | null
-  fat: number | null
-  calories: number | null
-  carbohydrates: number | null
-  imageUrl: string | null
-  preparationTimeMinutes: number | null
-  videoUrl: string | null
-  status: RecipeStatus
-  createdAt: string
-  updatedAt: string
-
-  // Các quan hệ
-  account: Account
-  categoryMappings: RecipeCategoryMapping[]
-  recipeIngredients: RecipeIngredient[]
-  cookingSteps: CookingStep[]
-  totalLikes: number
-  totalViews: number
-  totalFavorites: number
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  ingredients: {
+    id: string;
+    name: string;
+    quantity: number;
+    unit: string;
+    isMatched: boolean;
+  }[];
 }
 
 // Interface cho chi tiết công thức (dùng cho màn hình chi tiết)
 export interface RecipeDetailTypes extends Recipe {
   isFavorite: boolean;
   isLiked: boolean;
+  totalViews: number;
+  totalLikes: number;
+  totalFavorites: number;
+  preparationTimeMinutes: number;
+  protein: number;
+  fat: number;
+  calories: number;
+  carbohydrates: number;
+  account?: {
+    name: string;
+    userProfile?: {
+      avatarUrl?: string;
+      displayName?: string;
+      fullName?: string;
+    };
+  };
+  recipeIngredients?: {
+    ingredient: {
+      id: string;
+      name: string;
+      imageUrl: string;
+    };
+    quantity: number;
+    unit?: {
+      unitName: string;
+    };
+  }[];
+  cookingSteps?: {
+    id: number;
+    stepOrder: number;
+    instruction: string;
+    imageUrl?: string;
+  }[];
 }
 
 // Interface cho lượt thích công thức
@@ -171,6 +192,18 @@ export interface ViewHistory {
   recipeId: string
   viewedAt: string
 }
+
+// Enum cho unit
+export enum Unit {
+  GRAM = 1,
+  KILOGRAM = 2,
+  MILLILIT = 3,
+  LIT = 4,
+  CAI = 5,
+  THIA_CA_PHE = 6,
+  THIA_CANH = 7
+}
+
 
 // Interface cho nguyên liệu trong tủ bếp
 export interface AccountPantryItem {
@@ -205,4 +238,38 @@ export interface ClientCreateRecipePayload {
   }[];
   recipeImageFile?: any;
   stepImageFiles?: any[];
+}
+
+// Interface cho dữ liệu trả về từ API tìm công thức
+export interface RecipeResponse {
+  id: string;
+  name?: string;
+  displayName?: string;
+  description?: string;
+  imageUrl?: string;
+  preparationTimeMinutes?: number;
+  account: {
+    username: string;
+    userProfile: {
+      fullName?: string;
+      avatarUrl?: string;
+    };
+  };
+  ingredients: {
+    id: string;
+    name: string;
+    quantity: string;
+    unit: string;
+    isMatched: boolean;
+  }[];
+}
+
+export interface FindRecipesResponse {
+  data: Recipe[];
+  total: number;
+}
+
+// Interface cho ingredient search
+export interface IngredientSearch {
+  id: string;
 }

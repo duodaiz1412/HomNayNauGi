@@ -332,6 +332,7 @@ export const CookingGuide = () => {
             <TouchableOpacity
               className="rounded-full p-2 mr-2 "
               onPress={handleLike}
+              disabled={!globalThis.isLoggedIn}
               // style={{ backgroundColor: isLiked ? '#FDECEA' : 'transparent' }}
               activeOpacity={0.7}
             >
@@ -348,6 +349,7 @@ export const CookingGuide = () => {
             <TouchableOpacity
               className="rounded-full p-2 mr-2"
               onPress={handleFavorite}
+              disabled={!globalThis.isLoggedIn}
               style={{
                 backgroundColor: isFavorite ? '#FDECEA' : 'transparent',
               }}

@@ -10,8 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Modal,
-  FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -57,15 +55,14 @@ export const AddFoodScreen = () => {
   const [unitsOfMeasure, setUnitsOfMeasure] = useState<UnitOfMeasure[]>([]);
   const [isLoadingUnits, setIsLoadingUnits] = useState(false);
   const [errorUnits, setErrorUnits] = useState<string | null>(null);
-  const [showUnitModal, setShowUnitModal] = useState(false);
-  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
-  
+  // Destructure form data
   const {
     basicInfo,
     categories,
     ingredients: selectedIngredients,
     steps,
   } = form;
+  // Fetch danh sách đơn vị đo lường khi component được mount
   useEffect(() => {
     const fetchUnitsOfMeasure = async () => {
       setIsLoadingUnits(true);
@@ -86,6 +83,7 @@ export const AddFoodScreen = () => {
     fetchUnitsOfMeasure();
   }, []);
 
+  // Pick image from gallery
   const pickImage = async (type, stepId = null) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -108,6 +106,7 @@ export const AddFoodScreen = () => {
     }
   };
 
+  // Add new step
   const addStep = () => {
     const newId =
       steps.length > 0
@@ -126,6 +125,7 @@ export const AddFoodScreen = () => {
     ]);
   };
 
+  // Remove step
   const removeStep = (id) => {
     if (steps.length > 1) {
       updateSteps(steps.filter((item) => item.id !== id));
@@ -134,42 +134,27 @@ export const AddFoodScreen = () => {
     }
   };
 
+  // Update step
   const updateStep = (id, field, value) => {
     updateSteps(
       steps.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
   };
 
+  // Remove ingredient
   const removeIngredient = (id) => {
     updateIngredients(
       selectedIngredients.filter((item) => item.ingredientId !== id)
     );
   };
 
+  // Update ingredient
   const updateIngredient = (id, field, value) => {
     updateIngredients(
       selectedIngredients.map((item) =>
         item.ingredientId === id ? { ...item, [field]: value } : item
       )
     );
-  };
-  
-  const openUnitModal = (ingredientId) => {
-    setSelectedIngredientId(ingredientId);
-    setShowUnitModal(true);
-  };
-  
-  const selectUnit = (unitId) => {
-    if (selectedIngredientId) {
-      updateIngredient(selectedIngredientId, 'unitId', unitId);
-    }
-    setShowUnitModal(false);
-  };
-  
-  const getUnitName = (unitId) => {
-    const unit = unitsOfMeasure.find(u => u.id === unitId);
-    if (!unit) return '-- Chọn đơn vị --';
-    return unit.symbol ? `${unit.unitName} (${unit.symbol})` : unit.unitName;
   };
 
   const handleSubmit = async () => {
@@ -462,7 +447,7 @@ export const AddFoodScreen = () => {
                       <View style={{ width: 80 }} className="mr-2">
                         <Text className="text-gray-700 mb-1">Số lượng *</Text>
                         <TextInput
-                          className="border border-gray-300 rounded-lg px-3 py-3"
+                          className="border border-gray-300 rounded-lg px-3 py-2"
                           placeholder="Nhập số lượng"
                           value={
                             ingredient.quantity != null
@@ -479,11 +464,10 @@ export const AddFoodScreen = () => {
                             )
                           }
                           keyboardType="numeric"
-                          style={{ height: 46 }}
                         />
                       </View>
 
-                      {/* Đơn vị - Replace Picker with TouchableOpacity */}
+                      {/* Đơn vị */}
                       <View className="flex-1 ml-2">
                         <Text className="text-gray-700 mb-1">Đơn vị *</Text>
                         {isLoadingUnits ? (
@@ -497,18 +481,48 @@ export const AddFoodScreen = () => {
                             Lỗi tải đơn vị
                           </Text>
                         ) : (
-                          <TouchableOpacity
-                            onPress={() => openUnitModal(ingredient.ingredientId)}
-                            className="border border-gray-300 rounded-lg px-3 flex-row justify-between items-center"
-                            style={{ height: 46 }}
+                          <View
+                            className="border border-gray-300 rounded-lg px-2"
+                            style={{ height: 44, justifyContent: 'center' }}
                           >
-                            <Text className={ingredient.unitId ? "text-gray-700" : "text-gray-400"}>
-                              {ingredient.unitId 
-                                ? getUnitName(ingredient.unitId) 
-                                : "-- Chọn đơn vị --"}
-                            </Text>
-                            <Ionicons name="chevron-down" size={16} color="#454442" />
-                          </TouchableOpacity>
+                            <Picker
+                              selectedValue={ingredient.unitId}
+                              onValueChange={(itemValue) => {
+                                if (
+                                  itemValue !== null &&
+                                  itemValue !== undefined
+                                ) {
+                                  updateIngredient(
+                                    ingredient.ingredientId,
+                                    'unitId',
+                                    itemValue
+                                  );
+                                }
+                              }}
+                              style={{
+                                height: 44,
+                                fontSize: 16,
+                              }}
+                              dropdownIconColor="#000"
+                            >
+                              <Picker.Item
+                                label="-- Chọn đơn vị --"
+                                value={null}
+                                style={{ color: '#9CA3AF' }}
+                              />
+                              {unitsOfMeasure.map((unit) => (
+                                <Picker.Item
+                                  key={unit.id}
+                                  label={
+                                    unit.symbol
+                                      ? `${unit.unitName} (${unit.symbol})`
+                                      : unit.unitName
+                                  }
+                                  value={unit.id}
+                                />
+                              ))}
+                            </Picker>
+                          </View>
                         )}
                       </View>
                     </View>

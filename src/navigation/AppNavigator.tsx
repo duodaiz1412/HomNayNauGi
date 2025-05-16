@@ -26,6 +26,8 @@ import PrivacyPolicyScreen from '../screens/Profile/PrivacyPolicyScreen';
 import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
 import { AdminDrawerNavigator } from './AdminDrawerNavigator';
+import ScanIngredientScreen from '../screens/ScanIngredient/ScanIngredientScreen';
+
 import { CategorySelectScreen } from '@screens/AddDish/CategorySelectScreen';
 import { IngredientSelectScreen } from '@screens/AddDish/IngredientSelectScreen';
 import { IngredientCategorySelectScreen } from '@screens/AddDish/IngredientCategorySelect';
@@ -34,8 +36,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 interface Ingredient {
+  id: string;
   name: string;
-  image: string;
+  imageUrl?: string;
 }
 
 export type RootStackParamList = {
@@ -59,7 +62,7 @@ export type RootStackParamList = {
   };
   IngredientsScreen: { ingredients: Ingredient[] };
   SearchByRecipeScreen: undefined;
-  ListDishesScreen: undefined;
+  ListDishesScreen: { mealId: number };
   FilterScreen: undefined;
   ProfileScreen: undefined;
   FavoritesScreen: undefined;
@@ -76,6 +79,7 @@ export type RootStackParamList = {
   IngredientCategorySelectScreen: undefined;
   AdminDrawerNavigator: undefined;
   PersonalScreen: undefined;
+  ScanIngredient: { imageUri: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -163,6 +167,7 @@ const AppNavigator = () => {
             title: 'Thêm nguyên liệu',
           }}
         />
+        <Stack.Screen name="ScanIngredient" component={ScanIngredientScreen} />
         <Stack.Screen
           name="AdminDrawerNavigator"
           component={AdminDrawerNavigator}

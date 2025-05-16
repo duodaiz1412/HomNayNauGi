@@ -1,4 +1,4 @@
-import {useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   View,
@@ -10,9 +10,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import MyIngredient from '@components/MyIngredient';
-import SuggestDish from '@components/SuggestDish';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import SuggestDish from '@components/SuggestDish/index';
 
 export default function RecipeScreen() {
   const navigation =
@@ -537,7 +537,7 @@ export default function RecipeScreen() {
 
   const handleDishPress = (id: string) => {
     navigation.navigate('RecipeDetail', {
-      recipeId: Number(id.replace('d', '')),
+      recipeId: (id.replace('d', '')),
     });
   };
 
@@ -609,10 +609,10 @@ export default function RecipeScreen() {
           </ScrollView>
         ) : (
           <View className="flex-1 px-4">
-            <SuggestDish
+            {/* <SuggestDish
               dishes={suggestedDishes}
               onDishPress={handleDishPress}
-            />
+            /> */}
           </View>
         )}
 
