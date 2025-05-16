@@ -288,4 +288,22 @@ export const removeAllIngredientsFromPantry = async () => {
   }
 };
 
+// Xóa nhiều nguyên liệu khỏi pantry
+export const removeMultipleIngredientsFromPantry = async (ingredientIds: string[]) => {
+  try {
+    console.log('Xóa nhiều nguyên liệu khỏi pantry:', ingredientIds);
+    const response = await api.delete('/pantry/delete-multiple', {
+      data: { ingredientIds }
+    });
+    console.log('Kết quả xóa nhiều nguyên liệu:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      'Lỗi khi xóa nhiều nguyên liệu khỏi pantry:',
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
 export default api;
