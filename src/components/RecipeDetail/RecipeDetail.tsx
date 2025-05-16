@@ -91,7 +91,8 @@ export default function RecipeDetail({
             <View className="flex-row items-center">
               <Image
                 source={{
-                  uri: recipe.account?.userProfile?.avatarUrl ||
+                  uri:
+                    recipe.account?.userProfile?.avatarUrl ||
                     'https://ui-avatars.com/api/?name=' +
                       encodeURIComponent(
                         recipe.account?.userProfile?.displayName ||

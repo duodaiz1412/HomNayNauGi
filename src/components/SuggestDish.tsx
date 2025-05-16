@@ -43,9 +43,9 @@ export const SuggestDish: React.FC<SuggestDishProps> = ({
             <View style={styles.recipeInfo}>
               <Text style={styles.recipeName}>{result.recipe.name}</Text>
               <Text style={styles.authorName}>
-                {result.recipe.account?.userProfile?.fullName || 
-                 result.recipe.account?.name || 
-                 'Ẩn danh'}
+                {result.recipe.account?.userProfile?.fullName ||
+                  result.recipe.account?.name ||
+                  'Ẩn danh'}
               </Text>
               <Text style={styles.matchText}>
                 Phù hợp: {Math.round(result.matchPercentage * 100)}%
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-}); 
+});

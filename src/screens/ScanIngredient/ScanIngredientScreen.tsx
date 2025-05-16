@@ -81,8 +81,8 @@ const ScanIngredientScreen = () => {
     if (ingredients.length > 0) {
       setIsLoadingDishes(true);
       try {
-        const searchIngredients = ingredients.map(ing => ({
-          id: ing.id
+        const searchIngredients = ingredients.map((ing) => ({
+          id: ing.id,
         }));
         const response = await findRecipesByIngredients(searchIngredients);
         setSuggestedDishes(response.data);
@@ -193,7 +193,9 @@ const ScanIngredientScreen = () => {
         >
           <SafeAreaView className="flex-1 bg-white mt-10 p-2">
             <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
-              <Text className="text-xl font-bold text-[#941D23]">Gợi ý món ăn</Text>
+              <Text className="text-xl font-bold text-[#941D23]">
+                Gợi ý món ăn
+              </Text>
               <TouchableOpacity onPress={() => setShowSuggestDish(false)}>
                 <Ionicons name="close" size={24} color="#941D23" />
               </TouchableOpacity>

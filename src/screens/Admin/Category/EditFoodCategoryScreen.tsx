@@ -41,7 +41,9 @@ export const EditFoodCategoryScreen = () => {
     const fetchCategory = async () => {
       try {
         setIsFetching(true);
-        const reponse = await api.get(`/admin/recipe-categories/search/${categoryId}`)
+        const reponse = await api.get(
+          `/admin/recipe-categories/search/${categoryId}`
+        );
         const categoryData = reponse.data.data;
         console.log(categoryData);
         if (!categoryData) {

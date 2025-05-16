@@ -27,8 +27,9 @@ import api from 'src/api/api';
 // Add YouTube URL validation function
 const isValidYouTubeUrl = (url) => {
   if (!url) return true; // Empty URL is considered valid (optional field)
-  
-  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|shorts\/|v\/|)([a-zA-Z0-9_-]{11})$/;
+
+  const youtubeRegex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|shorts\/|v\/|)([a-zA-Z0-9_-]{11})$/;
   return youtubeRegex.test(url);
 };
 
@@ -70,7 +71,10 @@ export const AddFoodScreen = () => {
       try {
         const response = await api.get('/admin/unit-of-measure/all');
 
-        console.log('////////////////\n DON VI NE ',JSON.stringify( response.data,null,2));
+        console.log(
+          '////////////////\n DON VI NE ',
+          JSON.stringify(response.data, null, 2)
+        );
         setUnitsOfMeasure(response.data);
       } catch (e: any) {
         setErrorUnits(e.message || 'An unknown error occurred');
@@ -166,7 +170,7 @@ export const AddFoodScreen = () => {
             text: 'OK',
             onPress: () => {
               resetForm();
-              navigation.navigate('AdminFoodManagementScreen')
+              navigation.navigate('AdminFoodManagementScreen');
             },
           },
         ]);
@@ -288,16 +292,18 @@ export const AddFoodScreen = () => {
                   value={basicInfo.videoUrl || ''}
                   onChangeText={(value) => updateBasicInfo({ videoUrl: value })}
                 />
-                {basicInfo.videoUrl && !isValidYouTubeUrl(basicInfo.videoUrl) && (
-                  <Text className="text-red-500 text-xs mt-1">
-                    URL không hợp lệ. Vui lòng nhập URL YouTube hợp lệ.
-                  </Text>
-                )}
-                {basicInfo.videoUrl && isValidYouTubeUrl(basicInfo.videoUrl) && (
-                  <Text className="text-green-500 text-xs mt-1">
-                    URL YouTube hợp lệ.
-                  </Text>
-                )}
+                {basicInfo.videoUrl &&
+                  !isValidYouTubeUrl(basicInfo.videoUrl) && (
+                    <Text className="text-red-500 text-xs mt-1">
+                      URL không hợp lệ. Vui lòng nhập URL YouTube hợp lệ.
+                    </Text>
+                  )}
+                {basicInfo.videoUrl &&
+                  isValidYouTubeUrl(basicInfo.videoUrl) && (
+                    <Text className="text-green-500 text-xs mt-1">
+                      URL YouTube hợp lệ.
+                    </Text>
+                  )}
               </View>
               <View className="space-y-2">
                 <Text className="text-gray-800 text-base font-semibold">
@@ -633,7 +639,7 @@ export const AddFoodScreen = () => {
           </ScrollView>
         )}
       </KeyboardAvoidingView>
-      
+
       {/* Unit Selection Modal */}
       <Modal
         visible={showUnitModal}
@@ -643,11 +649,12 @@ export const AddFoodScreen = () => {
       >
         <View className="flex-1 justify-center items-center bg-black/40">
           <View className="bg-white rounded-2xl w-5/6 overflow-hidden ">
-
             {/* Header modal */}
             <View className="bg-red-800 px-4 py-4 flex-row justify-between items-center">
-              <Text className="text-lg font-bold text-white">Chọn đơn vị đo lường</Text>
-              <TouchableOpacity 
+              <Text className="text-lg font-bold text-white">
+                Chọn đơn vị đo lường
+              </Text>
+              <TouchableOpacity
                 onPress={() => setShowUnitModal(false)}
                 className="w-8 h-8 rounded-full items-center justify-center"
                 style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}
@@ -655,7 +662,7 @@ export const AddFoodScreen = () => {
                 <Ionicons name="close" size={20} color="white" />
               </TouchableOpacity>
             </View>
-            
+
             {/* List units */}
             <FlatList
               data={unitsOfMeasure}

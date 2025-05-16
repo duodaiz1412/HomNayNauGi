@@ -1,4 +1,10 @@
-import { IngredientDTO, Recipe, RecipeIngredient, RecipeSearchResult, Unit } from '../types/recipe';
+import {
+  IngredientDTO,
+  Recipe,
+  RecipeIngredient,
+  RecipeSearchResult,
+  Unit,
+} from '../types/recipe';
 
 const MATCH_THRESHOLD = 0.8; // 80% match required
 const QUANTITY_TOLERANCE = 0.2; // 20% quantity tolerance
@@ -32,17 +38,18 @@ const calculateRecipeMatches = (
   recipes: Recipe[],
   searchIngredients: IngredientDTO[]
 ): RecipeSearchResult[] => {
-  const results: RecipeSearchResult[] = recipes.map(recipe => {
+  const results: RecipeSearchResult[] = recipes.map((recipe) => {
     const matchedIngredients: RecipeIngredient[] = [];
     let matchCount = 0;
 
-    recipe.ingredients.forEach(recipeIngredient => {
+    recipe.ingredients.forEach((recipeIngredient) => {
       const searchIngredient = searchIngredients.find(
-        si => si.id === recipeIngredient.ingredientId
+        (si) => si.id === recipeIngredient.ingredientId
       );
 
       if (searchIngredient) {
-        const isUnitMatch = recipeIngredient.unitId === Number(searchIngredient.unit);
+        const isUnitMatch =
+          recipeIngredient.unitId === Number(searchIngredient.unit);
         const quantityDiff = Math.abs(
           recipeIngredient.quantity - searchIngredient.quantity
         );
@@ -68,12 +75,12 @@ const calculateRecipeMatches = (
         ingredients: matchedIngredients,
       },
       matchPercentage,
-      matchedIngredients: matchedIngredients.filter(i => i.isMatched),
+      matchedIngredients: matchedIngredients.filter((i) => i.isMatched),
     };
   });
 
   // Filter recipes that meet the threshold and sort by match percentage
   return results
-    .filter(result => result.matchPercentage >= MATCH_THRESHOLD)
+    .filter((result) => result.matchPercentage >= MATCH_THRESHOLD)
     .sort((a, b) => b.matchPercentage - a.matchPercentage);
-}; 
+};

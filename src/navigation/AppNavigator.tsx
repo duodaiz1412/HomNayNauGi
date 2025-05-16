@@ -6,7 +6,7 @@ import LoginScreen from '../screens/Login/LoginScreen';
 import { RegisterScreen } from '../screens/Login/RegisterScreen';
 import AboutScreen from '../screens/About/AboutScreen';
 import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
-import {CookingGuide} from '../screens/Recipe/CookingGuide';
+import { CookingGuide } from '../screens/Recipe/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import AddIngredientScreen from '@screens/Recipe/AddIngredient';
 import AddDishScreen from '../screens/AddDish/AddDishScreen';
@@ -32,8 +32,6 @@ import { CategorySelectScreen } from '@screens/AddDish/CategorySelectScreen';
 import { IngredientSelectScreen } from '@screens/AddDish/IngredientSelectScreen';
 import { IngredientCategorySelectScreen } from '@screens/AddDish/IngredientCategorySelect';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
 
 interface Ingredient {
   id: string;
@@ -93,12 +91,12 @@ const AppNavigator = () => {
   //   try {
   //     // Kiểm tra xem app đã được khởi chạy trước đó chưa
   //     const hasLaunched = await AsyncStorage.getItem('hasLaunched');
-      
+
   //     if (hasLaunched === null) {
   //       // Lần đầu khởi chạy app, xóa tất cả dữ liệu
   //       console.log('First launch - clearing AsyncStorage');
   //       await AsyncStorage.clear();
-        
+
   //       // Đánh dấu app đã được khởi chạy
   //       await AsyncStorage.setItem('hasLaunched', 'true');
   //     } else {
@@ -144,9 +142,18 @@ const AppNavigator = () => {
         />
         <Stack.Screen name="AddDishScreen" component={AddDishScreen} />
         <Stack.Screen name="EditDishScreen" component={EditDishScreen} />
-        <Stack.Screen name="CategorySelectScreen" component={CategorySelectScreen} />
-        <Stack.Screen name="IngredientSelectScreen" component={IngredientSelectScreen} />
-        <Stack.Screen name="IngredientCategorySelectScreen" component={IngredientCategorySelectScreen} />
+        <Stack.Screen
+          name="CategorySelectScreen"
+          component={CategorySelectScreen}
+        />
+        <Stack.Screen
+          name="IngredientSelectScreen"
+          component={IngredientSelectScreen}
+        />
+        <Stack.Screen
+          name="IngredientCategorySelectScreen"
+          component={IngredientCategorySelectScreen}
+        />
         <Stack.Screen
           name="SearchByIngredientScreen"
           component={SearchByIngredientScreen}

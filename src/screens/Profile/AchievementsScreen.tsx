@@ -45,7 +45,10 @@ const AchievementsScreen = () => {
         setTotalRecipes(response.data.total || recipes.length);
 
         const totalLikes = recipes.reduce((sum, r) => sum + r.likeCount, 0);
-        const totalFavorites = recipes.reduce((sum, r) => sum + r.favoriteCount, 0);
+        const totalFavorites = recipes.reduce(
+          (sum, r) => sum + r.favoriteCount,
+          0
+        );
 
         setTotalLikes(totalLikes);
         setTotalFavorites(totalFavorites);
@@ -123,18 +126,26 @@ const AchievementsScreen = () => {
   ];
 
   return (
-    <ImageBackground source={backgroundImage} style={{ flex: 1 }} resizeMode="cover">
+    <ImageBackground
+      source={backgroundImage}
+      style={{ flex: 1 }}
+      resizeMode="cover"
+    >
       <SafeAreaView className="flex-1">
         <ScrollView className="flex-1">
           <View className="flex-row items-center p-4">
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Text className="text-2xl text-black">⬅️</Text>
             </TouchableOpacity>
-            <Text className="text-2xl font-bold text-black ml-4">Thành tựu</Text>
+            <Text className="text-2xl font-bold text-black ml-4">
+              Thành tựu
+            </Text>
           </View>
 
           <View className="p-4">
-            <Text className="text-xl font-bold text-black mb-4">Thành tựu nổi bật của bạn</Text>
+            <Text className="text-xl font-bold text-black mb-4">
+              Thành tựu nổi bật của bạn
+            </Text>
 
             {loading ? (
               <ActivityIndicator size="large" color="#000" />
@@ -151,7 +162,9 @@ const AchievementsScreen = () => {
                     <Text className="text-3xl mr-3">{item.icon}</Text>
                     <View className="flex-1">
                       <Text className="font-bold text-black">{item.title}</Text>
-                      <Text className="text-black text-sm">{item.description}</Text>
+                      <Text className="text-black text-sm">
+                        {item.description}
+                      </Text>
                       <Text className="text-xs text-gray-500">
                         {isAchieved ? 'Đã đạt' : 'Chưa đạt'}
                       </Text>

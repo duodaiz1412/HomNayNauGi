@@ -22,9 +22,9 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 
-
 const AddDishScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {
     form,
     isLoading,
@@ -121,7 +121,8 @@ const AddDishScreen = () => {
   };
 
   const handleAddStep = () => {
-    const newId = steps.length > 0 ? Math.max(...steps.map(s => s.id)) + 1 : 1;
+    const newId =
+      steps.length > 0 ? Math.max(...steps.map((s) => s.id)) + 1 : 1;
     updateSteps([
       ...steps,
       {
@@ -158,13 +159,13 @@ const AddDishScreen = () => {
 
   const handleIngredientChange = (idx, field, value) => {
     const newIngredients = [...selectedIngredients];
-    
+
     if (field === 'amount') {
       newIngredients[idx].quantity = parseFloat(value) || 0;
     } else if (field === 'unit') {
       newIngredients[idx].unitId = value;
     }
-    
+
     updateIngredients(newIngredients);
   };
 
@@ -181,80 +182,89 @@ const AddDishScreen = () => {
       fat: parseFloat(nutrition.fat) || 0,
       videoUrl: video,
     });
-    
+
     // Danh sách lỗi
     const errors = [];
-    
+
     // Kiểm tra tên món ăn
     if (!basicInfo.name || basicInfo.name.trim() === '') {
       errors.push('Vui lòng nhập tên món ăn');
     }
-    
+
     // Kiểm tra mô tả
     if (!basicInfo.description || basicInfo.description.trim() === '') {
       errors.push('Vui lòng nhập mô tả món ăn');
     }
-    
+
     // Kiểm tra hình ảnh
     if (!basicInfo.imageUrl) {
       errors.push('Vui lòng thêm hình ảnh món ăn');
     }
-    
+
     // Kiểm tra danh mục
     if (!categories || categories.length === 0) {
       errors.push('Vui lòng chọn ít nhất một danh mục');
     }
-    
+
     // Kiểm tra thời gian chuẩn bị
-    if (!basicInfo.preparationTimeMinutes || basicInfo.preparationTimeMinutes <= 0) {
+    if (
+      !basicInfo.preparationTimeMinutes ||
+      basicInfo.preparationTimeMinutes <= 0
+    ) {
       errors.push('Vui lòng nhập thời gian chuẩn bị hợp lệ');
     }
-    
+
     // Kiểm tra nguyên liệu
     if (selectedIngredients.length === 0) {
       errors.push('Vui lòng thêm ít nhất một nguyên liệu');
     } else {
       // Kiểm tra từng nguyên liệu
       const invalidIngredients = selectedIngredients.some(
-        ing => !ing.ingredientId || !ing.quantity || ing.quantity <= 0 || !ing.unitId
+        (ing) =>
+          !ing.ingredientId || !ing.quantity || ing.quantity <= 0 || !ing.unitId
       );
-      
+
       if (invalidIngredients) {
-        errors.push('Vui lòng nhập đầy đủ thông tin cho tất cả các nguyên liệu (số lượng và đơn vị)');
+        errors.push(
+          'Vui lòng nhập đầy đủ thông tin cho tất cả các nguyên liệu (số lượng và đơn vị)'
+        );
       }
     }
-    
+
     // Kiểm tra thông tin dinh dưỡng
-    if (!nutrition.carb || !nutrition.protein || !nutrition.kcal || !nutrition.fat) {
+    if (
+      !nutrition.carb ||
+      !nutrition.protein ||
+      !nutrition.kcal ||
+      !nutrition.fat
+    ) {
       errors.push('Vui lòng nhập đầy đủ thông tin dinh dưỡng');
     }
-    
+
     // Kiểm tra các bước thực hiện
     if (steps.length === 0) {
       errors.push('Vui lòng thêm ít nhất một bước thực hiện');
     } else {
       // Kiểm tra nội dung của từng bước
-      const emptySteps = steps.some(step => !step.instruction || step.instruction.trim() === '');
+      const emptySteps = steps.some(
+        (step) => !step.instruction || step.instruction.trim() === ''
+      );
       if (emptySteps) {
         errors.push('Vui lòng nhập mô tả cho tất cả các bước thực hiện');
       }
     }
-    
+
     // Hiển thị lỗi nếu có
     if (errors.length > 0) {
-      Alert.alert(
-        'Thiếu thông tin',
-        errors.join('\n'),
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Thiếu thông tin', errors.join('\n'), [{ text: 'OK' }]);
       return;
     }
-    
+
     try {
       setIsSubmitting(true);
       // Sử dụng handleSaveForUser để lưu công thức (dành cho người dùng thường)
       const savedRecipe = await handleSaveForUser();
-      
+
       if (savedRecipe) {
         Alert.alert('Thành công', 'Đã thêm món ăn mới!', [
           {
@@ -286,7 +296,7 @@ const AddDishScreen = () => {
 
   // Get unit name helper function
   const getUnitName = (unitId) => {
-    const unit = unitsOfMeasure.find(u => u.id === unitId);
+    const unit = unitsOfMeasure.find((u) => u.id === unitId);
     if (!unit) return '';
     return unit.symbol ? `${unit.unitName} (${unit.symbol})` : unit.unitName;
   };
@@ -311,7 +321,9 @@ const AddDishScreen = () => {
           <View className="absolute z-50 h-full w-full bg-black/70 items-center justify-center">
             <View className="bg-white p-5 rounded-2xl items-center justify-center">
               <ActivityIndicator size="large" color="#941D23" />
-              <Text className="mt-3 text-base font-medium">Đang lưu món ăn...</Text>
+              <Text className="mt-3 text-base font-medium">
+                Đang lưu món ăn...
+              </Text>
             </View>
           </View>
         )}
@@ -342,7 +354,9 @@ const AddDishScreen = () => {
               ) : (
                 <View className="w-48 h-48 bg-gray-100 rounded-2xl items-center justify-center border-2 border-dashed border-gray-300">
                   <Ionicons name="camera-outline" size={44} color="#9CA3AF" />
-                  <Text className="text-gray-500 text-base mt-2">Chọn ảnh món ăn</Text>
+                  <Text className="text-gray-500 text-base mt-2">
+                    Chọn ảnh món ăn
+                  </Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -363,11 +377,15 @@ const AddDishScreen = () => {
 
             {/* Tiêu đề */}
             <View className="mb-4">
-              <Text className="text-lg font-semibold text-gray-700 mb-2">Tiêu đề</Text>
+              <Text className="text-lg font-semibold text-gray-700 mb-2">
+                Tiêu đề
+              </Text>
               <TextInput
                 className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-lg"
                 value={basicInfo.description}
-                onChangeText={(value) => updateBasicInfo({ description: value })}
+                onChangeText={(value) =>
+                  updateBasicInfo({ description: value })
+                }
                 placeholder="Nhập tiêu đề món ăn"
                 placeholderTextColor="#9CA3AF"
               />
@@ -387,7 +405,10 @@ const AddDishScreen = () => {
                     <Text className="text-gray-800 text-lg mb-2">
                       Đã chọn {categories.length} danh mục
                     </Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                    >
                       {categories.map((category) => (
                         <View key={category.id} className="mr-2 items-center">
                           <View className="w-16 h-16 rounded-full overflow-hidden border border-gray-200 mb-1">
@@ -399,11 +420,18 @@ const AddDishScreen = () => {
                               />
                             ) : (
                               <View className="w-full h-full bg-gray-200 items-center justify-center">
-                                <Ionicons name="restaurant-outline" size={24} color="#9CA3AF" />
+                                <Ionicons
+                                  name="restaurant-outline"
+                                  size={24}
+                                  color="#9CA3AF"
+                                />
                               </View>
                             )}
                           </View>
-                          <Text className="text-sm text-gray-600" numberOfLines={1}>
+                          <Text
+                            className="text-sm text-gray-600"
+                            numberOfLines={1}
+                          >
                             {category.name}
                           </Text>
                         </View>
@@ -425,7 +453,11 @@ const AddDishScreen = () => {
               <TextInput
                 className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-lg"
                 value={basicInfo.preparationTimeMinutes?.toString() || ''}
-                onChangeText={(value) => updateBasicInfo({ preparationTimeMinutes: Number.parseInt(value) || 0 })}
+                onChangeText={(value) =>
+                  updateBasicInfo({
+                    preparationTimeMinutes: Number.parseInt(value) || 0,
+                  })
+                }
                 placeholder="Nhập thời gian chuẩn bị (phút)"
                 placeholderTextColor="#9CA3AF"
                 keyboardType="numeric"
@@ -442,13 +474,17 @@ const AddDishScreen = () => {
                   className="bg-red-800 px-4 py-1.5 rounded-full"
                   onPress={handleAddIngredient}
                 >
-                  <Text className="text-white text-base font-medium">+ Thêm</Text>
+                  <Text className="text-white text-base font-medium">
+                    + Thêm
+                  </Text>
                 </TouchableOpacity>
               </View>
-              
+
               {selectedIngredients.length === 0 ? (
                 <View className="border border-dashed border-gray-300 rounded-xl p-6 items-center justify-center">
-                  <Text className="text-gray-500 text-base mt-2">Chưa có nguyên liệu</Text>
+                  <Text className="text-gray-500 text-base mt-2">
+                    Chưa có nguyên liệu
+                  </Text>
                 </View>
               ) : (
                 selectedIngredients.map((ingredient, idx) => (
@@ -457,7 +493,9 @@ const AddDishScreen = () => {
                     className="mb-3 p-3 bg-gray-50 rounded-xl border border-gray-200"
                   >
                     <View className="flex-row justify-between items-center mb-2">
-                      <Text className="font-semibold text-gray-700 text-lg">Nguyên liệu {idx + 1}</Text>
+                      <Text className="font-semibold text-gray-700 text-lg">
+                        Nguyên liệu {idx + 1}
+                      </Text>
                       <TouchableOpacity
                         onPress={() => handleRemoveIngredient(idx)}
                       >
@@ -484,9 +522,7 @@ const AddDishScreen = () => {
                         )}
                       </View>
                       <View className="flex-col w-2/3 items-center mb-2">
-                        <View
-                          className="bg-white border border-gray-200 rounded-xl h-[46px] px-4 py-2 text-gray-800 mb-2 flex-row items-center w-full"
-                        >
+                        <View className="bg-white border border-gray-200 rounded-xl h-[46px] px-4 py-2 text-gray-800 mb-2 flex-row items-center w-full">
                           <Text className="flex-1 text-gray-800 text-base">
                             {ingredient.ingredient?.name || 'Chọn nguyên liệu'}
                           </Text>
@@ -494,7 +530,11 @@ const AddDishScreen = () => {
                         <View className="flex-row gap-2">
                           <TextInput
                             className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-800 text-base"
-                            value={ingredient.quantity ? String(ingredient.quantity) : ''}
+                            value={
+                              ingredient.quantity
+                                ? String(ingredient.quantity)
+                                : ''
+                            }
                             onChangeText={(v) =>
                               handleIngredientChange(idx, 'amount', v)
                             }
@@ -507,7 +547,11 @@ const AddDishScreen = () => {
                               onValueChange={(v) =>
                                 handleIngredientChange(idx, 'unit', v)
                               }
-                              style={{ height: 50, color: '#4B5563', fontSize: 16 }}
+                              style={{
+                                height: 50,
+                                color: '#4B5563',
+                                fontSize: 16,
+                              }}
                               dropdownIconColor="#4B5563"
                               mode="dropdown"
                             >
@@ -520,7 +564,11 @@ const AddDishScreen = () => {
                               {unitsOfMeasure.map((unit) => (
                                 <Picker.Item
                                   key={unit.id}
-                                  label={unit.symbol ? `${unit.unitName} (${unit.symbol})` : unit.unitName}
+                                  label={
+                                    unit.symbol
+                                      ? `${unit.unitName} (${unit.symbol})`
+                                      : unit.unitName
+                                  }
                                   value={unit.id}
                                   color="#4B5563"
                                   style={{ fontSize: 16 }}
@@ -611,7 +659,9 @@ const AddDishScreen = () => {
                     />
                   </View>
                   <View className="flex-1">
-                    <Text className="font-semibold text-gray-700 text-base">Kcal</Text>
+                    <Text className="font-semibold text-gray-700 text-base">
+                      Kcal
+                    </Text>
                     <View className="flex flex-row items-end gap-1 mt-1">
                       <TextInput
                         className="text-gray-800 text-lg p-0 m-0"
@@ -672,16 +722,20 @@ const AddDishScreen = () => {
                   className="bg-red-800 px-4 py-1.5 rounded-full"
                   onPress={handleAddStep}
                 >
-                  <Text className="text-white text-base font-medium">+ Thêm</Text>
+                  <Text className="text-white text-base font-medium">
+                    + Thêm
+                  </Text>
                 </TouchableOpacity>
               </View>
-              
+
               {steps.map((step, idx) => (
                 <View
                   key={idx}
                   className="mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200"
                 >
-                  <Text className="mb-2 font-semibold text-gray-700 text-lg">Bước {idx + 1}</Text>
+                  <Text className="mb-2 font-semibold text-gray-700 text-lg">
+                    Bước {idx + 1}
+                  </Text>
                   <TextInput
                     className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-800 text-lg mb-2"
                     value={step.instruction}
@@ -705,7 +759,9 @@ const AddDishScreen = () => {
                           size={32}
                           color="#9CA3AF"
                         />
-                        <Text className="text-gray-500 text-base mt-1">Ảnh minh họa</Text>
+                        <Text className="text-gray-500 text-base mt-1">
+                          Ảnh minh họa
+                        </Text>
                       </View>
                     )}
                   </TouchableOpacity>
@@ -737,7 +793,9 @@ const AddDishScreen = () => {
 
             {/* Error message */}
             {error && (
-              <Text className="text-red-500 text-center text-base mb-2">{error}</Text>
+              <Text className="text-red-500 text-center text-base mb-2">
+                {error}
+              </Text>
             )}
 
             {/* Nút lưu */}

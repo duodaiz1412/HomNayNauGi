@@ -1,4 +1,11 @@
-import { View, Text, Image, TouchableOpacity, Alert,StatusBar } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Alert,
+  StatusBar,
+} from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItemList,
@@ -16,36 +23,36 @@ export const CustomDrawer = (props) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-const handleLogout = () => {
-  Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
-    {
-      text: 'Hủy',
-      style: 'cancel',
-    },
-    {
-      text: 'Đăng xuất',
-      onPress: async () => {
-        try {
-          await logout();
-          console.log("Đăng xuất thành công");
-          // Chuyển về màn hình login
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'MainTabs' }],
-          });
-        } catch (error) {
-          console.error('Lỗi đăng xuất:', error);
-          Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
-        }
+  const handleLogout = () => {
+    Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
+      {
+        text: 'Hủy',
+        style: 'cancel',
       },
-      style: 'destructive',
-    },
-  ]);
-};
+      {
+        text: 'Đăng xuất',
+        onPress: async () => {
+          try {
+            await logout();
+            console.log('Đăng xuất thành công');
+            // Chuyển về màn hình login
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'MainTabs' }],
+            });
+          } catch (error) {
+            console.error('Lỗi đăng xuất:', error);
+            Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+          }
+        },
+        style: 'destructive',
+      },
+    ]);
+  };
 
   return (
     <SafeAreaView className="flex-1">
-        <StatusBar barStyle="light-content" backgroundColor="#941D23" />
+      <StatusBar barStyle="light-content" backgroundColor="#941D23" />
       {/* Header */}
       <View className="bg-[#941D23] pt-12 pb-5 px-5 mb-2.5">
         <View className="flex-row items-center">
@@ -57,7 +64,9 @@ const handleLogout = () => {
           />
           <View className="ml-4">
             <Text className="text-white text-lg font-bold">Admin</Text>
-            <Text className="text-white/80 text-base mt-0.5">Quản trị viên</Text>
+            <Text className="text-white/80 text-base mt-0.5">
+              Quản trị viên
+            </Text>
           </View>
         </View>
       </View>

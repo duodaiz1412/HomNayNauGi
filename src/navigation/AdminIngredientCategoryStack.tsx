@@ -9,7 +9,8 @@ export type AdminIngredientCategoryStackParamList = {
   AddIngredientCategoryScreen: undefined;
   EditIngredientCategoryScreen: { ingredientCategoryId: string };
 };
-const Stack = createNativeStackNavigator<AdminIngredientCategoryStackParamList>();
+const Stack =
+  createNativeStackNavigator<AdminIngredientCategoryStackParamList>();
 
 export const AdminIngredientCategoryStack = () => {
   return (

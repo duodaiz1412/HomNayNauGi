@@ -21,5 +21,3 @@ const FavoriteIcon: React.FC<FavoriteIconProps> = ({ color, size = 24 }) => {
 };
 
 export default FavoriteIcon;
-
-

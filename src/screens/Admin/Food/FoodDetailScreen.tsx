@@ -1,22 +1,32 @@
-import React, { useEffect, useState } from "react"
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from "react-native"
-import { useNavigation, useRoute } from "@react-navigation/native"
-import { Ionicons } from "@expo/vector-icons"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { AdminFoodStackParamList } from "@navigation/AdminFoodStack"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { AdminHeader } from "@components/AdminHeader/AdminHeader"
-import api from "src/api/api"
-import { Recipe } from "src/types" 
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AdminFoodStackParamList } from '@navigation/AdminFoodStack';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AdminHeader } from '@components/AdminHeader/AdminHeader';
+import api from 'src/api/api';
+import { Recipe } from 'src/types';
 import LikeSolid from '@components/icons/LikeSolid';
 import { formatNumber } from 'src/ultils/formatNumber';
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe';
 import HeartSolid from '@components/icons/HeartSolid';
 
 export const FoodDetailScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>()
-  const route = useRoute()
-  const { foodId } = route.params as { foodId: string }
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
+  const route = useRoute();
+  const { foodId } = route.params as { foodId: string };
 
   const [isFetching, setIsFetching] = useState(true);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -25,13 +35,13 @@ export const FoodDetailScreen = () => {
     const fetchRecipe = async () => {
       try {
         setIsFetching(true);
-        const response = await api.get(`/admin/recipes/detail/${foodId}`)
+        const response = await api.get(`/admin/recipes/detail/${foodId}`);
         const recipeData = response.data.data;
         if (!recipeData) {
           throw new Error('Không tìm thấy công thức');
         }
-        
-        console.log("\nRecipe data:", JSON.stringify(recipeData,null,2));
+
+        console.log('\nRecipe data:', JSON.stringify(recipeData, null, 2));
         setRecipe(recipeData);
       } catch (e) {
         console.error('Error fetching recipe:', e);
@@ -96,12 +106,12 @@ export const FoodDetailScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <AdminHeader title="Chi tiết món ăn"/>
+      <AdminHeader title="Chi tiết món ăn" />
       <ScrollView className="flex-1 bg-gray-50">
         {/* Hero Image */}
         <View className="relative">
-          <Image 
-            source={{ uri: recipe.imageUrl }} 
+          <Image
+            source={{ uri: recipe.imageUrl }}
             className="w-full h-64"
             resizeMode="cover"
           />
@@ -187,7 +197,9 @@ export const FoodDetailScreen = () => {
             </View>
             <View className="items-center">
               <Text className="text-gray-500 text-xs">Tinh bột</Text>
-              <Text className="text-gray-700 font-bold">{recipe.carbohydrates}g</Text>
+              <Text className="text-gray-700 font-bold">
+                {recipe.carbohydrates}g
+              </Text>
             </View>
             <View className="items-center">
               <Text className="text-gray-500 text-xs">Calo</Text>
@@ -200,8 +212,13 @@ export const FoodDetailScreen = () => {
         <View className="bg-white p-4 mt-2">
           <Text className="text-lg font-bold mb-2">Nguyên liệu</Text>
           {recipe.recipeIngredients?.map((ingredient, index) => (
-            <View key={index} className="flex-row justify-between py-2 border-b border-gray-100">
-              <Text className="text-gray-700">{ingredient.ingredient.name}</Text>
+            <View
+              key={index}
+              className="flex-row justify-between py-2 border-b border-gray-100"
+            >
+              <Text className="text-gray-700">
+                {ingredient.ingredient.name}
+              </Text>
               <Text className="text-gray-500">
                 {ingredient.quantity} {ingredient.unit.symbol}
               </Text>
@@ -218,10 +235,17 @@ export const FoodDetailScreen = () => {
                 <View className="w-8 h-8 rounded-full bg-[#941D23] items-center justify-center">
                   <Text className="text-white font-bold">{step.stepOrder}</Text>
                 </View>
-                <Text className="text-gray-700 font-bold ml-2">Bước {step.stepOrder}</Text>
+                <Text className="text-gray-700 font-bold ml-2">
+                  Bước {step.stepOrder}
+                </Text>
               </View>
               <Text className="text-gray-600 mb-2">{step.instruction}</Text>
-              {step.imageUrl && <Image source={{ uri: step.imageUrl }} className="w-full h-48 rounded-lg" />}
+              {step.imageUrl && (
+                <Image
+                  source={{ uri: step.imageUrl }}
+                  className="w-full h-48 rounded-lg"
+                />
+              )}
             </View>
           ))}
         </View>
@@ -254,16 +278,22 @@ export const FoodDetailScreen = () => {
           <View className="flex-row justify-between py-2 border-b border-gray-100">
             <Text className="text-gray-500">Người tạo</Text>
             <View className="flex-row items-center">
-              <Text className="text-gray-700">{recipe.account?.userProfile.fullName}</Text>
+              <Text className="text-gray-700">
+                {recipe.account?.userProfile.fullName}
+              </Text>
             </View>
           </View>
           <View className="flex-row justify-between py-2 border-b border-gray-100">
             <Text className="text-gray-500">Ngày tạo</Text>
-            <Text className="text-gray-700">{new Date(recipe.createdAt).toLocaleDateString("vi-VN")}</Text>
+            <Text className="text-gray-700">
+              {new Date(recipe.createdAt).toLocaleDateString('vi-VN')}
+            </Text>
           </View>
           <View className="flex-row justify-between py-2">
             <Text className="text-gray-500">Cập nhật lần cuối</Text>
-            <Text className="text-gray-700">{new Date(recipe.updatedAt).toLocaleDateString("vi-VN")}</Text>
+            <Text className="text-gray-700">
+              {new Date(recipe.updatedAt).toLocaleDateString('vi-VN')}
+            </Text>
           </View>
         </View>
 
@@ -271,7 +301,9 @@ export const FoodDetailScreen = () => {
         <View className="flex-row justify-center p-4 bg-white shadow-lg">
           <TouchableOpacity
             className="bg-blue-500 px-4 py-2 rounded-lg flex-row items-center mr-4"
-            onPress={() => navigation.navigate("EditFoodScreen", { foodId: recipe.id })}
+            onPress={() =>
+              navigation.navigate('EditFoodScreen', { foodId: recipe.id })
+            }
           >
             <Ionicons name="create-outline" size={20} color="white" />
             <Text className="text-white font-bold ml-2">Chỉnh sửa</Text>
@@ -301,5 +333,5 @@ export const FoodDetailScreen = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};

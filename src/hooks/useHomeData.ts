@@ -25,8 +25,8 @@ interface FeaturedItem {
   name: string;
   image: string;
   time: string;
-  author: string,
-  avataUrl: string,
+  author: string;
+  avataUrl: string;
   isFavorite: boolean;
 }
 
@@ -56,9 +56,9 @@ interface HomeData {
     avatar: string;
   } | null;
   banner: {
-    id:string;
+    id: string;
     image: string;
-     description: string;
+    description: string;
   };
   recipeFeedHasMore: boolean;
 }
@@ -85,23 +85,24 @@ export const useHomeData = () => {
   // Fetch recipe feed
   const fetchRecipeFeed = async (sortBy = 'recommended', offset = 0) => {
     try {
-      const feedResponse = await api.get(`/recipes/recipeFeed?sortBy=${sortBy}&limit=10&offset=${offset}`);
+      const feedResponse = await api.get(
+        `/recipes/recipeFeed?sortBy=${sortBy}&limit=10&offset=${offset}`
+      );
       const feedData = feedResponse.data.data || [];
       const hasMore = feedResponse.data.pagination?.hasMore || false;
-      
-      setHomeData(prev => {
+
+      setHomeData((prev) => {
         if (!prev) return prev;
-        
+
         // Nếu offset = 0, thay thế hoàn toàn feed hiện tại
         // Nếu offset > 0 và có dữ liệu mới, thêm vào feed hiện tại
-        const newRecipeFeed = offset === 0 
-          ? feedData 
-          : [...(prev.recipeFeed || []), ...feedData];
-        
+        const newRecipeFeed =
+          offset === 0 ? feedData : [...(prev.recipeFeed || []), ...feedData];
+
         return {
           ...prev,
           recipeFeed: newRecipeFeed,
-          recipeFeedHasMore: hasMore
+          recipeFeedHasMore: hasMore,
         };
       });
       return feedData.length > 0;
@@ -121,12 +122,14 @@ export const useHomeData = () => {
 
       // Fetch categories
       const categoriesResponse = await api.get('/recipe-categories/random');
-      const categories = categoriesResponse.data.data.map((cat: any, index: number) => ({
-        id: cat.id,
-        name: cat.name,
-        icon: cat.imageUrl,
-        isActive: index === 0
-      }));
+      const categories = categoriesResponse.data.data.map(
+        (cat: any, index: number) => ({
+          id: cat.id,
+          name: cat.name,
+          icon: cat.imageUrl,
+          isActive: index === 0,
+        })
+      );
 
       // Fetch popular recipes
       const recipesResponse = await api.get('/recipes/popular');
@@ -139,11 +142,13 @@ export const useHomeData = () => {
         author: recipe.account?.userProfile?.fullName || 'Không xác định',
         authorAvatar: recipe.account?.userProfile?.avatarUrl || '',
         time: `${recipe.preparationTimeMinutes} phút`,
-        isFavorite: false
+        isFavorite: false,
       }));
 
       // Fetch featured recipes by category
-      const featuredResponse = await api.get(`/recipes/category/${activeCategoryId}/top`);
+      const featuredResponse = await api.get(
+        `/recipes/category/${activeCategoryId}/top`
+      );
       const featuredByCategory = {
         [activeCategoryId]: featuredResponse.data.data.map((recipe: any) => ({
           id: recipe.id,
@@ -152,8 +157,8 @@ export const useHomeData = () => {
           time: `${recipe.preparationTimeMinutes} phút`,
           avataUrl: recipe.account?.userProfile?.avatarUrl || '',
           author: recipe.account?.userProfile?.fullName || 'Không xác định',
-          isFavorite: false
-        }))
+          isFavorite: false,
+        })),
       };
 
       // Fetch banner
@@ -161,7 +166,7 @@ export const useHomeData = () => {
       const banner = {
         id: bannerResponse.data.data?.id || '',
         image: bannerResponse.data.data?.imageUrl || '',
-        description: bannerResponse.data.data?.description || ''
+        description: bannerResponse.data.data?.description || '',
       };
 
       // Fetch user profile only if authenticated
@@ -173,7 +178,7 @@ export const useHomeData = () => {
           if (userData) {
             user = {
               name: userData.name || '',
-              avatar: userData.avatarUrl || ''
+              avatar: userData.avatarUrl || '',
             };
           }
         } catch (error) {
@@ -182,7 +187,9 @@ export const useHomeData = () => {
       }
 
       // Fetch feed recipes (new)
-      const feedResponse = await api.get('/recipes/recipeFeed?sortBy=recommended&limit=10');
+      const feedResponse = await api.get(
+        '/recipes/recipeFeed?sortBy=recommended&limit=10'
+      );
       const recipeFeed = feedResponse.data.data || [];
 
       setHomeData({
@@ -192,7 +199,7 @@ export const useHomeData = () => {
         recipeFeed,
         user,
         banner,
-        recipeFeedHasMore: false
+        recipeFeedHasMore: false,
       });
     } catch (err) {
       console.error('Error fetching home data:', err);
@@ -202,21 +209,22 @@ export const useHomeData = () => {
     }
   };
 
-
   // Handle category change
   const handleCategoryPress = async (categoryId: string) => {
     setActiveCategoryId(categoryId);
-    setHomeData(prev => ({
+    setHomeData((prev) => ({
       ...prev,
-      categories: prev.categories.map(category => ({
+      categories: prev.categories.map((category) => ({
         ...category,
-        isActive: category.id === categoryId
-      }))
+        isActive: category.id === categoryId,
+      })),
     }));
 
     // Fetch new featured recipes for the selected category
     try {
-      const featuredResponse = await api.get(`/recipes/category/${categoryId}/top`);
+      const featuredResponse = await api.get(
+        `/recipes/category/${categoryId}/top`
+      );
       const newFeatured = featuredResponse.data.data.map((recipe: any) => ({
         id: recipe.id,
         name: recipe.name,
@@ -224,15 +232,15 @@ export const useHomeData = () => {
         time: `${recipe.preparationTimeMinutes} phút`,
         avataUrl: recipe.account?.userProfile?.avatarUrl || '',
         author: recipe.account?.userProfile?.fullName || 'Không xác định',
-        isFavorite: false
+        isFavorite: false,
       }));
 
-      setHomeData(prev => ({
+      setHomeData((prev) => ({
         ...prev,
         featuredByCategory: {
           ...prev.featuredByCategory,
-          [categoryId]: newFeatured
-        }
+          [categoryId]: newFeatured,
+        },
       }));
     } catch (error) {
       console.error('Error fetching featured recipes:', error);
@@ -252,6 +260,6 @@ export const useHomeData = () => {
     handleCategoryPress,
     refreshData: fetchHomeData,
     fetchRecipeFeed,
-    isAuthenticated
+    isAuthenticated,
   };
 };

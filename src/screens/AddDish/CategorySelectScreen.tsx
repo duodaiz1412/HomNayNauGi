@@ -1,16 +1,28 @@
-import { useState, useEffect,useCallback} from "react"
-import { View, Text, TextInput, FlatList, TouchableOpacity, StatusBar, ActivityIndicator, Alert, Image } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { useFoodManagement } from "src/context/FoodManagementContext"
+import { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  StatusBar,
+  ActivityIndicator,
+  Alert,
+  Image,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFoodManagement } from 'src/context/FoodManagementContext';
 import debounce from 'lodash.debounce';
-import api from "src/api/api"
+import api from 'src/api/api';
 
 export const CategorySelectScreen = () => {
-  const navigation = useNavigation()
-  const { recipeForm, updateCategories } = useFoodManagement()
-  const [selectedCategories, setSelectedCategories] = useState(recipeForm.categories)
+  const navigation = useNavigation();
+  const { recipeForm, updateCategories } = useFoodManagement();
+  const [selectedCategories, setSelectedCategories] = useState(
+    recipeForm.categories
+  );
   ///
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +38,7 @@ export const CategorySelectScreen = () => {
         params: { query, offset, limit },
       });
       const { data, total } = response.data;
-      console.log("Danh sach danh muc mon an", data);
+      console.log('Danh sach danh muc mon an', data);
       return { data, total };
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -63,28 +75,28 @@ export const CategorySelectScreen = () => {
     loadCategories(true);
   }, [searchQuery]);
 
-
-
   // Toggle category selection
   const toggleCategorySelection = (category) => {
     if (selectedCategories.some((cat) => cat.id === category.id)) {
-      setSelectedCategories(selectedCategories.filter((cat) => cat.id !== category.id))
+      setSelectedCategories(
+        selectedCategories.filter((cat) => cat.id !== category.id)
+      );
     } else {
-      setSelectedCategories([...selectedCategories, category])
+      setSelectedCategories([...selectedCategories, category]);
     }
-  }
-
+  };
 
   // Confirm selection and go back
   const confirmSelection = () => {
-    updateCategories(selectedCategories)
-    navigation.goBack()
-  }
+    updateCategories(selectedCategories);
+    navigation.goBack();
+  };
 
   // Filter out already selected categories from the list
   const filteredCategories = categories.filter(
-    (category) => !selectedCategories.some((selected) => selected.id === category.id),
-  )
+    (category) =>
+      !selectedCategories.some((selected) => selected.id === category.id)
+  );
 
   // Render category item
   const renderCategoryItem = ({ item }) => (
@@ -95,7 +107,11 @@ export const CategorySelectScreen = () => {
       <View className="flex-row items-center flex-1">
         <View className="w-12 h-12 rounded-full overflow-hidden mr-3 border border-gray-200">
           {item.imageUrl ? (
-            <Image source={{ uri: item.imageUrl }} className="w-full h-full" resizeMode="cover" />
+            <Image
+              source={{ uri: item.imageUrl }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
           ) : (
             <View className="w-full h-full bg-gray-200 items-center justify-center">
               <Ionicons name="restaurant-outline" size={20} color="#9CA3AF" />
@@ -108,7 +124,7 @@ export const CategorySelectScreen = () => {
       </View>
       <Ionicons name="add-circle-outline" size={24} color="#941D23" />
     </TouchableOpacity>
-  )
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -154,7 +170,9 @@ export const CategorySelectScreen = () => {
       {/* Selected Categories */}
       {selectedCategories.length > 0 && (
         <View className="px-4 py-3 border-b border-gray-200">
-          <Text className="font-medium mb-3">Đã chọn ({selectedCategories.length})</Text>
+          <Text className="font-medium mb-3">
+            Đã chọn ({selectedCategories.length})
+          </Text>
           <FlatList
             data={selectedCategories}
             keyExtractor={(item) => item.id.toString()}
@@ -168,10 +186,18 @@ export const CategorySelectScreen = () => {
                 <View className="relative">
                   <View className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#941D23]">
                     {item.imageUrl ? (
-                      <Image source={{ uri: item.imageUrl }} className="w-full h-full" resizeMode="cover" />
+                      <Image
+                        source={{ uri: item.imageUrl }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
                     ) : (
                       <View className="w-full h-full bg-gray-200 items-center justify-center">
-                        <Ionicons name="restaurant-outline" size={24} color="#9CA3AF" />
+                        <Ionicons
+                          name="restaurant-outline"
+                          size={24}
+                          color="#9CA3AF"
+                        />
                       </View>
                     )}
                   </View>
@@ -179,7 +205,12 @@ export const CategorySelectScreen = () => {
                     <Ionicons name="close" size={14} color="#FFFFFF" />
                   </View>
                 </View>
-                <Text className="text-xs mt-1 text-center max-w-16" numberOfLines={2}>{item.name}</Text>
+                <Text
+                  className="text-xs mt-1 text-center max-w-16"
+                  numberOfLines={2}
+                >
+                  {item.name}
+                </Text>
               </TouchableOpacity>
             )}
           />
@@ -194,11 +225,19 @@ export const CategorySelectScreen = () => {
         contentContainerStyle={{ padding: 16 }}
         onEndReached={() => loadCategories(false)}
         onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <ActivityIndicator size="small" color="#941D23" className="py-4" /> : null}
+        ListFooterComponent={
+          loading ? (
+            <ActivityIndicator size="small" color="#941D23" className="py-4" />
+          ) : null
+        }
         ListEmptyComponent={
-          !loading ? <Text className="text-center p-4 text-gray-500">Không tìm thấy danh mục</Text> : null
+          !loading ? (
+            <Text className="text-center p-4 text-gray-500">
+              Không tìm thấy danh mục
+            </Text>
+          ) : null
         }
       />
     </SafeAreaView>
-  )
-}
+  );
+};

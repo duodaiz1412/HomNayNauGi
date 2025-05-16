@@ -161,43 +161,43 @@ const HomeScreen = () => {
           </View>
 
           {/* Banner */}
-          <TouchableOpacity
-            className="mx-4 mb-4 rounded-2xl p-4 flex-row items-center"
-            style={{ backgroundColor: '#941D23' }}
-            activeOpacity={0.9}
-          >
-            <View className="flex-1 pr-3">
-              <Text
-                numberOfLines={3}
-                ellipsizeMode="tail" // hoặc "middle" | "head" | "clip"
-                className="text-white text-base font-medium leading-[22px]"
-              >
-                {homeData.banner.description}
-              </Text>
-
-              <TouchableOpacity
-                className="mt-3 border border-white rounded-full px-3 py-1.5 flex-row items-center self-start"
-                onPress={() => {
-                  navigation.navigate('RecipeDetail', {
-                    recipeId: homeData.banner.id,
-                  });
-                }}
-              >
-                <Text className="text-white font-medium mr-1">
-                  Tìm hiểu ngay
+                    {homeData.banner && (
+            <TouchableOpacity
+              className="mx-4 mb-4 rounded-2xl p-4 flex-row items-center"
+              style={{ backgroundColor: '#941D23' }}
+              activeOpacity={0.9}
+            >
+              <View className="flex-1 pr-3">
+                <Text
+                  numberOfLines={3}
+                  ellipsizeMode="tail" // hoặc "middle" | "head" | "clip"
+                  className="text-white text-base font-medium leading-[22px]"
+                >
+                  {homeData.banner.description}
                 </Text>
-                <Ionicons name="arrow-forward" size={16} color="white" />
-              </TouchableOpacity>
-            </View>
 
-            <Image
-              source={{ 
-                uri: homeData.banner?.image || 'https://via.placeholder.com/200'
-              }}
-              className="w-44 h-44 rounded-full"
-              resizeMode="cover"
-            />
-          </TouchableOpacity>
+                <TouchableOpacity
+                  className="mt-3 border border-white rounded-full px-3 py-1.5 flex-row items-center self-start"
+                  onPress={() => {
+                    navigation.navigate('RecipeDetail', {
+                      recipeId: homeData.banner.id,
+                    });
+                  }}
+                >
+                  <Text className="text-white font-medium mr-1">
+                    Tìm hiểu ngay
+                  </Text>
+                  <Ionicons name="arrow-forward" size={16} color="white" />
+                </TouchableOpacity>
+              </View>
+
+              <Image
+                source={{ uri: homeData.banner.image }}
+                className="w-44 h-44 rounded-full"
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          )}
 
           {/* Section Title */}
           <Text className="text-xl font-bold px-4 mb-4 text-[#4B4B4B]">
@@ -230,38 +230,43 @@ const HomeScreen = () => {
 
                   <View className="absolute w-full h-full bg-black/30" />
 
-                <View className="absolute bottom-0 left-0 right-0 p-3">
-                  <Text className="text-white font-bold text-base mb-2">
-                    {recipe.description.length > 25
-                      ? recipe.description.substring(0, 25) + '...'
-                      : recipe.description}
-                  </Text>
+                  <View className="absolute bottom-0 left-0 right-0 p-3">
+                    <Text className="text-white font-bold text-base mb-2">
+                      {recipe.description.length > 25
+                        ? recipe.description.substring(0, 25) + '...'
+                        : recipe.description}
+                    </Text>
 
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-row items-center">
-                      {recipe.author ? (
-                        <Image
-                          source={{ uri: recipe.authorAvatar }}
-                          className="w-5 h-5 rounded-full mr-1"
-                        />
-                      ) : (
-                        <View className="w-5 h-5 rounded-full bg-gray-300 mr-1" />
-                      )}
-                      <Text className="text-white text-xs">
-                        {recipe.author}
-                      </Text>
-                    </View>
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-row items-center">
+                        {recipe.author ? (
+                          <Image
+                            source={{ uri: recipe.authorAvatar }}
+                            className="w-5 h-5 rounded-full mr-1"
+                          />
+                        ) : (
+                          <View className="w-5 h-5 rounded-full bg-gray-300 mr-1" />
+                        )}
+                        <Text className="text-white text-xs">
+                          {recipe.author}
+                        </Text>
+                      </View>
 
-                    <View className="flex-row items-center">
-                      <Ionicons name="time-outline" size={14} color="white" />
-                      <Text className="text-white text-xs ml-1">
-                        {recipe.time}
-                      </Text>
+                      <View className="flex-row items-center">
+                        <Ionicons name="time-outline" size={14} color="white" />
+                        <Text className="text-white text-xs ml-1">
+                          {recipe.time}
+                        </Text>
+                      </View>
                     </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View className="justify-center items-center py-2">
+                <Text className="text-gray-500">Không có danh mục nào</Text>
+              </View>
+            )}
           </ScrollView>
 
           {/* Popular Dishes Section */}
@@ -445,3 +450,4 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
