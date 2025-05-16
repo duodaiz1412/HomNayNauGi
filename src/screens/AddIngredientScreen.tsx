@@ -42,7 +42,7 @@ const AddIngredientScreen = ({ navigation }) => {
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaType.Images, // dùng enum đúng
+        mediaTypes: "images", // dùng enum đúng
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
@@ -68,11 +68,14 @@ const AddIngredientScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.innerContainer}>
           {/* Image Upload Section */}
-          <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+          <TouchableOpacity onPress={pickImage} className="items-center mb-8">
             {image ? (
-              <View style={styles.imageWrapper}>
-                <Image source={{ uri: image }} style={styles.image} />
-                <View style={styles.cameraIconWrapper}>
+              <View className="relative">
+                <Image
+                  source={{ uri: image }}
+                  className="w-48 h-48 rounded-2xl"
+                />
+                <View className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md">
                   <Ionicons name="camera" size={20} color="#4B5563" />
                 </View>
               </View>
@@ -87,8 +90,10 @@ const AddIngredientScreen = ({ navigation }) => {
           {/* Form Fields */}
           <View style={styles.form}>
             {/* Name Input */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Tên nguyên liệu</Text>
+            <View>
+              <Text className="text-gray-700 font-medium mb-2">
+                Tên nguyên liệu
+              </Text>
               <TextInput
                 style={styles.input}
                 value={name}
@@ -99,16 +104,22 @@ const AddIngredientScreen = ({ navigation }) => {
             </View>
 
             {/* Type Picker */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Loại thực phẩm</Text>
-              <View style={styles.pickerWrapper}>
+            <View>
+              <Text className="text-gray-700 font-medium mb-2">
+                Loại thực phẩm
+              </Text>
+              <View className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
                 <Picker
                   selectedValue={type}
                   onValueChange={(itemValue) => setType(itemValue)}
                   style={styles.picker}
                 >
                   {foodTypes.map((foodType) => (
-                    <Picker.Item key={foodType} label={foodType} value={foodType} />
+                    <Picker.Item
+                      key={foodType}
+                      label={foodType}
+                      value={foodType}
+                    />
                   ))}
                 </Picker>
               </View>

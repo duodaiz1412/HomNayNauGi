@@ -11,8 +11,7 @@ export const mockData = {
     {
       id: '1',
       name: 'Phở Hà Nội',
-      description:
-        'Công thức nấu phở bò',
+      description: 'Công thức nấu phở bò',
       time: '60 Phút',
       image:
         'https://cdn.pixabay.com/photo/2023/05/27/12/39/noodle-soup-8021418_1280.png',

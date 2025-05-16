@@ -7,6 +7,7 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import Octicons from 'react-native-vector-icons/Octicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RecipeDetailTypes } from 'src/types';
 import { formatNumber } from '../../ultils/formatNumber';
 import LikeSolid from 'src/components/icons/LikeSolid';
@@ -90,7 +91,8 @@ export default function RecipeDetail({
             <View className="flex-row items-center">
               <Image
                 source={{
-                  uri: recipe.account?.userProfile?.avatarUrl ||
+                  uri:
+                    recipe.account?.userProfile?.avatarUrl ||
                     'https://ui-avatars.com/api/?name=' +
                       encodeURIComponent(
                         recipe.account?.userProfile?.displayName ||
@@ -174,12 +176,7 @@ export default function RecipeDetail({
           <View className="flex-row justify-around mt-6">
             <View className="flex-row items-center">
               <View className="bg-[#F4EFEB] p-2 rounded-xl mr-2">
-                <Feather
-                  name="droplet"
-                  size={26}
-                  color="gray"
-                  className="text-[#4B4B4B]"
-                />
+                <MaterialCommunityIcons name="grain" size={26} color="#222" />
               </View>
               <View>
                 <Text className="text-lg text-[#4B4B4B] font-bold">
@@ -193,11 +190,10 @@ export default function RecipeDetail({
 
             <View className="flex-row items-center">
               <View className="bg-[#F4EFEB] p-2 rounded-xl mr-2">
-                <Feather
-                  name="droplet"
+                <MaterialCommunityIcons
+                  name="food-steak"
                   size={26}
-                  color="gray"
-                  className="text-[#4B4B4B]"
+                  color="#222"
                 />
               </View>
               <View>
@@ -214,12 +210,7 @@ export default function RecipeDetail({
           <View className="flex-row justify-around mt-6">
             <View className="flex-row items-center">
               <View className="bg-[#F4EFEB] p-2 rounded-xl mr-2">
-                <Octicons
-                  name="flame"
-                  size={26}
-                  color="gray"
-                  className="text-[#4B4B4B]"
-                />
+                <MaterialCommunityIcons name="fire" size={26} color="#222" />
               </View>
               <View>
                 <Text className="text-lg text-[#4B4B4B] font-bold">Kcal</Text>
@@ -231,12 +222,7 @@ export default function RecipeDetail({
 
             <View className="flex-row items-center">
               <View className="bg-[#F4EFEB] p-2 rounded-xl mr-2">
-                <Feather
-                  name="droplet"
-                  size={26}
-                  color="gray"
-                  className="text-[#4B4B4B]"
-                />
+                <MaterialCommunityIcons name="water" size={26} color="#222" />
               </View>
               <View>
                 <Text className="text-lg text-[#4B4B4B] font-bold">

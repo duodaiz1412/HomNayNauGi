@@ -4,7 +4,7 @@ import { RecipeResponse } from 'src/types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface SuggestDishProps {
-  dishes: RecipeResponse[];
+  dishes?: RecipeResponse[];
   search?: boolean;
   onDishPress: (id: string) => void;
 }
@@ -14,7 +14,7 @@ export default function SuggestDish({
   dishes,
   onDishPress,
 }: SuggestDishProps) {
-  if (dishes.length === 0) {
+  if (dishes && dishes.length === 0) {
     return (
       <View className="flex-1 items-center justify-center">
         <Text className="text-lg text-gray-500 mb-2">
@@ -28,8 +28,10 @@ export default function SuggestDish({
   }
 
   const renderDishItem = ({ item }: { item: RecipeResponse }) => {
-    const matchedIngredients = item.ingredients.filter(ing => ing.isMatched);
-    const matchPercentage = Math.round((matchedIngredients.length / item.ingredients.length) * 100);
+    const matchedIngredients = item.ingredients.filter((ing) => ing.isMatched);
+    const matchPercentage = Math.round(
+      (matchedIngredients.length / item.ingredients.length) * 100
+    );
 
     return (
       <TouchableOpacity
@@ -53,7 +55,8 @@ export default function SuggestDish({
             <View className="flex-row items-center bg-green-50 px-3 py-1 rounded-full">
               <Ionicons name="checkmark-circle" size={16} color="#22C55E" />
               <Text className="text-green-600 text-xs ml-1 font-medium">
-                {matchedIngredients.length}/{item.ingredients.length} nguyên liệu ({matchPercentage}%)
+                {matchedIngredients.length}/{item.ingredients.length} nguyên
+                liệu ({matchPercentage}%)
               </Text>
             </View>
           </View>
@@ -62,8 +65,8 @@ export default function SuggestDish({
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Image
-                source={{ 
-                  uri: 'https://via.placeholder.com/150'
+                source={{
+                  uri: 'https://via.placeholder.com/150',
                 }}
                 className="w-6 h-6 rounded-full mr-2"
               />

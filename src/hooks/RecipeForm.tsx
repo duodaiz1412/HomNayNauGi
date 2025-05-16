@@ -19,6 +19,8 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
     updateSteps,
     resetForm,
     saveRecipe,
+    createRecipeForUser,
+    updateRecipeForUser,
     recipeForm,
     setCurrentRecipe,
   } = useFoodManagement();
@@ -213,8 +215,8 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
           setIsLoading(false);
           return null;
         }
-        if (!steps || steps.length === 0) {
-          setError('Vui lòng thêm ít nhất một bước nấu ăn khi công khai.');
+        if (!steps || steps.length < 3) {
+          setError('Vui lòng thêm ít nhất 3 bước nấu ăn khi công khai.');
           setIsLoading(false);
           return null;
         }
@@ -246,12 +248,206 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
         // Hiện tại, tôi sẽ không thêm kiểm tra bắt buộc ảnh cho từng step,
         // bạn có thể thêm nếu cần.
       }
+
+      const savedRecipeData = await saveRecipe(); // Gọi hàm saveRecipe từ context
       setIsLoading(true);
       setError(null);
-      const savedRecipeData = await saveRecipe(); // Gọi hàm saveRecipe từ context
       return savedRecipeData; // Trả về công thức đã lưu (hoặc null nếu saveRecipe thất bại)
     } catch (err: any) {
       setError(err.message || 'Không thể lưu món ăn. Đã có lỗi xảy ra.');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Hàm tương tự handleSave nhưng gọi createRecipeForUser thay vì saveRecipe
+  const handleSaveForUser = async (): Promise<Recipe | null> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { basicInfo, categories, ingredients, steps } = recipeForm;
+
+      // Thực hiện validation tương tự như handleSave
+      // (copy phần validation từ handleSave nếu cần thiết)
+
+      if (!basicInfo.name || basicInfo.name.trim() === '') {
+        setError('Tên món ăn là bắt buộc.');
+        setIsLoading(false);
+        return null;
+      }
+
+      if (!categories || categories.length === 0) {
+        setError('Vui lòng chọn ít nhất một danh mục.');
+        setIsLoading(false);
+        return null;
+      }
+
+      // Chuẩn bị payload
+      let recipeImageFileForUpload: any = null;
+      if (basicInfo.imageUrl && basicInfo.imageUrl.startsWith('file://')) {
+        recipeImageFileForUpload = {
+          uri: basicInfo.imageUrl,
+          name: `recipeImage_${Date.now()}.${basicInfo.imageUrl.split('.').pop() || 'jpg'}`,
+          type: `image/${basicInfo.imageUrl.split('.').pop() || 'jpeg'}`,
+        };
+      }
+
+      const stepImageFilesForUpload: any[] = [];
+      steps.forEach((step) => {
+        if (step.imageUrl && step.imageUrl.startsWith('file://')) {
+          stepImageFilesForUpload.push({
+            uri: step.imageUrl,
+            name: `step_${step.id || Date.now()}_${step.stepOrder}.${step.imageUrl.split('.').pop() || 'jpg'}`,
+            type: `image/${step.imageUrl.split('.').pop() || 'jpeg'}`,
+          });
+        }
+      });
+
+      const payload = {
+        name: basicInfo.name || '',
+        description: basicInfo.description,
+        protein: basicInfo.protein,
+        fat: basicInfo.fat,
+        calories: basicInfo.calories,
+        carbohydrates: basicInfo.carbohydrates,
+        preparationTimeMinutes: basicInfo.preparationTimeMinutes,
+        videoUrl: basicInfo.videoUrl,
+        hasNewRecipeImageFile: !!recipeImageFileForUpload,
+        status: RecipeStatus.PENDING_APPROVAL,
+        categoryIds: categories.map((cat) => cat.id),
+        ingredients: ingredients.map((ing) => ({
+          ingredientId: ing.ingredientId,
+          quantity: ing.quantity,
+          unitId: ing.unitId,
+        })),
+        steps: steps.map((step) => ({
+          stepOrder: step.stepOrder,
+          instruction: step.instruction,
+          imageUrl:
+            step.imageUrl && !step.imageUrl.startsWith('file://')
+              ? step.imageUrl
+              : null,
+          hasNewImageFile: !!(
+            step.imageUrl && step.imageUrl.startsWith('file://')
+          ),
+        })),
+        recipeImageFile: recipeImageFileForUpload,
+        stepImageFiles: stepImageFilesForUpload,
+      };
+
+      // Gọi hàm createRecipeForUser từ context
+      const savedRecipeData = await createRecipeForUser(payload);
+
+      // Sau khi lưu thành công, reset form
+      if (savedRecipeData) {
+        resetForm();
+      }
+
+      return savedRecipeData;
+    } catch (err: any) {
+      setError(err.message || 'Không thể lưu món ăn. Đã có lỗi xảy ra.');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Hàm tương tự handleSaveForUser nhưng gọi updateRecipeForUser thay vì createRecipeForUser
+  const handleUpdateForUser = async (): Promise<Recipe | null> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { basicInfo, categories, ingredients, steps } = recipeForm;
+
+      // Kiểm tra ID
+      if (!recipeId) {
+        setError('Không có ID công thức để cập nhật');
+        setIsLoading(false);
+        return null;
+      }
+
+      // Thực hiện validation tương tự như handleSave
+      if (!basicInfo.name || basicInfo.name.trim() === '') {
+        setError('Tên món ăn là bắt buộc.');
+        setIsLoading(false);
+        return null;
+      }
+
+      if (!categories || categories.length === 0) {
+        setError('Vui lòng chọn ít nhất một danh mục.');
+        setIsLoading(false);
+        return null;
+      }
+
+      // Chuẩn bị payload
+      let recipeImageFileForUpload: any = null;
+      if (basicInfo.imageUrl && basicInfo.imageUrl.startsWith('file://')) {
+        recipeImageFileForUpload = {
+          uri: basicInfo.imageUrl,
+          name: `recipeImage_${Date.now()}.${basicInfo.imageUrl.split('.').pop() || 'jpg'}`,
+          type: `image/${basicInfo.imageUrl.split('.').pop() || 'jpeg'}`,
+        };
+      }
+
+      const stepImageFilesForUpload: any[] = [];
+      steps.forEach((step) => {
+        if (step.imageUrl && step.imageUrl.startsWith('file://')) {
+          stepImageFilesForUpload.push({
+            uri: step.imageUrl,
+            name: `step_${step.id || Date.now()}_${step.stepOrder}.${step.imageUrl.split('.').pop() || 'jpg'}`,
+            type: `image/${step.imageUrl.split('.').pop() || 'jpeg'}`,
+          });
+        }
+      });
+
+      const payload = {
+        id: recipeId, // Quan trọng: cung cấp ID công thức để cập nhật
+        name: basicInfo.name || '',
+        description: basicInfo.description,
+        protein: basicInfo.protein,
+        fat: basicInfo.fat,
+        calories: basicInfo.calories,
+        carbohydrates: basicInfo.carbohydrates,
+        preparationTimeMinutes: basicInfo.preparationTimeMinutes,
+        videoUrl: basicInfo.videoUrl,
+        hasNewRecipeImageFile: !!recipeImageFileForUpload,
+        status: basicInfo.status || RecipeStatus.DRAFT,
+        categoryIds: categories.map((cat) => cat.id),
+        ingredients: ingredients.map((ing) => ({
+          ingredientId: ing.ingredientId,
+          quantity: ing.quantity,
+          unitId: ing.unitId,
+        })),
+        steps: steps.map((step) => ({
+          stepOrder: step.stepOrder,
+          instruction: step.instruction,
+          imageUrl:
+            step.imageUrl && !step.imageUrl.startsWith('file://')
+              ? step.imageUrl
+              : null,
+          hasNewImageFile: !!(
+            step.imageUrl && step.imageUrl.startsWith('file://')
+          ),
+        })),
+        recipeImageFile: recipeImageFileForUpload,
+        stepImageFiles: stepImageFilesForUpload,
+      };
+
+      // Gọi hàm updateRecipeForUser từ context
+      const updatedRecipeData = await updateRecipeForUser(payload);
+
+      // Sau khi cập nhật thành công, reset form
+      if (updatedRecipeData) {
+        resetForm();
+        setCurrentRecipe(null);
+      }
+
+      return updatedRecipeData;
+    } catch (err: any) {
+      setError(err.message || 'Không thể cập nhật món ăn. Đã có lỗi xảy ra.');
       return null;
     } finally {
       setIsLoading(false);
@@ -291,6 +487,9 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
     // Save actions
     handleSave,
     handlePublic,
+    handleSaveForUser,
+    handleUpdateForUser, // Thêm hàm xử lý cập nhật cho người dùng
+    createRecipeForUser,
 
     // Reference data
     availableCategories: recipeCategories,

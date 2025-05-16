@@ -6,10 +6,11 @@ import LoginScreen from '../screens/Login/LoginScreen';
 import { RegisterScreen } from '../screens/Login/RegisterScreen';
 import AboutScreen from '../screens/About/AboutScreen';
 import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
-import {CookingGuide} from '../screens/Recipe/CookingGuide';
+import { CookingGuide } from '../screens/Recipe/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import AddIngredientScreen from '@screens/Recipe/AddIngredient';
-import AddDishScreen from '../screens/AddDish';
+import AddDishScreen from '../screens/AddDish/AddDishScreen';
+import EditDishScreen from '../screens/AddDish/EditDishScreen';
 import SearchByIngredientScreen from '../screens/Search/SearchByIngredientScreen';
 import IngredientsScreen from '../screens/Search/IngredientsScreen';
 import SearchByRecipeScreen from '../screens/Search/SearchByRecipeScreen';
@@ -26,6 +27,11 @@ import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
 import { AdminDrawerNavigator } from './AdminDrawerNavigator';
 import ScanIngredientScreen from '../screens/ScanIngredient/ScanIngredientScreen';
+
+import { CategorySelectScreen } from '@screens/AddDish/CategorySelectScreen';
+import { IngredientSelectScreen } from '@screens/AddDish/IngredientSelectScreen';
+import { IngredientCategorySelectScreen } from '@screens/AddDish/IngredientCategorySelect';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Ingredient {
   id: string;
@@ -44,6 +50,7 @@ export type RootStackParamList = {
   EditProfileScreen: undefined;
   AddIngredient: { isMultiSelect: boolean };
   AddDish: undefined;
+  EditDishScreen: { recipeId: string };
   SearchByIngredientScreen: {
     ingredients?: {
       id: string;
@@ -64,6 +71,9 @@ export type RootStackParamList = {
   SupportScreen: undefined;
   AboutUsScreen: undefined;
   AddDishScreen: undefined;
+  CategorySelectScreen: undefined;
+  IngredientSelectScreen: undefined;
+  IngredientCategorySelectScreen: undefined;
   AdminDrawerNavigator: undefined;
   PersonalScreen: undefined;
   ScanIngredient: { imageUri: string };
@@ -72,6 +82,30 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
+  // useEffect(() => {
+  //   checkFirstLaunch();
+  // }, []);
+
+  // const checkFirstLaunch = async () => {
+  //   try {
+  //     // Kiểm tra xem app đã được khởi chạy trước đó chưa
+  //     const hasLaunched = await AsyncStorage.getItem('hasLaunched');
+
+  //     if (hasLaunched === null) {
+  //       // Lần đầu khởi chạy app, xóa tất cả dữ liệu
+  //       console.log('First launch - clearing AsyncStorage');
+  //       await AsyncStorage.clear();
+
+  //       // Đánh dấu app đã được khởi chạy
+  //       await AsyncStorage.setItem('hasLaunched', 'true');
+  //     } else {
+  //       console.log('App has been launched before');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error checking first launch:', error);
+  //   }
+  // };
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -106,6 +140,19 @@ const AppNavigator = () => {
           component={PrivacyPolicyScreen}
         />
         <Stack.Screen name="AddDishScreen" component={AddDishScreen} />
+        <Stack.Screen name="EditDishScreen" component={EditDishScreen} />
+        <Stack.Screen
+          name="CategorySelectScreen"
+          component={CategorySelectScreen}
+        />
+        <Stack.Screen
+          name="IngredientSelectScreen"
+          component={IngredientSelectScreen}
+        />
+        <Stack.Screen
+          name="IngredientCategorySelectScreen"
+          component={IngredientCategorySelectScreen}
+        />
         <Stack.Screen
           name="SearchByIngredientScreen"
           component={SearchByIngredientScreen}

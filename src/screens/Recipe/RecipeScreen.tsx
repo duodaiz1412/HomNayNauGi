@@ -537,7 +537,7 @@ export default function RecipeScreen() {
 
   const handleDishPress = (id: string) => {
     navigation.navigate('RecipeDetail', {
-      recipeId: (id.replace('d', '')),
+      recipeId: id.replace('d', ''),
     });
   };
 

@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,53 +9,59 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-} from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { useNavigation, useRoute,RouteProp } from "@react-navigation/native"
-import * as ImagePicker from "expo-image-picker"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { AdminHeader } from "@components/AdminHeader/AdminHeader"
-import { AdminIngredientCategoryStackParamList } from "@navigation/AdminIngredientCategoryStack"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import api from "src/api/api"
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AdminHeader } from '@components/AdminHeader/AdminHeader';
+import { AdminIngredientCategoryStackParamList } from '@navigation/AdminIngredientCategoryStack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import api from 'src/api/api';
 
-type EditIngredientCategoryScreenRouteProp = RouteProp<AdminIngredientCategoryStackParamList,'EditIngredientCategoryScreen'>
-
+type EditIngredientCategoryScreenRouteProp = RouteProp<
+  AdminIngredientCategoryStackParamList,
+  'EditIngredientCategoryScreen'
+>;
 
 export const EditIngredientCategoryScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<AdminIngredientCategoryStackParamList>>()
-  const route = useRoute<EditIngredientCategoryScreenRouteProp>()
-  const { ingredientCategoryId } = route.params
+  const navigation =
+    useNavigation<
+      NativeStackNavigationProp<AdminIngredientCategoryStackParamList>
+    >();
+  const route = useRoute<EditIngredientCategoryScreenRouteProp>();
+  const { ingredientCategoryId } = route.params;
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [isFetching, setIsFetching] = useState(true)
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
-  const [categoryName, setCategoryName] = useState("")
-  const [categoryImg, setCategoryImg] = useState(null)
+  const [categoryName, setCategoryName] = useState('');
+  const [categoryImg, setCategoryImg] = useState(null);
 
   // Fetch category data
   useEffect(() => {
-    const fetchCategory = async () =>{
+    const fetchCategory = async () => {
       try {
         setIsFetching(true);
-        const reponse = await api.get(`/admin/ingredient-categories/search/${ingredientCategoryId}`)
+        const reponse = await api.get(
+          `/admin/ingredient-categories/search/${ingredientCategoryId}`
+        );
         const categoryData = reponse.data.data;
-        console.log (categoryData)
+        console.log(categoryData);
         if (!categoryData) {
           throw new Error('Không tìm thấy danh mục');
         }
         setCategoryName(categoryData.name);
         setCategoryImg(categoryData.imageUrl);
-      }catch (e){
+      } catch (e) {
         console.error('Error fetching category:', e);
         Alert.alert('Lỗi', 'Không thể tải thông tin danh mục');
-      }
-      finally {
+      } finally {
         setIsFetching(false);
       }
-    }
+    };
     fetchCategory();
-  }, [ingredientCategoryId])
+  }, [ingredientCategoryId]);
 
   // Pick image from gallery
   const pickImage = async () => {
@@ -65,12 +70,12 @@ export const EditIngredientCategoryScreen = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    })
+    });
 
     if (!result.canceled) {
-      setCategoryImg(result.assets[0].uri)
+      setCategoryImg(result.assets[0].uri);
     }
-  }
+  };
 
   // Handle form submission
   const handleSubmit = async () => {
@@ -122,7 +127,7 @@ export const EditIngredientCategoryScreen = () => {
       Alert.alert('Thành công', 'Sửa danh mục thành công');
 
       // Navigate back
-      navigation.replace("AdminIngredientCategoryManagementScreen");
+      navigation.replace('AdminIngredientCategoryManagementScreen');
     } catch (error) {
       console.error('Error:', error);
       // Show error message
@@ -137,24 +142,30 @@ export const EditIngredientCategoryScreen = () => {
       <SafeAreaView className="flex-1 bg-gray-50">
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color="#941D23" />
-          <Text className="mt-4 text-gray-600">Đang tải thông tin danh mục...</Text>
+          <Text className="mt-4 text-gray-600">
+            Đang tải thông tin danh mục...
+          </Text>
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-
       {/* Header */}
-    <AdminHeader title="Chỉnh sửa danh mục nguyên liệu" />
+      <AdminHeader title="Chỉnh sửa danh mục nguyên liệu" />
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
         <View className="flex-1 px-4 py-4">
           {/* Form */}
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
             <View className="mb-4">
-              <Text className="text-gray-700 mb-1">Tên danh mục nguyên liệu *</Text>
+              <Text className="text-gray-700 mb-1">
+                Tên danh mục nguyên liệu *
+              </Text>
               <TextInput
                 className="border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="Nhập tên danh mục"
@@ -170,7 +181,11 @@ export const EditIngredientCategoryScreen = () => {
                 onPress={pickImage}
               >
                 {categoryImg ? (
-                  <Image source={{ uri: categoryImg }} className="w-24 h-24 rounded-lg" resizeMode="contain" />
+                  <Image
+                    source={{ uri: categoryImg }}
+                    className="w-24 h-24 rounded-lg"
+                    resizeMode="contain"
+                  />
                 ) : (
                   <View className="items-center">
                     <Ionicons name="image-outline" size={48} color="#454442" />
@@ -186,15 +201,16 @@ export const EditIngredientCategoryScreen = () => {
 
           {/* Submit Button */}
           <TouchableOpacity
-            className={`bg-[#941D23] py-3 rounded-lg items-center ${isLoading ? "opacity-70" : ""}`}
+            className={`bg-[#941D23] py-3 rounded-lg items-center ${isLoading ? 'opacity-70' : ''}`}
             onPress={handleSubmit}
             disabled={isLoading}
           >
-            <Text className="text-white font-bold">{isLoading ? "Đang xử lý..." : "Cập nhật danh mục"}</Text>
+            <Text className="text-white font-bold">
+              {isLoading ? 'Đang xử lý...' : 'Cập nhật danh mục'}
+            </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
-}
-
+  );
+};

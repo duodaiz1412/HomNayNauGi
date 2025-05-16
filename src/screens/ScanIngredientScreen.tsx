@@ -15,7 +15,7 @@ import { searchRecipesByIngredients } from '../api/recipeService';
 import { SuggestDish } from '../components/SuggestDish';
 
 interface ScannedIngredient {
-  id: number;
+  id: string;
   name: string;
   quantity?: number;
   unit?: Unit;
@@ -27,34 +27,34 @@ export const ScanIngredientScreen: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [searchResults, setSearchResults] = useState<RecipeSearchResult[]>([]);
 
-  const handleQuantityChange = (id: number, quantity: string) => {
-    setIngredients(prev =>
-      prev.map(ing =>
-        ing.id === id ? { ...ing, quantity: parseFloat(quantity) || undefined } : ing
+  const handleQuantityChange = (id: string, quantity: string) => {
+    setIngredients((prev) =>
+      prev.map((ing) =>
+        ing.id === id
+          ? { ...ing, quantity: parseFloat(quantity) || undefined }
+          : ing
       )
     );
   };
 
-  const handleUnitChange = (id: number, unit: Unit) => {
-    setIngredients(prev =>
-      prev.map(ing => (ing.id === id ? { ...ing, unit } : ing))
+  const handleUnitChange = (id: string, unit: Unit) => {
+    setIngredients((prev) =>
+      prev.map((ing) => (ing.id === id ? { ...ing, unit } : ing))
     );
   };
 
   const handleSearch = async () => {
     const validIngredients = ingredients.filter(
-      ing => ing.quantity && ing.unit
-    ) as Required<ScannedIngredient>[];
+      (ing) => ing.quantity !== undefined && ing.unit !== undefined
+    );
 
     if (validIngredients.length === 0) {
       // TODO: Show error message
       return;
     }
 
-    const searchIngredients: IngredientDTO[] = validIngredients.map(ing => ({
+    const searchIngredients: IngredientDTO[] = validIngredients.map((ing) => ({
       id: ing.id,
-      quantity: ing.quantity,
-      unit: ing.unit,
     }));
 
     setLoading(true);
@@ -79,16 +79,16 @@ export const ScanIngredientScreen: React.FC = () => {
           keyboardType="numeric"
           placeholder="Số lượng"
           value={item.quantity?.toString()}
-          onChangeText={value => handleQuantityChange(item.id, value)}
+          onChangeText={(value) => handleQuantityChange(item.id, value)}
         />
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={item.unit}
-            onValueChange={value => handleUnitChange(item.id, value as Unit)}
+            onValueChange={(value) => handleUnitChange(item.id, value as Unit)}
             style={styles.unitPicker}
           >
             <Picker.Item label="Chọn đơn vị" value={undefined} />
-            {Object.values(Unit).map(unit => (
+            {Object.values(Unit).map((unit) => (
               <Picker.Item key={unit} label={unit} value={unit} />
             ))}
           </Picker>
@@ -102,7 +102,7 @@ export const ScanIngredientScreen: React.FC = () => {
       <FlatList
         data={ingredients}
         renderItem={renderIngredient}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         style={styles.list}
       />
 
@@ -127,7 +127,7 @@ export const ScanIngredientScreen: React.FC = () => {
         <View style={styles.modalContainer}>
           <SuggestDish
             results={searchResults}
-            onSelectRecipe={recipe => {
+            onSelectRecipe={(recipe) => {
               // TODO: Navigate to recipe detail
               setShowModal(false);
             }}
@@ -202,4 +202,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
-}); 
+});

@@ -1,5 +1,4 @@
-
-import { useState } from "react"
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -9,19 +8,20 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-} from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
-import * as ImagePicker from "expo-image-picker"
-import { AdminHeader } from "@components/AdminHeader/AdminHeader"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { AdminFoodCategoryStackParamList } from "@navigation/AdminFoodCategoryStack"
-import api from "src/api/api"
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { AdminHeader } from '@components/AdminHeader/AdminHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AdminFoodCategoryStackParamList } from '@navigation/AdminFoodCategoryStack';
+import api from 'src/api/api';
 
 export const AddFoodCategoryScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<AdminFoodCategoryStackParamList>>()
-  const [isLoading, setIsLoading] = useState(false)
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AdminFoodCategoryStackParamList>>();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Form states
   const [categoryName, setCategoryName] = useState('');
@@ -89,7 +89,7 @@ export const AddFoodCategoryScreen = () => {
       // Show success message
       Alert.alert('Thành công', 'Đã thêm danh mục mới');
 
-      navigation.replace("AdminFoodCategoryManagementScreen");
+      navigation.replace('AdminFoodCategoryManagementScreen');
     } catch (error) {
       console.error('Error:', error);
       // Show error message
@@ -102,9 +102,12 @@ export const AddFoodCategoryScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
-    <AdminHeader title="Thêm danh mục món ăn"/>
+      <AdminHeader title="Thêm danh mục món ăn" />
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
         <View className="flex-1 px-4 py-4">
           {/* Form */}
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
@@ -156,7 +159,5 @@ export const AddFoodCategoryScreen = () => {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
-}
-
-
+  );
+};
