@@ -9,6 +9,7 @@ import {
   ImageBackground,
   ActivityIndicator,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -36,6 +37,7 @@ const HomeScreen = () => {
     handleCategoryPress,
     isAuthenticated,
     fetchRecipeFeed,
+    refreshData
   } = useHomeData();
 
   // Kiểm tra role admin
@@ -61,7 +63,7 @@ const HomeScreen = () => {
   // Hàm refresh feed
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchRecipeFeed('recommended', 0);
+    await refreshData();
     setIsRefreshing(false);
   };
 
@@ -114,7 +116,15 @@ const HomeScreen = () => {
       resizeMode="cover"
     >
       <SafeAreaView className="flex-1">
-        <ScrollView className="flex-1">
+        <ScrollView
+          className="flex-1"
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+            />
+          }
+        >
           {/* Header */}
           <View className="flex-row items-center justify-between mb-2 px-5 py-4">
             {isAuthenticated ? (
@@ -156,7 +166,7 @@ const HomeScreen = () => {
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity onPress={() => navigation2.navigate('Favorite')}>
+            <TouchableOpacity onPress={() => navigation.navigate('AddDishScreen')}>
               <Ionicons name="search-outline" size={28} color="#4B4B4B" />
             </TouchableOpacity>
           </View>
@@ -375,44 +385,32 @@ const HomeScreen = () => {
                 scrollEnabled={false}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate('RecipeDetail', { recipeId: item.id })
-                    }
-                    className="bg-white rounded-xl mb-4 shadow-md overflow-hidden"
+                    onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}
+                    className="bg-white rounded-3xl mb-6 shadow-xl overflow-hidden"
                   >
-                    <View className="flex-row">
+                    <View className="flex-row p-4">
                       {/* Ảnh món ăn bên trái */}
-                      <Image
-                        source={{ uri: item.imageUrl }}
-                        className="w-36 h-32"
+                      <Image 
+                        source={{ uri: item.imageUrl }} 
+                        className="w-36 h-36 rounded-3xl"
                         resizeMode="cover"
                       />
 
                       {/* Thông tin món ăn bên phải */}
-                      <View className="flex-1 p-3 justify-between relative">
-                        <View>
-                          <Text
-                            className="font-bold text-gray-800 text-lg"
-                            numberOfLines={1}
-                          >
-                            {item.name}
-                          </Text>
-                          <Text
-                            className="text-gray-600 text-sm mt-1"
-                            numberOfLines={1}
-                          >
-                            {item.description}
-                          </Text>
-                        </View>
-
-                        {/* Thông tin tác giả */}
-                        <View className="flex-row justify-between items-center mt-2">
+                      <View className="flex-1 pl-4 pr-2 py-2 justify-between">
+                        {/* Tiêu đề món ăn */}
+                        <Text className="font-bold text-gray-800 text-xl" numberOfLines={2}>
+                          Công thức {item.name}
+                        </Text>
+                        
+                        {/* Thông tin tác giả và mũi tên */}
+                        <View className="flex-row items-center justify-between mt-3">
                           <View className="flex-row items-center">
                             <Image
                               source={{ uri: item.author.avatar }}
-                              className="w-6 h-6 rounded-full"
+                              className="w-12 h-12 rounded-full" 
                             />
-                            <Text className="text-gray-700 ml-2 text-xs">
+                            <Text className="text-gray-600 ml-2 text-base">
                               {item.author.name}
                             </Text>
                           </View>

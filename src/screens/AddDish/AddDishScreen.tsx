@@ -22,7 +22,22 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 
+// Add YouTube URL validation function
+const isValidYouTubeUrl = (url) => {
+  if (!url) return true; // Empty URL is considered valid (optional field)
+
+  const youtubeRegex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|shorts\/|v\/|)([a-zA-Z0-9_-]{11})$/;
+  return youtubeRegex.test(url);
+};
+const statusOptions = [
+  { label: 'Nháp', value: RecipeStatus.DRAFT },
+  { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
+  { label: 'Công khai', value: RecipeStatus.PUBLIC },
+];
 const AddDishScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {
@@ -49,7 +64,6 @@ const AddDishScreen = () => {
   const [isLoadingUnits, setIsLoadingUnits] = useState(false);
   const [errorUnits, setErrorUnits] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   // Fetch units of measure
   useEffect(() => {
     const fetchUnitsOfMeasure = async () => {
@@ -74,7 +88,7 @@ const AddDishScreen = () => {
     updateBasicInfo({
       name: '',
       description: '',
-      status: RecipeStatus.PENDING_APPROVAL,
+      status: RecipeStatus.DRAFT,
       protein: 0,
       fat: 0,
       carbohydrates: 0,
@@ -183,82 +197,6 @@ const AddDishScreen = () => {
       videoUrl: video,
     });
 
-    // Danh sách lỗi
-    const errors = [];
-
-    // Kiểm tra tên món ăn
-    if (!basicInfo.name || basicInfo.name.trim() === '') {
-      errors.push('Vui lòng nhập tên món ăn');
-    }
-
-    // Kiểm tra mô tả
-    if (!basicInfo.description || basicInfo.description.trim() === '') {
-      errors.push('Vui lòng nhập mô tả món ăn');
-    }
-
-    // Kiểm tra hình ảnh
-    if (!basicInfo.imageUrl) {
-      errors.push('Vui lòng thêm hình ảnh món ăn');
-    }
-
-    // Kiểm tra danh mục
-    if (!categories || categories.length === 0) {
-      errors.push('Vui lòng chọn ít nhất một danh mục');
-    }
-
-    // Kiểm tra thời gian chuẩn bị
-    if (
-      !basicInfo.preparationTimeMinutes ||
-      basicInfo.preparationTimeMinutes <= 0
-    ) {
-      errors.push('Vui lòng nhập thời gian chuẩn bị hợp lệ');
-    }
-
-    // Kiểm tra nguyên liệu
-    if (selectedIngredients.length === 0) {
-      errors.push('Vui lòng thêm ít nhất một nguyên liệu');
-    } else {
-      // Kiểm tra từng nguyên liệu
-      const invalidIngredients = selectedIngredients.some(
-        (ing) =>
-          !ing.ingredientId || !ing.quantity || ing.quantity <= 0 || !ing.unitId
-      );
-
-      if (invalidIngredients) {
-        errors.push(
-          'Vui lòng nhập đầy đủ thông tin cho tất cả các nguyên liệu (số lượng và đơn vị)'
-        );
-      }
-    }
-
-    // Kiểm tra thông tin dinh dưỡng
-    if (
-      !nutrition.carb ||
-      !nutrition.protein ||
-      !nutrition.kcal ||
-      !nutrition.fat
-    ) {
-      errors.push('Vui lòng nhập đầy đủ thông tin dinh dưỡng');
-    }
-
-    // Kiểm tra các bước thực hiện
-    if (steps.length === 0) {
-      errors.push('Vui lòng thêm ít nhất một bước thực hiện');
-    } else {
-      // Kiểm tra nội dung của từng bước
-      const emptySteps = steps.some(
-        (step) => !step.instruction || step.instruction.trim() === ''
-      );
-      if (emptySteps) {
-        errors.push('Vui lòng nhập mô tả cho tất cả các bước thực hiện');
-      }
-    }
-
-    // Hiển thị lỗi nếu có
-    if (errors.length > 0) {
-      Alert.alert('Thiếu thông tin', errors.join('\n'), [{ text: 'OK' }]);
-      return;
-    }
 
     try {
       setIsSubmitting(true);
@@ -464,6 +402,58 @@ const AddDishScreen = () => {
               />
             </View>
 
+            {/* Video thực hiện */}
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-700 mb-2">
+                Link video YouTube
+              </Text>
+              <TextInput
+                className={`border ${!isValidYouTubeUrl(video) ? 'border-red-500' : video ? 'border-green-500' : 'border-gray-300'} bg-gray-50 border rounded-xl px-4 py-3 text-gray-800 text-lg`}
+                value={video}
+                onChangeText={setVideo}
+                placeholder="Dán link YouTube hướng dẫn nấu món này"
+                placeholderTextColor="#9CA3AF"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {video && !isValidYouTubeUrl(video) && (
+                <Text className="text-red-500 text-xs mt-1">
+                  URL không hợp lệ. Vui lòng nhập URL YouTube hợp lệ.
+                </Text>
+              )}
+              {video && isValidYouTubeUrl(video) && (
+                <Text className="text-green-500 text-xs mt-1">
+                  URL YouTube hợp lệ.
+                </Text>
+              )}
+            </View>
+            {/*Trạng thái */}
+            <View className="space-y-2">
+              <Text className="text-gray-800 text-base font-semibold">
+                Trạng thái
+              </Text>
+
+              <View className="self-start rounded-full p-1 flex-row shadow-sm mt-2">
+                {statusOptions.map(({ label, value }) => {
+                  const isActive = basicInfo.status === value;
+                  return (
+                    <TouchableOpacity
+                      key={value}
+                      onPress={() => updateBasicInfo({ status: value })}
+                      className={`px-4 py-1.5 rounded-full mx-0.5
+            ${isActive ? 'bg-[#941D23]' : 'bg-white'}
+          `}
+                    >
+                      <Text
+                        className={`text-sm font-medium ${isActive ? 'text-white' : 'text-gray-600'}`}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
             {/* Nguyên liệu */}
             <View className="mb-4">
               <View className="flex-row justify-between items-center mb-2">
@@ -773,22 +763,6 @@ const AddDishScreen = () => {
                   </TouchableOpacity>
                 </View>
               ))}
-            </View>
-
-            {/* Video thực hiện */}
-            <View className="mb-6">
-              <Text className="text-lg font-semibold text-gray-700 mb-2">
-                Link video YouTube
-              </Text>
-              <TextInput
-                className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-lg"
-                value={video}
-                onChangeText={setVideo}
-                placeholder="Dán link YouTube hướng dẫn nấu món này"
-                placeholderTextColor="#9CA3AF"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
             </View>
 
             {/* Error message */}

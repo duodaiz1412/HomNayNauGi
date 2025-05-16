@@ -289,6 +289,12 @@ export const FoodDetailScreen = () => {
               {new Date(recipe.createdAt).toLocaleDateString('vi-VN')}
             </Text>
           </View>
+                    <View className="flex-row justify-between py-2">
+            <Text className="text-gray-500">Cập nhật lần cuối bởi</Text>
+            <Text className="text-gray-700">
+              {recipe.updatedByAccount?.userProfile?.fullName || 'Chưa có thông tin'}
+            </Text>
+          </View>
           <View className="flex-row justify-between py-2">
             <Text className="text-gray-500">Cập nhật lần cuối</Text>
             <Text className="text-gray-700">

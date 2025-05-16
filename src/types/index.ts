@@ -119,17 +119,30 @@ export interface CookingStep {
 
 // Interface cho công thức
 export interface Recipe {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  ingredients: {
-    id: string;
-    name: string;
-    quantity: number;
-    unit: string;
-    isMatched: boolean;
-  }[];
+  id: string // UUID
+  accountId: string
+  name: string
+  description: string | null
+  protein: number | null
+  fat: number | null
+  calories: number | null
+  carbohydrates: number | null
+  imageUrl: string | null
+  preparationTimeMinutes: number | null
+  videoUrl: string | null
+  status: RecipeStatus
+  createdAt: string
+  updatedAt: string
+  updateBy:string | null
+  // Các quan hệ
+  updatedByAccount:Account
+  account: Account
+  categoryMappings: RecipeCategoryMapping[]
+  recipeIngredients: RecipeIngredient[]
+  cookingSteps: CookingStep[]
+  totalLikes: number
+  totalViews: number
+  totalFavorites: number
 }
 
 // Interface cho chi tiết công thức (dùng cho màn hình chi tiết)

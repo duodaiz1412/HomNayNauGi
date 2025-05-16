@@ -272,18 +272,119 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
       // Thực hiện validation tương tự như handleSave
       // (copy phần validation từ handleSave nếu cần thiết)
 
+      // --- VALIDATION CƠ BẢN (luôn thực hiện) ---
       if (!basicInfo.name || basicInfo.name.trim() === '') {
         setError('Tên món ăn là bắt buộc.');
-        setIsLoading(false);
+        setIsLoading(false); // Quan trọng: reset loading
         return null;
       }
-
       if (!categories || categories.length === 0) {
-        setError('Vui lòng chọn ít nhất một danh mục.');
+        setError('Vui lòng chọn ít nhất một danh mục.'); // Áp dụng cho cả nháp
         setIsLoading(false);
         return null;
       }
+      const hasInvalidIngredientForDraft = ingredients.some(
+        (ing) =>
+          !ing.ingredientId || // Chưa chọn nguyên liệu
+          ing.quantity == null ||
+          ing.quantity <= 0 || // Chưa nhập số lượng
+          !ing.unitId // Chưa chọn đơn vị
+      );
+      if (hasInvalidIngredientForDraft) {
+        setError('Mỗi nguyên liệu cần có tên, số lượng và đơn vị.');
+        setIsLoading(false);
+        return null;
+      }
+      if (!steps || steps.length === 0) {
+        setError('Vui lòng thêm ít nhất một bước nấu ăn.'); // Áp dụng cho cả nháp
+        setIsLoading(false);
+        return null;
+      }
+      // Kiểm tra chi tiết hơn cho steps nếu cần (ví dụ: instruction)
+      // Ví dụ:
+      const hasEmptyStepInstructionForDraft = steps.some(
+        (step) => !step.instruction || step.instruction.trim() === ''
+      );
+      if (hasEmptyStepInstructionForDraft) {
+        setError('Vui lòng điền mô tả cho tất cả các bước nấu ăn.');
+        setIsLoading(false);
+        return null;
+      }
+      // --- VALIDATION CHI TIẾT KHI STATUS LÀ PUBLISHED ---
+      if (basicInfo.status === RecipeStatus.PUBLIC) {
+        if (!basicInfo.description || basicInfo.description.trim() === '') {
+          setError('Mô tả món ăn là bắt buộc khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        if (!categories || categories.length === 0) {
+          setError('Vui lòng chọn ít nhất một danh mục khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
 
+        // === KIỂM TRA ẢNH CHÍNH ===
+        if (!basicInfo.imageUrl) {
+          // basicInfo.imageUrl sẽ là URI từ ImagePicker
+          setError('Hình ảnh món ăn là bắt buộc khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        // Bạn có thể muốn kiểm tra sâu hơn, ví dụ: basicInfo.imageUrl phải là 'file://' nếu là tạo mới
+        // hoặc phải là một URL http/https nếu là sửa và không thay đổi ảnh.
+        // Hiện tại, chỉ cần có giá trị là đủ cho bước này.
+
+        if (
+          basicInfo.protein === null ||
+          basicInfo.protein === undefined ||
+          basicInfo.fat === null ||
+          basicInfo.fat === undefined ||
+          basicInfo.carbohydrates === null ||
+          basicInfo.carbohydrates === undefined ||
+          basicInfo.calories === null ||
+          basicInfo.calories === undefined
+        ) {
+          setError(
+            'Vui lòng điền đầy đủ thông tin dinh dưỡng (Protein, Fat, Carb, Calories) khi công khai.'
+          );
+          setIsLoading(false);
+          return null;
+        }
+        if (!ingredients || ingredients.length === 0) {
+          setError('Vui lòng thêm ít nhất một nguyên liệu khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        const hasEmptyIngredientQuantity = ingredients.some(
+          (ing) =>
+            ing.quantity === null ||
+            ing.quantity === undefined ||
+            ing.quantity <= 0 ||
+            !ing.unitId
+        );
+        if (hasEmptyIngredientQuantity) {
+          setError(
+            'Vui lòng điền đầy đủ số lượng và đơn vị cho tất cả nguyên liệu khi công khai.'
+          );
+          setIsLoading(false);
+          return null;
+        }
+        if (!steps || steps.length < 3) {
+          setError('Vui lòng thêm ít nhất 3 bước nấu ăn khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        const hasEmptyStepInstruction = steps.some(
+          (step) => !step.instruction || step.instruction.trim() === ''
+        );
+        if (hasEmptyStepInstruction) {
+          setError(
+            'Vui lòng điền đầy đủ mô tả cho tất cả các bước nấu ăn khi công khai.'
+          );
+          setIsLoading(false);
+          return null;
+        }
+      }
       // Chuẩn bị payload
       let recipeImageFileForUpload: any = null;
       if (basicInfo.imageUrl && basicInfo.imageUrl.startsWith('file://')) {
@@ -315,7 +416,7 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
         preparationTimeMinutes: basicInfo.preparationTimeMinutes,
         videoUrl: basicInfo.videoUrl,
         hasNewRecipeImageFile: !!recipeImageFileForUpload,
-        status: RecipeStatus.PENDING_APPROVAL,
+        status: basicInfo.status || RecipeStatus.DRAFT,
         categoryIds: categories.map((cat) => cat.id),
         ingredients: ingredients.map((ing) => ({
           ingredientId: ing.ingredientId,
@@ -362,24 +463,118 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
 
       const { basicInfo, categories, ingredients, steps } = recipeForm;
 
-      // Kiểm tra ID
-      if (!recipeId) {
-        setError('Không có ID công thức để cập nhật');
-        setIsLoading(false);
-        return null;
-      }
-
-      // Thực hiện validation tương tự như handleSave
+           // --- VALIDATION CƠ BẢN (luôn thực hiện) ---
       if (!basicInfo.name || basicInfo.name.trim() === '') {
         setError('Tên món ăn là bắt buộc.');
+        setIsLoading(false); // Quan trọng: reset loading
+        return null;
+      }
+      if (!categories || categories.length === 0) {
+        setError('Vui lòng chọn ít nhất một danh mục.'); // Áp dụng cho cả nháp
         setIsLoading(false);
         return null;
       }
-
-      if (!categories || categories.length === 0) {
-        setError('Vui lòng chọn ít nhất một danh mục.');
+      const hasInvalidIngredientForDraft = ingredients.some(
+        (ing) =>
+          !ing.ingredientId || // Chưa chọn nguyên liệu
+          ing.quantity == null ||
+          ing.quantity <= 0 || // Chưa nhập số lượng
+          !ing.unitId // Chưa chọn đơn vị
+      );
+      if (hasInvalidIngredientForDraft) {
+        setError('Mỗi nguyên liệu cần có tên, số lượng và đơn vị.');
         setIsLoading(false);
         return null;
+      }
+      if (!steps || steps.length === 0) {
+        setError('Vui lòng thêm ít nhất một bước nấu ăn.'); // Áp dụng cho cả nháp
+        setIsLoading(false);
+        return null;
+      }
+      // Kiểm tra chi tiết hơn cho steps nếu cần (ví dụ: instruction)
+      // Ví dụ:
+      const hasEmptyStepInstructionForDraft = steps.some(
+        (step) => !step.instruction || step.instruction.trim() === ''
+      );
+      if (hasEmptyStepInstructionForDraft) {
+        setError('Vui lòng điền mô tả cho tất cả các bước nấu ăn.');
+        setIsLoading(false);
+        return null;
+      }
+      // --- VALIDATION CHI TIẾT KHI STATUS LÀ PUBLISHED ---
+      if (basicInfo.status === RecipeStatus.PUBLIC) {
+        if (!basicInfo.description || basicInfo.description.trim() === '') {
+          setError('Mô tả món ăn là bắt buộc khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        if (!categories || categories.length === 0) {
+          setError('Vui lòng chọn ít nhất một danh mục khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+
+        // === KIỂM TRA ẢNH CHÍNH ===
+        if (!basicInfo.imageUrl) {
+          // basicInfo.imageUrl sẽ là URI từ ImagePicker
+          setError('Hình ảnh món ăn là bắt buộc khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        // Bạn có thể muốn kiểm tra sâu hơn, ví dụ: basicInfo.imageUrl phải là 'file://' nếu là tạo mới
+        // hoặc phải là một URL http/https nếu là sửa và không thay đổi ảnh.
+        // Hiện tại, chỉ cần có giá trị là đủ cho bước này.
+
+        if (
+          basicInfo.protein === null ||
+          basicInfo.protein === undefined ||
+          basicInfo.fat === null ||
+          basicInfo.fat === undefined ||
+          basicInfo.carbohydrates === null ||
+          basicInfo.carbohydrates === undefined ||
+          basicInfo.calories === null ||
+          basicInfo.calories === undefined
+        ) {
+          setError(
+            'Vui lòng điền đầy đủ thông tin dinh dưỡng (Protein, Fat, Carb, Calories) khi công khai.'
+          );
+          setIsLoading(false);
+          return null;
+        }
+        if (!ingredients || ingredients.length === 0) {
+          setError('Vui lòng thêm ít nhất một nguyên liệu khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        const hasEmptyIngredientQuantity = ingredients.some(
+          (ing) =>
+            ing.quantity === null ||
+            ing.quantity === undefined ||
+            ing.quantity <= 0 ||
+            !ing.unitId
+        );
+        if (hasEmptyIngredientQuantity) {
+          setError(
+            'Vui lòng điền đầy đủ số lượng và đơn vị cho tất cả nguyên liệu khi công khai.'
+          );
+          setIsLoading(false);
+          return null;
+        }
+        if (!steps || steps.length < 3) {
+          setError('Vui lòng thêm ít nhất 3 bước nấu ăn khi công khai.');
+          setIsLoading(false);
+          return null;
+        }
+        const hasEmptyStepInstruction = steps.some(
+          (step) => !step.instruction || step.instruction.trim() === ''
+        );
+        if (hasEmptyStepInstruction) {
+          setError(
+            'Vui lòng điền đầy đủ mô tả cho tất cả các bước nấu ăn khi công khai.'
+          );
+          setIsLoading(false);
+          return null;
+        }
       }
 
       // Chuẩn bị payload

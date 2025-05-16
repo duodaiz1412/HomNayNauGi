@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AddIngredientScreen } from '@screens/Admin/Ingredient/AddIngredientScreen';
-import { EditIngredientScreen } from '@screens/Admin/Ingredient/EditIngredientScreen';
+import { AddIngredientScreen } from '@screens/Admin/Ingredient/AdminAddIngredientScreen';
+import { EditIngredientScreen } from '@screens/Admin/Ingredient/AdminEditIngredientScreen';
 import { IngredientManagementScreen } from '@screens/Admin/IngredientManagementScreen';
 
 export type AdminIngredientStackParamList = {
