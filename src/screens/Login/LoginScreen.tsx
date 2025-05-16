@@ -39,14 +39,25 @@ const LoginScreen = () => {
         password: password,
       });
 
-      const { accessToken, refreshToken } = response.data;
+      // Kiểm tra trạng thái success từ response
+      if (!response.data.success) {
+        // Xử lý trường hợp đăng nhập thất bại
+        Alert.alert('Lỗi đăng nhập', response.data.message || 'Thông tin đăng nhập không đúng');
+        return;
+      }
+
+      // Lấy dữ liệu từ response.data.data
+      const { accessToken, refreshToken, user } = response.data.data;
+      
+      // Lưu thông tin vào AsyncStorage
       await AsyncStorage.setItem('accessToken', accessToken);
       await AsyncStorage.setItem('refreshToken', refreshToken);
-      await AsyncStorage.setItem('accountId', response.data.user.id);
-      await AsyncStorage.setItem('accountRole', response.data.user.roles[0]);
+      await AsyncStorage.setItem('accountId', user.id);
+      await AsyncStorage.setItem('accountRole', user.roles[0]);
       globalThis.isLoggedIn = true;
+      
       // Kiểm tra role để điều hướng
-      if (response.data.user.roles.includes('admin')) {
+      if (user.roles.includes('admin')) {
         console.log(
           'Danh nhap admin thanh cong   ' +
             accessToken +
@@ -70,7 +81,7 @@ const LoginScreen = () => {
         Alert.alert(
           'Lỗi đăng nhập',
           error.response.data.message ||
-            'Tên đăng nhập hoặc mật khẩu không đúng'
+            'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.'
         );
       } else {
         // Lỗi kết nối

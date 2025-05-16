@@ -133,8 +133,9 @@ export interface Recipe {
   status: RecipeStatus
   createdAt: string
   updatedAt: string
-
+  updateBy:string | null
   // Các quan hệ
+  updatedByAccount:Account
   account: Account
   categoryMappings: RecipeCategoryMapping[]
   recipeIngredients: RecipeIngredient[]
