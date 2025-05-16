@@ -1,177 +1,135 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   Image,
-  ScrollView,
   FlatList,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// Danh sách nguyên liệu mẫu
-const INGREDIENTS = {
-  'Thịt & Hải sản': [
-    {
-      id: '1',
-      name: 'Ba chỉ',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '2',
-      name: 'Thịt bò ta',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '3',
-      name: 'Bò tảng',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '4',
-      name: 'Gà nguyên con',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '5',
-      name: 'Ức gà',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '6',
-      name: 'Đùi gà',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '7',
-      name: 'Thịt lợn xay',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '8',
-      name: 'Tôm',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '9',
-      name: 'Đùi cừu',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-  ],
-  'Rau củ': [
-    {
-      id: '10',
-      name: 'Súp lơ',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '11',
-      name: 'Cà rốt',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '12',
-      name: 'Rau cải',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-  ],
-  'Trái cây': [
-    {
-      id: '13',
-      name: 'Táo',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '14',
-      name: 'Cam',
-      image:
-        'https://storage.googleapis.com/teko-gae.appspot.com/media/image/2024/3/29/0779f948-50d5-448e-ac07-62c1daa22092/M%C3%B3n%20%C4%82n%20Ngon%20T%E1%BB%AB%20Th%E1%BB%8Bt%20Ba%20Ch%E1%BB%89.png',
-    },
-    {
-      id: '15',
-      name: 'Nho',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/grapes-1239192_1280.jpg',
-    },
-  ],
-  'Nước & Trái cây': [
-    {
-      id: '16',
-      name: 'Nước cam',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/orange-1239191_1280.jpg',
-    },
-    {
-      id: '17',
-      name: 'Nước táo',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/apple-1239190_1280.jpg',
-    },
-  ],
-  'A Trái cây': [
-    {
-      id: '1',
-      name: 'Ba chỉ',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/bacon-1239192_1280.jpg',
-    },
-    {
-      id: '2',
-      name: 'Thịt bò ta',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/beef-1239189_1280.jpg',
-    },
-    {
-      id: '3',
-      name: 'Bò tảng',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/beef-1239189_1280.jpg',
-    },
-    {
-      id: '4',
-      name: 'Gà nguyên con',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/05/19/02/chicken-1239193_1280.jpg',
-    },
-  ],
-  // ... Thêm các loại khác nếu muốn
-};
-const TABS = Object.keys(INGREDIENTS);
+import { getIngredientCategories, addToPantry } from 'src/api/api';
+
+const INGREDIENT_CATEGORIES = [
+  'Tất cả',
+  'Gia vị',
+  'Thịt',
+  'Thuỷ hải sản',
+  'Rau củ quả',
+  'Nấm',
+  'Trứng sữa',
+  'Khác',
+];
+
+interface Ingredient {
+  id: string;
+  name: string;
+  imageUrl: string;
+}
+
+interface IngredientMapping {
+  ingredientId: string;
+  ingredientCategoryId: number;
+  ingredient: Ingredient;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  imageUrl: string;
+  ingredientMappings: IngredientMapping[];
+}
+
+interface ApiResponse {
+  message: string;
+  data: Category[];
+  total: number;
+}
 
 const AddIngredientScreen = ({ navigation, route }) => {
-  const [selectedTab, setSelectedTab] = useState(TABS[0]);
-  const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState([]);
-  const isMultiSelect = route.params?.isMultiSelect ?? false;
-
-  const filtered = INGREDIENTS[selectedTab].filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
+  const [selectedCategory, setSelectedCategory] = useState(
+    INGREDIENT_CATEGORIES[0]
   );
+  const [search, setSearch] = useState('');
+  const [selected, setSelected] = useState<Ingredient[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10; // Số lượng loại nguyên liệu mỗi lần load
+  const isMultiSelect = route.params?.isMultiSelect ?? false;
+  const [isAdding, setIsAdding] = useState(false);
 
-  const toggleSelect = (item) => {
+  // Fetch ingredients khi chọn category hoặc search thay đổi
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      if (!hasMore && offset > 0) return;
+
+      setIsLoading(true);
+      try {
+        const queryParam =
+          search || (selectedCategory !== 'Tất cả' ? selectedCategory : '');
+        const response = await getIngredientCategories(
+          offset,
+          limit,
+          queryParam
+        );
+
+        // Lấy tất cả ingredients từ tất cả categories
+        const allIngredients = response.data.flatMap((category) =>
+          category.ingredientMappings.map((mapping) => mapping.ingredient)
+        );
+
+        // Cập nhật trạng thái hasMore dựa vào total
+        setHasMore(offset + limit < response.total);
+
+        // Nếu là trang đầu tiên, thay thế hoàn toàn
+        if (offset === 0) {
+          setIngredients(allIngredients);
+        } else {
+          // Nếu là trang tiếp theo, thêm vào danh sách hiện tại
+          setIngredients((prev) => [...prev, ...allIngredients]);
+        }
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Lỗi khi tải nguyên liệu:', err);
+        setError(err);
+        setIsLoading(false);
+      }
+    };
+
+    // Reset data khi đổi category hoặc search
+    if (search || selectedCategory !== INGREDIENT_CATEGORIES[0]) {
+      setOffset(0);
+      setHasMore(true);
+      setIngredients([]);
+      fetchIngredients();
+    }
+
+    const debounceTimer = setTimeout(fetchIngredients, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [selectedCategory, search, offset]);
+
+  const handleLoadMore = () => {
+    if (!isLoading && hasMore) {
+      setOffset((prev) => prev + limit);
+    }
+  };
+
+  const toggleSelect = (item: Ingredient) => {
     if (isMultiSelect) {
-      // Chế độ chọn nhiều (Recipe screen)
       if (selected.some((i) => i.id === item.id)) {
         setSelected(selected.filter((i) => i.id !== item.id));
       } else {
         setSelected([...selected, item]);
       }
     } else {
-      // Chế độ chọn một (Add Dish screen)
       if (selected.some((i) => i.id === item.id)) {
         setSelected([]);
       } else {
@@ -180,12 +138,52 @@ const AddIngredientScreen = ({ navigation, route }) => {
     }
   };
 
-  const handleAddIngredient = () => {
-    if (selected.length > 0) {
-      route.params?.onSelect?.(selected[0]);
+  const handleAddIngredient = async () => {
+    if (selected.length === 0) {
+      Alert.alert('Thông báo', 'Vui lòng chọn ít nhất một nguyên liệu');
+      return;
     }
-    navigation.goBack();
+
+    if (route.params?.onSelect) {
+      route.params.onSelect(selected[0]);
+      navigation.goBack();
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const ingredientIds = selected.map((item) => item.id);
+      const result = await addToPantry(ingredientIds);
+
+      const addedCount = result.addedIngredients.length;
+      const skippedCount = result.skippedIngredients.length;
+
+      let message = '';
+      if (addedCount > 0 && skippedCount > 0) {
+        message = `Đã thêm ${addedCount} nguyên liệu mới vào kho.\n${skippedCount} nguyên liệu đã có trong kho được bỏ qua.`;
+      } else if (addedCount > 0) {
+        message = `Đã thêm ${addedCount} nguyên liệu vào kho.`;
+      } else {
+        message = 'Tất cả nguyên liệu đã có trong kho.';
+      }
+
+      Alert.alert('Thông báo', message);
+      route.params?.onAddSuccess?.();
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể thêm nguyên liệu. Vui lòng thử lại sau');
+    } finally {
+      setIsAdding(false);
+    }
   };
+
+  if (isLoading && ingredients.length === 0) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#B91C1C" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -210,73 +208,106 @@ const AddIngredientScreen = ({ navigation, route }) => {
         </View>
         {/* Slider loại nguyên liệu */}
         <FlatList
-          data={TABS}
+          data={INGREDIENT_CATEGORIES}
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item}
-          renderItem={({ item: tab }) => (
+          renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => setSelectedTab(tab)}
-              className={`px-4 py-2 rounded-full mr-2 ${selectedTab === tab ? 'bg-red-700' : 'bg-gray-200'}`}
+              onPress={() => setSelectedCategory(item)}
+              className={`px-4 py-2 min-h-[36p] rounded-full mr-2 ${selectedCategory === item ? 'bg-red-700' : 'bg-gray-200'}`}
             >
               <Text
-                className={selectedTab === tab ? 'text-white' : 'text-gray-700'}
+                className={
+                  selectedCategory === item
+                    ? 'text-white'
+                    : 'text-gray-700 items-center justify-center align-middle'
+                }
               >
-                {tab}
+                {item}
               </Text>
             </TouchableOpacity>
           )}
           contentContainerStyle={{
             paddingRight: 16,
             maxHeight: 40,
-            marginBottom: 30,
+            marginBottom: 15,
           }}
         />
 
-        <FlatList
-          data={filtered}
-          numColumns={3}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => toggleSelect(item)}
-              className="flex-1 m-2"
-              style={{ maxWidth: '30%'}}
-            >
-              <View
-                className={`rounded-xl overflow-hidden border ${selected.some((i) => i.id === item.id) ? 'border-red-800' : 'border-gray-300'}`}
+        {isLoading && ingredients.length === 0 ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#B91C1C" />
+          </View>
+        ) : (
+          <FlatList
+            data={ingredients}
+            numColumns={3}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => toggleSelect(item)}
+                className="flex-1 m-2"
+                style={{ maxWidth: '30%' }}
               >
-                <Image
-                  source={{ uri: item.image }}
-                  className="w-full h-24"
-                  resizeMode="cover"
-                />
-                <View className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-white items-center justify-center">
-                  {selected.some((i) => i.id === item.id) && (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={18}
-                      color="#B91C1C"
-                    />
-                  )}
+                <View
+                  className={`rounded-xl overflow-hidden border ${selected.some((i) => i.id === item.id) ? 'border-red-800' : 'border-gray-300'}`}
+                >
+                  <Image
+                    source={{ uri: item.imageUrl }}
+                    className="w-full h-24"
+                    resizeMode="cover"
+                  />
+                  <View className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-white items-center justify-center">
+                    {selected.some((i) => i.id === item.id) && (
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={18}
+                        color="#B91C1C"
+                      />
+                    )}
+                  </View>
+                  <Text className="text-center py-2 text-xs font-medium text-gray-700">
+                    {item.name}
+                  </Text>
                 </View>
-                <Text className="text-center py-2 text-xs font-medium text-gray-700">
-                  {item.name}
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={{ paddingBottom: 16 }}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              isLoading && ingredients.length > 0 ? (
+                <ActivityIndicator size="small" color="#B91C1C" />
+              ) : null
+            }
+            ListEmptyComponent={
+              !isLoading ? (
+                <Text className="text-center text-gray-500 mt-4">
+                  Không tìm thấy nguyên liệu nào
                 </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={{ paddingBottom: 16 }}
-        />
-
-        {/* Nút xác nhận */}
+              ) : null
+            }
+          />
+        )}
       </View>
       <View className="absolute bottom-5 left-0 right-0 px-7">
         <TouchableOpacity
           onPress={handleAddIngredient}
-          className="bg-red-900 rounded-full py-4 items-center w-3/5 self-center"
+          disabled={isAdding || selected.length === 0}
+          className={`rounded-full py-4 items-center w-3/5 self-center ${
+            isAdding || selected.length === 0 ? 'bg-gray-400' : 'bg-red-900'
+          }`}
         >
-          <Text className="text-white font-bold text-lg">Thêm nguyên liệu</Text>
+          {isAdding ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-bold text-lg">
+              {selected.length > 0
+                ? `Thêm (${selected.length})`
+                : 'Thêm nguyên liệu'}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

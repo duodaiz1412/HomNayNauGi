@@ -115,7 +115,11 @@ export const IngredientCategorySelectScreen = () => {
       <View className="flex-row items-center flex-1">
         <View className="w-12 h-12 rounded-full overflow-hidden mr-3 border border-gray-200">
           {item.imageUrl ? (
-            <Image source={{ uri: item.imageUrl }} className="w-full h-full" resizeMode="cover" />
+            <Image
+              source={{ uri: item.imageUrl }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
           ) : (
             <View className="w-full h-full bg-gray-200 items-center justify-center">
               <Ionicons name="nutrition-outline" size={20} color="#9CA3AF" />
@@ -190,10 +194,18 @@ export const IngredientCategorySelectScreen = () => {
                 <View className="relative">
                   <View className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#941D23]">
                     {item.imageUrl ? (
-                      <Image source={{ uri: item.imageUrl }} className="w-full h-full" resizeMode="cover" />
+                      <Image
+                        source={{ uri: item.imageUrl }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
                     ) : (
                       <View className="w-full h-full bg-gray-200 items-center justify-center">
-                        <Ionicons name="nutrition-outline" size={24} color="#9CA3AF" />
+                        <Ionicons
+                          name="nutrition-outline"
+                          size={24}
+                          color="#9CA3AF"
+                        />
                       </View>
                     )}
                   </View>
@@ -201,7 +213,12 @@ export const IngredientCategorySelectScreen = () => {
                     <Ionicons name="close" size={14} color="#FFFFFF" />
                   </View>
                 </View>
-                <Text className="text-xs mt-1 text-center max-w-16" numberOfLines={2}>{item.name}</Text>
+                <Text
+                  className="text-xs mt-1 text-center max-w-16"
+                  numberOfLines={2}
+                >
+                  {item.name}
+                </Text>
               </TouchableOpacity>
             )}
           />

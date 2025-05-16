@@ -13,7 +13,7 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 
 const FilterScreen = () => {
   const navigation =
-          useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [selected, setSelected] = useState({});
 
   const toggle = (category, option) => {
@@ -41,7 +41,12 @@ const FilterScreen = () => {
               style={[styles.option, isSelected && styles.optionSelected]}
               onPress={() => toggle(category, opt)}
             >
-              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  isSelected && styles.optionTextSelected,
+                ]}
+              >
                 {opt}
               </Text>
             </TouchableOpacity>
@@ -70,15 +75,56 @@ const FilterScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        {renderGroup('Chi phí nguyên liệu', 'cost', ['Dưới 50.000₫', 'Dưới 100.000₫', 'Dưới 200.000₫', 'Dưới 300.000₫'])}
-        {renderGroup('Bữa trong ngày', 'meal', ['Bữa sáng', 'Bữa phụ', 'Bữa trưa', 'Bữa xế', 'Ăn vặt', 'Bữa tối', 'Tráng miệng'])}
-        {renderGroup('Loại món ăn', 'type', ['Bánh mì', 'Đồ xào', 'Rau củ quả', 'Đồ chiên', 'Bún, miến, phở', 'Cơm rang', 'Salad'])}
-        {renderGroup('Khẩu phần Calories', 'calories', ['Dưới 200 Cal', '200 - 400 Cal', '400 - 800 Cal'])}
-        {renderGroup('Chế độ ăn', '', ['Ăn kiêng', 'Ăn chay', 'Ít đường', 'Ít đạm', 'Keto'])}
-        {renderGroup('Dị ứng', '', ['Hải sản', 'Tôm', 'Đồ tanh', 'Cá', 'Sữa tươi', 'Trứng'])}
+        {renderGroup('Chi phí nguyên liệu', 'cost', [
+          'Dưới 50.000₫',
+          'Dưới 100.000₫',
+          'Dưới 200.000₫',
+          'Dưới 300.000₫',
+        ])}
+        {renderGroup('Bữa trong ngày', 'meal', [
+          'Bữa sáng',
+          'Bữa phụ',
+          'Bữa trưa',
+          'Bữa xế',
+          'Ăn vặt',
+          'Bữa tối',
+          'Tráng miệng',
+        ])}
+        {renderGroup('Loại món ăn', 'type', [
+          'Bánh mì',
+          'Đồ xào',
+          'Rau củ quả',
+          'Đồ chiên',
+          'Bún, miến, phở',
+          'Cơm rang',
+          'Salad',
+        ])}
+        {renderGroup('Khẩu phần Calories', 'calories', [
+          'Dưới 200 Cal',
+          '200 - 400 Cal',
+          '400 - 800 Cal',
+        ])}
+        {renderGroup('Chế độ ăn', '', [
+          'Ăn kiêng',
+          'Ăn chay',
+          'Ít đường',
+          'Ít đạm',
+          'Keto',
+        ])}
+        {renderGroup('Dị ứng', '', [
+          'Hải sản',
+          'Tôm',
+          'Đồ tanh',
+          'Cá',
+          'Sữa tươi',
+          'Trứng',
+        ])}
       </ScrollView>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListDishesScreen')}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('ListDishesScreen')}
+      >
         <Text style={styles.buttonText}>Xem kết quả</Text>
       </TouchableOpacity>
     </View>
@@ -91,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: 50,
     paddingRight: 20,
-    paddingLeft:20
+    paddingLeft: 20,
   },
   header: {
     flexDirection: 'row',

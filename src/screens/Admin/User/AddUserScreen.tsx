@@ -1,5 +1,4 @@
-
-import { useState } from "react"
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -11,31 +10,29 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-} from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
-import * as ImagePicker from "expo-image-picker"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { AdminHeader } from "@components/AdminHeader/AdminHeader"
-
-
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AdminHeader } from '@components/AdminHeader/AdminHeader';
 
 export const AddUserScreen = () => {
-  const navigation = useNavigation()
-  const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Form states
-  const [fullName, setFullName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [bio, setBio] = useState("")
-  const [avatar, setAvatar] = useState(null)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isActive, setIsActive] = useState(true)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [bio, setBio] = useState('');
+  const [avatar, setAvatar] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Pick image from gallery
   const pickImage = async () => {
@@ -44,78 +41,84 @@ export const AddUserScreen = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    })
+    });
 
     if (!result.canceled) {
-      setAvatar(result.assets[0].uri)
+      setAvatar(result.assets[0].uri);
     }
-  }
+  };
 
   // Validate email format
   const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   // Validate phone format
   const isValidPhone = (phone) => {
-    const phoneRegex = /^[0-9]{10,11}$/
-    return phoneRegex.test(phone)
-  }
+    const phoneRegex = /^[0-9]{10,11}$/;
+    return phoneRegex.test(phone);
+  };
 
   // Handle form submission
   const handleSubmit = () => {
     // Validate form
     if (!fullName || !email || !phone || !password || !confirmPassword) {
-      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin bắt buộc")
-      return
+      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+      return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert("Lỗi", "Email không hợp lệ")
-      return
+      Alert.alert('Lỗi', 'Email không hợp lệ');
+      return;
     }
 
     if (!isValidPhone(phone)) {
-      Alert.alert("Lỗi", "Số điện thoại không hợp lệ")
-      return
+      Alert.alert('Lỗi', 'Số điện thoại không hợp lệ');
+      return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Lỗi", "Mật khẩu xác nhận không khớp")
-      return
+      Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+      return;
     }
 
     if (password.length < 6) {
-      Alert.alert("Lỗi", "Mật khẩu phải có ít nhất 6 ký tự")
-      return
+      Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+      return;
     }
 
     // Submit form
-    setIsLoading(true)
+    setIsLoading(true);
     setTimeout(() => {
-      setIsLoading(false)
-      Alert.alert("Thành công", "Đã thêm người dùng mới", [
+      setIsLoading(false);
+      Alert.alert('Thành công', 'Đã thêm người dùng mới', [
         {
-          text: "OK",
+          text: 'OK',
           onPress: () => navigation.goBack(),
         },
-      ])
-    }, 1500)
-  }
+      ]);
+    }, 1500);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
-      <AdminHeader title="Thêm người dùng"/>
+      <AdminHeader title="Thêm người dùng" />
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
         <ScrollView className="flex-1 px-4 py-4">
           {/* Avatar */}
           <View className="items-center mb-4">
             <TouchableOpacity onPress={pickImage}>
               {avatar ? (
-                <Image source={{ uri: avatar }} className="w-24 h-24 rounded-full" />
+                <Image
+                  source={{ uri: avatar }}
+                  className="w-24 h-24 rounded-full"
+                />
               ) : (
                 <View className="w-24 h-24 rounded-full bg-gray-300 items-center justify-center">
                   <Ionicons name="person" size={40} color="white" />
@@ -193,8 +196,14 @@ export const AddUserScreen = () => {
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#454442" />
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={20}
+                    color="#454442"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -210,8 +219,16 @@ export const AddUserScreen = () => {
                   secureTextEntry={!showConfirmPassword}
                   autoCapitalize="none"
                 />
-                <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  <Ionicons name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#454442" />
+                <TouchableOpacity
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <Ionicons
+                    name={
+                      showConfirmPassword ? 'eye-off-outline' : 'eye-outline'
+                    }
+                    size={20}
+                    color="#454442"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -226,8 +243,8 @@ export const AddUserScreen = () => {
               <Switch
                 value={isAdmin}
                 onValueChange={setIsAdmin}
-                trackColor={{ false: "#D1D1D6", true: "#E57373" }}
-                thumbColor={isAdmin ? "#941D23" : "#F4F3F4"}
+                trackColor={{ false: '#D1D1D6', true: '#E57373' }}
+                thumbColor={isAdmin ? '#941D23' : '#F4F3F4'}
               />
             </View>
 
@@ -236,23 +253,24 @@ export const AddUserScreen = () => {
               <Switch
                 value={isActive}
                 onValueChange={setIsActive}
-                trackColor={{ false: "#D1D1D6", true: "#E57373" }}
-                thumbColor={isActive ? "#941D23" : "#F4F3F4"}
+                trackColor={{ false: '#D1D1D6', true: '#E57373' }}
+                thumbColor={isActive ? '#941D23' : '#F4F3F4'}
               />
             </View>
           </View>
 
           {/* Submit Button */}
           <TouchableOpacity
-            className={`bg-[#941D23] py-3 rounded-lg items-center mb-6 ${isLoading ? "opacity-70" : ""}`}
+            className={`bg-[#941D23] py-3 rounded-lg items-center mb-6 ${isLoading ? 'opacity-70' : ''}`}
             onPress={handleSubmit}
             disabled={isLoading}
           >
-            <Text className="text-white font-bold">{isLoading ? "Đang xử lý..." : "Thêm người dùng"}</Text>
+            <Text className="text-white font-bold">
+              {isLoading ? 'Đang xử lý...' : 'Thêm người dùng'}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
-}
-
+  );
+};

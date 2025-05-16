@@ -27,7 +27,7 @@ const HomeScreen = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  
+
   const navigation2 = useNavigation<NativeStackNavigationProp<TabParamList>>();
   const {
     isLoading,
@@ -45,18 +45,18 @@ const HomeScreen = () => {
     const checkAdminRole = async () => {
       try {
         const role = await AsyncStorage.getItem('accountRole');
-        console.log(role)
-        if(role ==='admin'){
-                  navigation.reset({
-          index: 0,
-          routes: [{ name: 'AdminDrawerNavigator' }],
-        });
+        console.log(role);
+        if (role === 'admin') {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'AdminDrawerNavigator' }],
+          });
         }
       } catch (error) {
         console.error('Error checking admin role:', error);
       }
     };
-    
+
     checkAdminRole();
   }, []);
 
@@ -70,7 +70,7 @@ const HomeScreen = () => {
   // Hàm tải thêm
   const handleLoadMore = async () => {
     if (isLoadingMore || !homeData?.recipeFeedHasMore) return;
-    
+
     setIsLoadingMore(true);
     const currentLength = homeData.recipeFeed?.length || 0;
     await fetchRecipeFeed('recommended', currentLength);
@@ -84,7 +84,6 @@ const HomeScreen = () => {
       navigation.navigate('Login');
     }
   };
-
 
   if (isLoading) {
     return (
@@ -135,13 +134,17 @@ const HomeScreen = () => {
                 className="flex-row items-center"
               >
                 <Image
-                  source={{ uri: homeData.user?.avatar }}
+                  source={{
+                    uri:
+                      homeData.user?.avatar ||
+                      'https://via.placeholder.com/200',
+                  }}
                   className="w-20 h-20 rounded-full mr-3"
                 />
                 <View>
                   <Text className="text-[#4B4B4B] italic">Chào buổi sáng,</Text>
                   <Text className="text-[#4B4B4B] text-2xl font-bold">
-                    {homeData.user?.name}
+                    {homeData.user?.name || 'Người dùng'}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -169,41 +172,43 @@ const HomeScreen = () => {
           </View>
 
           {/* Banner */}
-          <TouchableOpacity
-            className="mx-4 mb-4 rounded-2xl p-4 flex-row items-center"
-            style={{ backgroundColor: '#941D23' }}
-            activeOpacity={0.9}
-          >
-            <View className="flex-1 pr-3">
-              <Text
-                numberOfLines={3}
-                ellipsizeMode="tail" // hoặc "middle" | "head" | "clip"
-                className="text-white text-base font-medium leading-[22px]"
-              >
-                {homeData.banner.description}
-              </Text>
-
-              <TouchableOpacity
-                className="mt-3 border border-white rounded-full px-3 py-1.5 flex-row items-center self-start"
-                onPress={() => {
-                  navigation.navigate('RecipeDetail', {
-                    recipeId: homeData.banner.id,
-                  });
-                }}
-              >
-                <Text className="text-white font-medium mr-1">
-                  Tìm hiểu ngay
+          {homeData.banner && (
+            <TouchableOpacity
+              className="mx-4 mb-4 rounded-2xl p-4 flex-row items-center"
+              style={{ backgroundColor: '#941D23' }}
+              activeOpacity={0.9}
+            >
+              <View className="flex-1 pr-3">
+                <Text
+                  numberOfLines={3}
+                  ellipsizeMode="tail" // hoặc "middle" | "head" | "clip"
+                  className="text-white text-base font-medium leading-[22px]"
+                >
+                  {homeData.banner.description}
                 </Text>
-                <Ionicons name="arrow-forward" size={16} color="white" />
-              </TouchableOpacity>
-            </View>
 
-            <Image
-              source={{ uri: homeData.banner.image }}
-              className="w-44 h-44 rounded-full"
-              resizeMode="cover"
-            />
-          </TouchableOpacity>
+                <TouchableOpacity
+                  className="mt-3 border border-white rounded-full px-3 py-1.5 flex-row items-center self-start"
+                  onPress={() => {
+                    navigation.navigate('RecipeDetail', {
+                      recipeId: homeData.banner.id,
+                    });
+                  }}
+                >
+                  <Text className="text-white font-medium mr-1">
+                    Tìm hiểu ngay
+                  </Text>
+                  <Ionicons name="arrow-forward" size={16} color="white" />
+                </TouchableOpacity>
+              </View>
+
+              <Image
+                source={{ uri: homeData.banner.image }}
+                className="w-44 h-44 rounded-full"
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          )}
 
           {/* Section Title */}
           <Text className="text-xl font-bold px-4 mb-4 text-[#4B4B4B]">
@@ -269,8 +274,8 @@ const HomeScreen = () => {
                 </TouchableOpacity>
               ))
             ) : (
-              <View className="flex-1 justify-center items-center my-4">
-                <Text className="text-gray-500">Không có công thức nào</Text>
+              <View className="justify-center items-center py-2">
+                <Text className="text-gray-500">Không có danh mục nào</Text>
               </View>
             )}
           </ScrollView>
@@ -321,14 +326,13 @@ const HomeScreen = () => {
 
           {/* Featured Dishes Section */}
           <View className="px-4 pt-2 pb-6">
-
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingRight: 15, paddingTop: 40 }}
             >
-              {homeData.featuredByCategory && 
-              homeData.featuredByCategory[activeCategoryId] && 
+              {homeData.featuredByCategory &&
+              homeData.featuredByCategory[activeCategoryId] &&
               homeData.featuredByCategory[activeCategoryId].length > 0 ? (
                 homeData.featuredByCategory[activeCategoryId].map((item) => (
                   <TouchableOpacity
@@ -358,7 +362,9 @@ const HomeScreen = () => {
                 ))
               ) : (
                 <View className="flex-1 justify-center items-center mb-4 mt-4 w-full">
-                  <Text className="text-gray-500 text-3xl">Không có món ăn nổi bật nào</Text>
+                  <Text className="text-gray-500 text-3xl">
+                    Không có món ăn nổi bật nào
+                  </Text>
                 </View>
               )}
             </ScrollView>
@@ -371,7 +377,7 @@ const HomeScreen = () => {
                 Khám phá món ăn
               </Text>
             </View>
-            
+
             {homeData.recipeFeed && homeData.recipeFeed.length > 0 ? (
               <FlatList
                 data={homeData.recipeFeed}
@@ -389,7 +395,7 @@ const HomeScreen = () => {
                         className="w-36 h-36 rounded-3xl"
                         resizeMode="cover"
                       />
-                      
+
                       {/* Thông tin món ăn bên phải */}
                       <View className="flex-1 pl-4 pr-2 py-2 justify-between">
                         {/* Tiêu đề món ăn */}
@@ -400,7 +406,7 @@ const HomeScreen = () => {
                         {/* Thông tin tác giả và mũi tên */}
                         <View className="flex-row items-center justify-between mt-3">
                           <View className="flex-row items-center">
-                            <Image 
+                            <Image
                               source={{ uri: item.author.avatar }}
                               className="w-12 h-12 rounded-full" 
                             />
@@ -421,10 +427,12 @@ const HomeScreen = () => {
                   isLoadingMore ? (
                     <View className="py-4 items-center">
                       <ActivityIndicator size="small" color="#941D23" />
-                      <Text className="text-gray-500 text-xs mt-2">Đang tải thêm...</Text>
+                      <Text className="text-gray-500 text-xs mt-2">
+                        Đang tải thêm...
+                      </Text>
                     </View>
                   ) : homeData.recipeFeedHasMore ? (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       className="py-4 items-center"
                       onPress={handleLoadMore}
                     >
@@ -432,7 +440,9 @@ const HomeScreen = () => {
                     </TouchableOpacity>
                   ) : (
                     <View className="py-4 items-center">
-                      <Text className="text-gray-500 text-xs">Bạn đã xem hết danh sách</Text>
+                      <Text className="text-gray-500 text-xs">
+                        Bạn đã xem hết danh sách
+                      </Text>
                     </View>
                   )
                 }

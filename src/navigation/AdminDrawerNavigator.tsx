@@ -10,7 +10,7 @@ import { AdminUserStack } from './AdminUserStack';
 import { AdminPostManagementScreen } from '@screens/Admin/PostManagementScreen';
 import { StatisticsScreen } from '@screens/Admin/StatisticsScreen';
 import { AdminIngredientStack } from './AdminIngredientStack';
-import { CommonActions } from '@react-navigation/native'; 
+import { CommonActions } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 export type AdminDrawerParamList = {
@@ -102,7 +102,7 @@ export const AdminDrawerNavigator = () => {
               })
             );
           },
-        })}        
+        })}
       />
       <Drawer.Screen
         name="AdminFoodCategoryManagement"
@@ -125,7 +125,7 @@ export const AdminDrawerNavigator = () => {
               })
             );
           },
-        })}  
+        })}
       />
       <Drawer.Screen
         name="AdminIngredientCategoryManagement"
@@ -148,7 +148,7 @@ export const AdminDrawerNavigator = () => {
               })
             );
           },
-        })}  
+        })}
       />
       <Drawer.Screen
         name="AdminUserManagement"
@@ -171,7 +171,7 @@ export const AdminDrawerNavigator = () => {
               })
             );
           },
-        })}  
+        })}
       />
       <Drawer.Screen
         name="AdminPostManagement"

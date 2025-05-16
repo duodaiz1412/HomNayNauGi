@@ -1,420 +1,4 @@
-// import React, { useState, useEffect } from 'react';
-// import {
-//   View,
-//   Text,
-//   TouchableOpacity,
-//   FlatList,
-//   Image,
-//   TextInput,
-//   ScrollView,
-// } from 'react-native';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// import { SafeAreaView } from 'react-native-safe-area-context';
-// import { mockData } from '../../MockData/Data';
-// import { useNavigation } from '@react-navigation/native';
-// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-// import { RootStackParamList } from '../../navigation/AppNavigator';
-// import { Alert } from 'react-native';
-// import { RouteProp, useRoute } from '@react-navigation/native';
-// // ✅ ADDED
-// // import { useNavigation,  } from '@react-navigation/native';
 
-
-
-// interface Ingredient {
-//   id: string
-//   name: string;
-//   image: string;
-// }
-
-// // ✅ ADDED
-// type IngredientRouteProp = RouteProp<RootStackParamList, 'SearchByIngredientScreen'>;
-
-
-// const SearchByIngredientsScreen = () => {
-//   const navigation =
-//       useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-//       // ✅ ADDED inside SearchByIngredientsScreen
-// // const route = useRoute<IngredientRouteProp>();
-//   const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
-
-//   const initialIngredients = route.params?.ingredients || [];
-
-//   const [allIngredients, setAllIngredients] = useState<Ingredient[]>(mockData.recipes);
-
-//   const [selectedIngredients, setSelectedIngredients] = useState<Ingredient[]>([]);
-
-//     useEffect(() => {
-//     if (initialIngredients.length > 0) {
-//       toggleIngredient(initialIngredients[0].id)  
-//     }
-//   }, [initialIngredients]);
-
-//   // Trích xuất danh sách nguyên liệu duy nhất
-
-//   const toggleIngredient = (id: string) => {
-//     const selectI = selectedIngredients.find(x => x.id === id);
-//     const allI = allIngredients.find(x => x.id === id)
-//     if (selectI) {
-//       setSelectedIngredients(selectedIngredients.filter(x => x.id === id))
-//       setAllIngredients([...allIngredients, selectI])
-//     } else {
-//       setSelectedIngredients([...selectedIngredients, allI])
-//       setAllIngredients(allIngredients.filter(x => x.id === id))
-//     }
-//   };
-
-//   const handleViewResults = () => {
-//     if (!selectedIngredients || selectedIngredients.length === 0) {
-//       Alert.alert('Thông báo', 'Hãy chọn nguyên liệu');
-//       return;
-//     }
-
-//     const selectedDetail = allIngredients.filter(i => selectedIngredients.includes(i.name));
-//     navigation.navigate('IngredientsScreen', { ingredients: selectedDetail });
-//   };
-
-//   return (
-//     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff1ed' }}>
-//       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16 }}>
-//         {/* Header */}
-//         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-//         <TouchableOpacity onPress={() => navigation.goBack()}>
-//           <Ionicons name="close" size={24} color="#333" />
-//         </TouchableOpacity>
-
-//           <Text className="text-3xl font-bold text-black-800 mx-auto">
-//             Tìm bằng nguyên liệu
-//           </Text>
-//           <View style={{ width: 24 }} />
-//         </View>
-
-//         {/* Search bar */}
-//         <View style={{
-//           flexDirection: 'row',
-//           alignItems: 'center',
-//           backgroundColor: '#fff',
-//           borderRadius: 999,
-//           paddingHorizontal: 16,
-//           paddingVertical: 8,
-//           borderWidth: 1,
-//           borderColor: '#ddd'
-//         }}>
-//           <Ionicons name="arrow-back" size={20} color="#ccc" />
-//           <TextInput
-//             placeholder="Chọn nguyên liệu"
-//             style={{ flex: 1, marginLeft: 10 }}
-//           />
-//         </View>
-
-//         {/* Selected Ingredients */}
-//         <Text style={{ marginTop: 24, fontSize: 16, fontWeight: 'bold', color: '#444' }}>
-//           Nguyên liệu đã chọn
-//         </Text>
-//         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 12 }}>
-//           {selectedIngredients.map((item) => (
-//               <View key={item.id} style={{ alignItems: 'center', marginRight: 12, marginBottom: 12 }}>
-//                 <TouchableOpacity
-//                   onPress={() => toggleIngredient(item.id)}
-//                   style={{
-//                     width: 64,
-//                     height: 64,
-//                     borderRadius: 32,
-//                     backgroundColor: '#ffe4e6',
-//                     alignItems: 'center',
-//                     justifyContent: 'center',
-//                     position: 'relative',
-//                   }}
-//                 >
-//                   <Image
-//                     source={{ uri: item.image }}
-//                     style={{ width: 64, height: 64, borderRadius: 32 }}
-//                   />
-//                   <TouchableOpacity
-//                     onPress={() => toggleIngredient(item.id)}
-//                     style={{
-//                       position: 'absolute',
-//                       top: 4,
-//                       right: 4,
-//                       backgroundColor: '#333',
-//                       borderRadius: 10,
-//                       width: 18,
-//                       height: 18,
-//                       alignItems: 'center',
-//                       justifyContent: 'center',
-//                     }}
-//                   >
-//                     <Ionicons name="close" size={12} color="#fff" />
-//                   </TouchableOpacity>
-//                 </TouchableOpacity>
-//                 <Text style={{ marginTop: 4, fontSize: 12 }}>{item.name}</Text>
-//               </View>
-//             )
-//           )}
-//         </View>
-
-//         {/* Ingredient Grid */}
-//         <FlatList
-//           data={allIngredients}
-//           numColumns={4}
-//           keyExtractor={(item) => item.name}
-//           contentContainerStyle={{ marginTop: 16, paddingBottom: 80 }}
-//           renderItem={({ item }) => {
-//             return (
-//               <TouchableOpacity
-//                 onPress={() => toggleIngredient(item.name)}
-//                 style={{ width: '25%', alignItems: 'center', marginBottom: 20 }}
-//               >
-//                 <View style={{
-//                   width: 64,
-//                   height: 64,
-//                   borderRadius: 32,
-//                   backgroundColor: '#fff',
-//                   alignItems: 'center',
-//                   justifyContent: 'center',
-//                   borderWidth: 1,
-//                   borderColor: '#ddd',
-//                 }}>
-//                   <Image
-//                     source={{ uri: item.image }}
-//                     style={{ width: 64, height: 64, borderRadius: 32 }}
-//                   />
-//                 </View>
-//                 <Text style={{ marginTop: 6, fontSize: 12, color: '#444' }}>{item.name}</Text>
-//               </TouchableOpacity>
-//             );
-//           }}
-//         />
-
-//         {/* Button */}
-//         <TouchableOpacity
-//           onPress={handleViewResults}
-//           style={{
-//             position: 'absolute',
-//             bottom: 20,
-//             left: 16,
-//             right: 16,
-//             height: 48,
-//             borderRadius: 24,
-//             backgroundColor: '#f43f5e',
-//             alignItems: 'center',
-//             justifyContent: 'center',
-//           }}>
-//           <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Xem kết quả</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
-
-// export default SearchByIngredientsScreen;
-
-
-// import React, { useState, useEffect } from 'react';
-// import {
-//   View,
-//   Text,
-//   TouchableOpacity,
-//   FlatList,
-//   Image,
-//   TextInput,
-//   ScrollView,
-//   Alert,
-// } from 'react-native';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// import { SafeAreaView } from 'react-native-safe-area-context';
-// import { mockData } from '../../MockData/Data';
-// import { useNavigation } from '@react-navigation/native';
-// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-// import { RootStackParamList } from '../../navigation/AppNavigator';
-// import { RouteProp, useRoute } from '@react-navigation/native';
-
-// interface Ingredient {
-//   name: string;
-//   image: string;
-// }
-
-// type IngredientRouteProp = RouteProp<RootStackParamList, 'SearchByIngredientScreen'>;
-
-// const SearchByIngredientsScreen = () => {
-//   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-//   // const route = useRoute<IngredientRouteProp>();
-//    const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
-
-//   const initialIngredients = route.params?.ingredients || [];
-
-//   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-
-//   useEffect(() => {
-//     if (initialIngredients.length > 0) {
-//       setSelectedIngredients(initialIngredients.map(i => i.name));
-//     }
-//   }, [initialIngredients]);
-
-//   // Tập hợp toàn bộ nguyên liệu duy nhất
-//   const allIngredients: Ingredient[] = Array.from(
-//     new Map(
-//       mockData.recipes
-//         .flatMap((recipe) => recipe.ingredients)
-//         .map((i) => [i.name, i])
-//     ).values()
-//   );
-
-//   // Tính lại mỗi lần render: nguyên liệu chưa chọn
-//   const availableIngredients: Ingredient[] = allIngredients.filter(
-//     (i) => !selectedIngredients.includes(i.name)
-//   );
-
-//   const toggleIngredient = (name: string) => {
-//     setSelectedIngredients((prev) =>
-//       prev.includes(name)
-//         ? prev.filter((i) => i !== name)
-//         : [...prev, name]
-//     );
-//   };
-
-//   const handleViewResults = () => {
-//     if (selectedIngredients.length === 0) {
-//       Alert.alert('Thông báo', 'Hãy chọn nguyên liệu');
-//       return;
-//     }
-
-//     const selectedDetail = allIngredients.filter(i => selectedIngredients.includes(i.name));
-//     navigation.navigate('IngredientsScreen', { ingredients: selectedDetail });
-//   };
-
-//   return (
-//     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff1ed' }}>
-//       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16 }}>
-//         {/* Header */}
-//         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-//           <TouchableOpacity onPress={() => navigation.goBack()}>
-//             <Ionicons name="close" size={24} color="#333" />
-//           </TouchableOpacity>
-//           <Text className="text-3xl font-bold text-black-800 mx-auto">Tìm bằng nguyên liệu</Text>
-//           <View style={{ width: 24 }} />
-//         </View>
-
-//         {/* Search bar */}
-//         <View style={{
-//           flexDirection: 'row',
-//           alignItems: 'center',
-//           backgroundColor: '#fff',
-//           borderRadius: 999,
-//           paddingHorizontal: 16,
-//           paddingVertical: 8,
-//           borderWidth: 1,
-//           borderColor: '#ddd'
-//         }}>
-//           <Ionicons name="search" size={20} color="#ccc" />
-//           <TextInput
-//             placeholder="Chọn nguyên liệu"
-//             style={{ flex: 1, marginLeft: 10 }}
-//           />
-//         </View>
-
-//         {/* Selected Ingredients */}
-//         <Text style={{ marginTop: 24, fontSize: 16, fontWeight: 'bold', color: '#444' }}>
-//           Nguyên liệu đã chọn
-//         </Text>
-//         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 12 }}>
-//           {selectedIngredients.map((name) => {
-//             const item = allIngredients.find((i) => i.name === name);
-//             if (!item) return null;
-//             return (
-//               <View key={name} style={{ alignItems: 'center', marginRight: 12, marginBottom: 12 }}>
-//                 <TouchableOpacity
-//                   onPress={() => toggleIngredient(name)}
-//                   style={{
-//                     width: 64,
-//                     height: 64,
-//                     borderRadius: 32,
-//                     backgroundColor: '#ffe4e6',
-//                     alignItems: 'center',
-//                     justifyContent: 'center',
-//                     position: 'relative',
-//                   }}
-//                 >
-//                   <Image
-//                     source={{ uri: item.image }}
-//                     style={{ width: 64, height: 64, borderRadius: 32 }}
-//                   />
-//                   <TouchableOpacity
-//                     onPress={() => toggleIngredient(name)}
-//                     style={{
-//                       position: 'absolute',
-//                       top: 4,
-//                       right: 4,
-//                       backgroundColor: '#333',
-//                       borderRadius: 10,
-//                       width: 18,
-//                       height: 18,
-//                       alignItems: 'center',
-//                       justifyContent: 'center',
-//                     }}
-//                   >
-//                     <Ionicons name="close" size={12} color="#fff" />
-//                   </TouchableOpacity>
-//                 </TouchableOpacity>
-//                 <Text style={{ marginTop: 4, fontSize: 12 }}>{name}</Text>
-//               </View>
-//             );
-//           })}
-//         </View>
-
-//         {/* Ingredient Grid */}
-//         <FlatList
-//           data={availableIngredients}
-//           numColumns={4}
-//           keyExtractor={(item) => item.name}
-//           contentContainerStyle={{ marginTop: 16, paddingBottom: 80 }}
-//           renderItem={({ item }) => (
-//             <TouchableOpacity
-//               onPress={() => toggleIngredient(item.name)}
-//               style={{ width: '25%', alignItems: 'center', marginBottom: 20 }}
-//             >
-//               <View style={{
-//                 width: 64,
-//                 height: 64,
-//                 borderRadius: 32,
-//                 backgroundColor: '#fff',
-//                 alignItems: 'center',
-//                 justifyContent: 'center',
-//                 borderWidth: 1,
-//                 borderColor: '#ddd',
-//               }}>
-//                 <Image
-//                   source={{ uri: item.image }}
-//                   style={{ width: 64, height: 64, borderRadius: 32 }}
-//                 />
-//               </View>
-//               <Text style={{ marginTop: 6, fontSize: 12, color: '#444' }}>{item.name}</Text>
-//             </TouchableOpacity>
-//           )}
-//         />
-
-//         {/* Button */}
-//         <TouchableOpacity
-//           onPress={handleViewResults}
-//           style={{
-//             position: 'absolute',
-//             bottom: 20,
-//             left: 16,
-//             right: 16,
-//             height: 48,
-//             borderRadius: 24,
-//             backgroundColor: '#f43f5e',
-//             alignItems: 'center',
-//             justifyContent: 'center',
-//           }}>
-//           <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Xem kết quả</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
-
-// export default SearchByIngredientsScreen;
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -423,7 +7,8 @@ import {
   FlatList,
   Image,
   TextInput,
-  ScrollView,
+  StyleSheet,
+  ScrollView, ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -433,14 +18,21 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { Alert } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import {IngredientCategory} from "../../types";
+import api from "../../api/api";
+import debounce from 'lodash.debounce';
+import Toast from 'react-native-toast-message';
+
+
 // ✅ ADDED
 // import { useNavigation,  } from '@react-navigation/native';
 
 
 
 interface Ingredient {
+  id: string;
   name: string;
-  image: string;
+  imageUrl: string;
 }
 
 // ✅ ADDED
@@ -451,27 +43,83 @@ const SearchByIngredientsScreen = () => {
   const navigation =
       useNavigation<NativeStackNavigationProp<RootStackParamList>>();
       // ✅ ADDED inside SearchByIngredientsScreen
-// const route = useRoute<IngredientRouteProp>();
-const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
-
-const initialIngredients = route.params?.ingredients || [];
-
+  // const route = useRoute<IngredientRouteProp>();
+  const route = useRoute<RouteProp<RootStackParamList, 'SearchByIngredientScreen'>>();
+  const initialIngredients = route.params?.ingredients || [];
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
-    useEffect(() => {
+  useEffect(() => {
     if (initialIngredients.length > 0) {
       setSelectedIngredients(initialIngredients.map(i => i.name));
     }
   }, [initialIngredients]);
 
-  // Trích xuất danh sách nguyên liệu duy nhất
-  const allIngredients: Ingredient[] = Array.from(
-    new Map(
-      mockData.recipes
-        .flatMap((recipe) => recipe.ingredients)
-        .map((i) => [i.name, i])
-    ).values()
-  );
+  useEffect(() => {
+    fetchIngredients();
+  }, []);
+
+  useEffect(() => {
+    fetchIngredientsSearch('');
+  }, []);
+
+  
+  const fetchIngredientsSearch = async () => {
+    const query = search.trim();
+    try {
+      setLoading(true);
+      const response = await api.get('/ingredients/search', {
+        params: {
+          query: query,
+          offset: 0,
+          limit: 20,
+        },
+      });
+      let data = response.data.data || [];
+      console.log('-----------------------------------------------');
+      console.log(data);
+      console.log('-----------------------------------------------');
+      console.log(selectedCategoryId);
+      if (data.length === 0) {
+        Toast.show({
+          type: 'info',
+          text1: 'Không có kết quả phù hợp',
+        });
+      }
+
+      setIngredients(data);
+    } catch (error) {
+      console.error('Lỗi khi tìm nguyên liệu:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchIngredients = async (query = '', offset = 0, limit = 10) => {
+    try {
+      setLoading(true);
+      const response = await api.get('/ingredients');
+      setIngredients(response.data);
+      console.log('Danh sách nguyên liệu', response.data);
+    } catch (error) {
+      console.error('Error fetching ingredient:', error);
+      Alert.alert('Lỗi', 'Không thể tải danh sách nguyên liệu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+      const debounced = debounce(() => {
+        fetchIngredientsSearch(search);
+      }, 300);
+      debounced();
+      return () => debounced.cancel();
+    }, [search, selectedCategoryId]);
+  
 
   const toggleIngredient = (name: string) => {
     setSelectedIngredients((prev) =>
@@ -487,7 +135,7 @@ const initialIngredients = route.params?.ingredients || [];
       return;
     }
 
-    const selectedDetail = allIngredients.filter(i => selectedIngredients.includes(i.name));
+    const selectedDetail = ingredients.filter(i => selectedIngredients.includes(i.name));
     navigation.navigate('IngredientsScreen', { ingredients: selectedDetail });
   };
 
@@ -507,21 +155,15 @@ const initialIngredients = route.params?.ingredients || [];
         </View>
 
         {/* Search bar */}
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: '#fff',
-          borderRadius: 999,
-          paddingHorizontal: 16,
-          paddingVertical: 8,
-          borderWidth: 1,
-          borderColor: '#ddd'
-        }}>
-          <Ionicons name="arrow-back" size={20} color="#ccc" />
+
+        <View style={styles.searchBar}>
           <TextInput
-            placeholder="Chọn nguyên liệu"
-            style={{ flex: 1, marginLeft: 10 }}
+            placeholder="Tìm kiếm"
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
           />
+          <Ionicons name="search" size={20} color="#888" />
         </View>
 
         {/* Selected Ingredients */}
@@ -530,7 +172,7 @@ const initialIngredients = route.params?.ingredients || [];
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 12 }}>
           {selectedIngredients.map((name) => {
-            const item = allIngredients.find((i) => i.name === name);
+            const item = ingredients.find((i) => i.name === name);
             if (!item) return null;
             return (
               <View key={name} style={{ alignItems: 'center', marginRight: 12, marginBottom: 12 }}>
@@ -547,7 +189,7 @@ const initialIngredients = route.params?.ingredients || [];
                   }}
                 >
                   <Image
-                    source={{ uri: item.image }}
+                    source={{ uri: item.imageUrl }}
                     style={{ width: 64, height: 64, borderRadius: 32 }}
                   />
                   <TouchableOpacity
@@ -575,10 +217,27 @@ const initialIngredients = route.params?.ingredients || [];
 
         {/* Ingredient Grid */}
         <FlatList
-          data={allIngredients}
+          data={ingredients}
           numColumns={4}
           keyExtractor={(item) => item.name}
           contentContainerStyle={{ marginTop: 16, paddingBottom: 80 }}
+          ListFooterComponent={
+            loading ? (
+              <View className="py-4 items-center">
+                <ActivityIndicator size="small" color="#941D23" />
+                <Text className="text-gray-500 mt-2">Đang tải...</Text>
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
+            !loading ? (
+              <View className="py-8 items-center">
+                <Text className="text-gray-500">
+                  Không tìm thấy nguyên liệu
+                </Text>
+              </View>
+            ) : null
+          }
           renderItem={({ item }) => {
             const isSelected = selectedIngredients.includes(item.name);
             return (
@@ -597,7 +256,7 @@ const initialIngredients = route.params?.ingredients || [];
                   borderColor: '#ddd',
                 }}>
                   <Image
-                    source={{ uri: item.image }}
+                    source={{ uri: item.imageUrl }}
                     style={{ width: 64, height: 64, borderRadius: 32 }}
                   />
                 </View>
@@ -628,4 +287,32 @@ const initialIngredients = route.params?.ingredients || [];
   );
 };
 
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 60 },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 30 },
+  title: { flex: 1, textAlign: 'center', fontSize: 24, fontWeight: 'bold', color: '#941D23' },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2f2f2',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+    height: 44,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  searchInput: { flex: 1, height: 40 },
+  categoryWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 20,
+  },
+});
 export default SearchByIngredientsScreen;

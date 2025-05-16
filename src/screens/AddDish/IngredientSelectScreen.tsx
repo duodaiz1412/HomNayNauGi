@@ -27,7 +27,8 @@ type IngredientSelectScreenRouteProp = RouteProp<
 >;
 
 export const IngredientSelectScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<IngredientSelectScreenRouteProp>();
   const {
     recipeForm,
@@ -36,7 +37,9 @@ export const IngredientSelectScreen = () => {
     updateIngredientCategoryFilters,
   } = useFoodManagement();
 
-  const [selectedIngredients, setSelectedIngredients] = useState<RecipeIngredient[]>(recipeForm.ingredients);
+  const [selectedIngredients, setSelectedIngredients] = useState<
+    RecipeIngredient[]
+  >(recipeForm.ingredients);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredients, setIngredients] = useState([]);
@@ -45,11 +48,21 @@ export const IngredientSelectScreen = () => {
   const [hasMore, setHasMore] = useState(true);
 
   // Fetch ingredients with pagination and filtering
-  const fetchIngredients = async (query = '', categoryIds = [], offset = 0, limit = 10) => {
+  const fetchIngredients = async (
+    query = '',
+    categoryIds = [],
+    offset = 0,
+    limit = 10
+  ) => {
     try {
       setLoading(true);
       const response = await api.get('/ingredients/search', {
-        params: { query, ...(categoryIds.length > 0 && { categoryIds: categoryIds.join(',') }), offset, limit },
+        params: {
+          query,
+          ...(categoryIds.length > 0 && { categoryIds: categoryIds.join(',') }),
+          offset,
+          limit,
+        },
       });
       const { data, total } = response.data;
       return { data, total };
@@ -65,31 +78,48 @@ export const IngredientSelectScreen = () => {
     if (loading || (!hasMore && !reset)) return;
     const newOffset = reset ? 0 : offset;
     const categoryIds = ingredientCategoryFilters.map((cat) => cat.id);
-    const { data, total } = await fetchIngredients(searchQuery, categoryIds, newOffset, 10);
+    const { data, total } = await fetchIngredients(
+      searchQuery,
+      categoryIds,
+      newOffset,
+      10
+    );
     const newIngredients = reset ? data : [...ingredients, ...data];
     setIngredients(newIngredients);
     setOffset(newOffset + 10);
     setHasMore(newIngredients.length < total);
   };
 
-  const debouncedSearch = useCallback(debounce((query) => setSearchQuery(query), 500), []);
+  const debouncedSearch = useCallback(
+    debounce((query) => setSearchQuery(query), 500),
+    []
+  );
 
   useEffect(() => {
     loadIngredients(true);
   }, [searchQuery, ingredientCategoryFilters]);
 
   const toggleIngredientSelection = (ingredient) => {
-    if (selectedIngredients.some((item) => item.ingredientId === ingredient.id)) {
-      setSelectedIngredients(selectedIngredients.filter((item) => item.ingredientId !== ingredient.id));
+    if (
+      selectedIngredients.some((item) => item.ingredientId === ingredient.id)
+    ) {
+      setSelectedIngredients(
+        selectedIngredients.filter(
+          (item) => item.ingredientId !== ingredient.id
+        )
+      );
     } else {
-      setSelectedIngredients([...selectedIngredients, {
-        recipeId: '',
-        ingredientId: ingredient.id,
-        quantity: null,
-        unitId: null,
-        ingredient: ingredient,
-        unit: null
-      }]);
+      setSelectedIngredients([
+        ...selectedIngredients,
+        {
+          recipeId: '',
+          ingredientId: ingredient.id,
+          quantity: null,
+          unitId: null,
+          ingredient: ingredient,
+          unit: null,
+        },
+      ]);
     }
   };
 
@@ -98,10 +128,14 @@ export const IngredientSelectScreen = () => {
     navigation.goBack();
   };
 
-  const goToCategoryFilter = () => navigation.navigate('IngredientCategorySelectScreen');
+  const goToCategoryFilter = () =>
+    navigation.navigate('IngredientCategorySelectScreen');
 
   const filteredIngredient = ingredients.filter(
-    (category) => !selectedIngredients.some((selected) => selected.ingredientId === category.id)
+    (category) =>
+      !selectedIngredients.some(
+        (selected) => selected.ingredientId === category.id
+      )
   );
 
   const renderIngredientItem = ({ item }) => (
@@ -112,7 +146,11 @@ export const IngredientSelectScreen = () => {
       <View className="flex-row items-center flex-1">
         <View className="w-12 h-12 rounded-full overflow-hidden mr-3 border border-gray-200">
           {item.imageUrl ? (
-            <Image source={{ uri: item.imageUrl }} className="w-full h-full" resizeMode="cover" />
+            <Image
+              source={{ uri: item.imageUrl }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
           ) : (
             <View className="w-full h-full bg-gray-200 items-center justify-center">
               <Ionicons name="nutrition-outline" size={20} color="#9CA3AF" />
@@ -152,8 +190,18 @@ export const IngredientSelectScreen = () => {
         contentContainerStyle={{ paddingBottom: 16 }}
         onEndReached={() => loadIngredients(false)}
         onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <ActivityIndicator size="small" color="#941D23" className="py-4" /> : null}
-        ListEmptyComponent={!loading ? <Text className="text-center p-4 text-gray-500">Không tìm thấy nguyên liệu</Text> : null}
+        ListFooterComponent={
+          loading ? (
+            <ActivityIndicator size="small" color="#941D23" className="py-4" />
+          ) : null
+        }
+        ListEmptyComponent={
+          !loading ? (
+            <Text className="text-center p-4 text-gray-500">
+              Không tìm thấy nguyên liệu
+            </Text>
+          ) : null
+        }
         ListHeaderComponent={
           <View>
             {/* Thanh tìm kiếm và nút lọc */}
@@ -171,7 +219,12 @@ export const IngredientSelectScreen = () => {
                     }}
                   />
                   {searchInput ? (
-                    <TouchableOpacity onPress={() => { setSearchInput(''); setSearchQuery(''); }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSearchInput('');
+                        setSearchQuery('');
+                      }}
+                    >
                       <Ionicons name="close-circle" size={24} color="#454442" />
                     </TouchableOpacity>
                   ) : null}
@@ -180,10 +233,18 @@ export const IngredientSelectScreen = () => {
                   className={`p-3 rounded-lg shadow-sm ${ingredientCategoryFilters.length > 0 ? 'bg-[#941D23]' : 'bg-white'}`}
                   onPress={goToCategoryFilter}
                 >
-                  <Ionicons name="filter" size={24} color={ingredientCategoryFilters.length > 0 ? 'white' : '#454442'} />
+                  <Ionicons
+                    name="filter"
+                    size={24}
+                    color={
+                      ingredientCategoryFilters.length > 0 ? 'white' : '#454442'
+                    }
+                  />
                   {ingredientCategoryFilters.length > 0 && (
                     <View className="absolute -top-2 -right-2 bg-blue-500 rounded-full w-5 h-5 items-center justify-center">
-                      <Text className="text-white text-xs font-bold">{ingredientCategoryFilters.length}</Text>
+                      <Text className="text-white text-xs font-bold">
+                        {ingredientCategoryFilters.length}
+                      </Text>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -192,16 +253,28 @@ export const IngredientSelectScreen = () => {
 
             {/* Bộ lọc danh mục */}
             {ingredientCategoryFilters.length > 0 && (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-4 py-2">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="px-4 py-2"
+              >
                 <TouchableOpacity
                   className="bg-gray-200 rounded-full px-3 py-1 flex-row items-center"
                   onPress={() => updateIngredientCategoryFilters([])}
                 >
                   <Text className="text-gray-700">Xóa bộ lọc</Text>
-                  <Ionicons name="close-circle" size={16} color="#454442" className="ml-1" />
+                  <Ionicons
+                    name="close-circle"
+                    size={16}
+                    color="#454442"
+                    className="ml-1"
+                  />
                 </TouchableOpacity>
                 {ingredientCategoryFilters.map((category) => (
-                  <View key={category.id} className="bg-gray-100 rounded-full px-3 py-1 mr-2 flex-row items-center">
+                  <View
+                    key={category.id}
+                    className="bg-gray-100 rounded-full px-3 py-1 mr-2 flex-row items-center"
+                  >
                     <Text className="text-gray-700">{category.name}</Text>
                   </View>
                 ))}
@@ -211,7 +284,9 @@ export const IngredientSelectScreen = () => {
             {/* Nguyên liệu đã chọn */}
             {selectedIngredients.length > 0 && (
               <View className="px-4 py-3 border-b border-gray-200">
-                <Text className="font-medium mb-3">Đã chọn ({selectedIngredients.length})</Text>
+                <Text className="font-medium mb-3">
+                  Đã chọn ({selectedIngredients.length})
+                </Text>
                 <FlatList
                   data={selectedIngredients}
                   keyExtractor={(item) => item.ingredientId}
@@ -225,10 +300,18 @@ export const IngredientSelectScreen = () => {
                       <View className="relative">
                         <View className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#941D23]">
                           {item.ingredient?.imageUrl ? (
-                            <Image source={{ uri: item.ingredient.imageUrl }} className="w-full h-full" resizeMode="cover" />
+                            <Image
+                              source={{ uri: item.ingredient.imageUrl }}
+                              className="w-full h-full"
+                              resizeMode="cover"
+                            />
                           ) : (
                             <View className="w-full h-full bg-gray-200 items-center justify-center">
-                              <Ionicons name="nutrition-outline" size={24} color="#9CA3AF" />
+                              <Ionicons
+                                name="nutrition-outline"
+                                size={24}
+                                color="#9CA3AF"
+                              />
                             </View>
                           )}
                         </View>
@@ -236,7 +319,12 @@ export const IngredientSelectScreen = () => {
                           <Ionicons name="close" size={14} color="#FFFFFF" />
                         </View>
                       </View>
-                      <Text className="text-xs mt-1 text-center max-w-16" numberOfLines={2}>{item.ingredient?.name}</Text>
+                      <Text
+                        className="text-xs mt-1 text-center max-w-16"
+                        numberOfLines={2}
+                      >
+                        {item.ingredient?.name}
+                      </Text>
                     </TouchableOpacity>
                   )}
                 />

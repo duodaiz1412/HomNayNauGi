@@ -157,7 +157,7 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
         return null;
       }
       // --- VALIDATION CHI TIẾT KHI STATUS LÀ PUBLISHED ---
-      if (basicInfo.status === RecipeStatus.PUBLIC) {
+      if (basicInfo.status && basicInfo.status === RecipeStatus.PUBLIC) {
         if (!basicInfo.description || basicInfo.description.trim() === '') {
           setError('Mô tả món ăn là bắt buộc khi công khai.');
           setIsLoading(false);

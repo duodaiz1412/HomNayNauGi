@@ -33,8 +33,9 @@ export const CookingGuide = () => {
   const route = useRoute<CookingGuideRouteProp>();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { recipeId } = route.params;
+  const { recipeId, isSuggested } = route.params;
   const [recipe, setRecipe] = useState<RecipeDetailTypes | null>(null);
+  const [ingredients, setIngredients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -51,9 +52,9 @@ export const CookingGuide = () => {
         const response = await api.get(
           `/recipes/detail/${recipeId}?increaseView=false`
         );
-        
+
         console.log('Token status:', response.data.tokenStatus);
-        
+
         // Kiểm tra tokenStatus nếu API trả về
         if (response.data.tokenStatus === 'expired') {
           console.log('Token expired, attempting refresh...');
@@ -61,38 +62,47 @@ export const CookingGuide = () => {
           try {
             const refreshToken = await AsyncStorage.getItem('refreshToken');
             if (refreshToken) {
-              console.log('Found refresh token, requesting new access token...');
+              console.log(
+                'Found refresh token, requesting new access token...'
+              );
               const refreshResponse = await axios.post(
                 `${api.defaults.baseURL}/auth/refresh`,
                 { refreshToken }
               );
-              
+
               if (refreshResponse.data.accessToken) {
                 console.log('Got new access token, updating storage...');
-                await AsyncStorage.setItem('accessToken', refreshResponse.data.accessToken);
+                await AsyncStorage.setItem(
+                  'accessToken',
+                  refreshResponse.data.accessToken
+                );
                 globalThis.isLoggedIn = true;
-                
+
                 // Thử lại request với token mới
                 console.log('Re-fetching recipe with new token...');
-                const newResponse = await api.get(`/recipes/detail/${recipeId}?increaseView=false`);
+                const newResponse = await api.get(
+                  `/recipes/detail/${recipeId}?increaseView=false`
+                );
                 setRecipe(newResponse.data.data);
+                setIngredients(newResponse.data.data.recipeIngredients);
                 setIsFavorite(newResponse.data.data.isFavorite);
                 setIsLiked(newResponse.data.data.isLiked);
                 return;
               }
             }
-            
+
             // Nếu không refresh được, đánh dấu là đã đăng xuất
             console.log('Could not refresh token, logging out...');
             globalThis.isLoggedIn = false;
             await AsyncStorage.removeItem('accessToken');
             await AsyncStorage.removeItem('refreshToken');
-            
+
             // Vẫn hiển thị recipe nhưng không có trạng thái like/favorite
             setRecipe(response.data.data);
+            setIngredients(response.data.data.recipeIngredients);
             setIsFavorite(false);
             setIsLiked(false);
-            
+
             // Thông báo cho người dùng biết họ đã bị đăng xuất
             Alert.alert(
               'Phiên đăng nhập hết hạn',
@@ -102,9 +112,10 @@ export const CookingGuide = () => {
           } catch (refreshError) {
             console.error('Refresh token error:', refreshError);
             globalThis.isLoggedIn = false;
-            
+
             // Vẫn hiển thị recipe
             setRecipe(response.data.data);
+            setIngredients(response.data.data.recipeIngredients);
             setIsFavorite(false);
             setIsLiked(false);
           }
@@ -112,6 +123,7 @@ export const CookingGuide = () => {
           // Token vẫn hợp lệ hoặc không có token
           console.log('Token is valid or not present, setting recipe data...');
           setRecipe(response.data.data);
+          setIngredients(response.data.data.recipeIngredients);
           setIsFavorite(response.data.data.isFavorite);
           setIsLiked(response.data.data.isLiked);
         }
@@ -122,55 +134,57 @@ export const CookingGuide = () => {
         setLoading(false);
       }
     };
-    
+
     fetchRecipe();
   }, [recipeId]);
 
   const handleLike = async () => {
     if (!globalThis.isLoggedIn) {
-    Alert.alert(
-      'Yêu cầu đăng nhập',
-      'Bạn cần đăng nhập để thích công thức này. Chuyển đến trang đăng nhập?',
-      [
-        { text: 'Không', style: 'cancel' },
-        { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') }
-      ]
-    );
+      Alert.alert(
+        'Yêu cầu đăng nhập',
+        'Bạn cần đăng nhập để thích công thức này. Chuyển đến trang đăng nhập?',
+        [
+          { text: 'Không', style: 'cancel' },
+          { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') },
+        ]
+      );
       return;
     }
     try {
       // Lưu giá trị hiện tại để hoàn tác nếu có lỗi
       const currentIsLiked = isLiked;
       const currentTotalLikes = recipe.totalLikes;
-      
+
       // Cập nhật UI ngay lập tức (optimistic update)
       const newIsLiked = !currentIsLiked;
       setIsLiked(newIsLiked);
-      
+
       // Cập nhật số lượng likes mà không thay đổi toàn bộ recipe object
-      const newTotalLikes = newIsLiked 
-        ? currentTotalLikes + 1 
+      const newTotalLikes = newIsLiked
+        ? currentTotalLikes + 1
         : Math.max(0, currentTotalLikes - 1);
-      
+
       // Chỉ cập nhật thuộc tính totalLikes của recipe
-      setRecipe(prevRecipe => ({
+      setRecipe((prevRecipe) => ({
         ...prevRecipe,
-        totalLikes: newTotalLikes
+        totalLikes: newTotalLikes,
       }));
-      
+
       // Gọi API
       const response = await api.post(`/recipes/${recipe.id}/like`);
-      
+
       // Xử lý trường hợp response không khớp với dự đoán
       if (response.data.isLiked !== newIsLiked) {
-        console.log('Server response differs from client prediction, syncing state');
+        console.log(
+          'Server response differs from client prediction, syncing state'
+        );
         setIsLiked(response.data.isLiked);
         // Cập nhật lại totalLikes nếu cần
-        setRecipe(prevRecipe => ({
+        setRecipe((prevRecipe) => ({
           ...prevRecipe,
-          totalLikes: response.data.isLiked 
-            ? currentTotalLikes + 1 
-            : Math.max(0, currentTotalLikes - 1)
+          totalLikes: response.data.isLiked
+            ? currentTotalLikes + 1
+            : Math.max(0, currentTotalLikes - 1),
         }));
       }
     } catch (err) {
@@ -181,49 +195,51 @@ export const CookingGuide = () => {
 
   const handleFavorite = async () => {
     if (!globalThis.isLoggedIn) {
-    Alert.alert(
-      'Yêu cầu đăng nhập',
-      'Bạn cần đăng nhập để lưu công thức này. Chuyển đến trang đăng nhập?',
-      [
-        { text: 'Không', style: 'cancel' },
-        { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') }
-      ]
-    );
+      Alert.alert(
+        'Yêu cầu đăng nhập',
+        'Bạn cần đăng nhập để lưu công thức này. Chuyển đến trang đăng nhập?',
+        [
+          { text: 'Không', style: 'cancel' },
+          { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') },
+        ]
+      );
       return;
     }
     try {
       // Lưu giá trị hiện tại để hoàn tác nếu có lỗi
       const currentIsFavorite = isFavorite;
       const currentTotalFavorites = recipe.totalFavorites;
-      
+
       // Cập nhật UI ngay lập tức
       const newIsFavorite = !currentIsFavorite;
       setIsFavorite(newIsFavorite);
-      
+
       // Cập nhật số lượng favorites
-      const newTotalFavorites = newIsFavorite 
-        ? currentTotalFavorites + 1 
+      const newTotalFavorites = newIsFavorite
+        ? currentTotalFavorites + 1
         : Math.max(0, currentTotalFavorites - 1);
-      
+
       // Chỉ cập nhật thuộc tính totalFavorites
-      setRecipe(prevRecipe => ({
+      setRecipe((prevRecipe) => ({
         ...prevRecipe,
-        totalFavorites: newTotalFavorites
+        totalFavorites: newTotalFavorites,
       }));
-      
+
       // Gọi API
       const response = await api.post(`/recipes/${recipe.id}/favorite`);
-      
+
       // Xử lý trường hợp response không khớp với dự đoán
       if (response.data.isFavorite !== newIsFavorite) {
-        console.log('Server response differs from client prediction, syncing state');
+        console.log(
+          'Server response differs from client prediction, syncing state'
+        );
         setIsFavorite(response.data.isFavorite);
         // Cập nhật lại totalFavorites nếu cần
-        setRecipe(prevRecipe => ({
+        setRecipe((prevRecipe) => ({
           ...prevRecipe,
-          totalFavorites: response.data.isFavorite 
-            ? currentTotalFavorites + 1 
-            : Math.max(0, currentTotalFavorites - 1)
+          totalFavorites: response.data.isFavorite
+            ? currentTotalFavorites + 1
+            : Math.max(0, currentTotalFavorites - 1),
         }));
       }
     } catch (err) {
@@ -260,6 +276,38 @@ export const CookingGuide = () => {
       videoId = parts[parts.length - 1];
     }
   }
+
+  const handleRemoveIngredients = async () => {
+    try {
+      if (!ingredients || ingredients.length === 0) {
+        console.log('Không có nguyên liệu nào để xóa');
+        return;
+      }
+
+      const ingredientIds = ingredients.map((item) => item.ingredient.id);
+      console.log('Danh sách ID nguyên liệu:', ingredientIds);
+      
+      if (ingredientIds.length === 0) {
+        console.log('Không có ID nguyên liệu nào để xóa');
+        return;
+      }
+
+      const response = await api.delete('/pantry/delete-multiple', {
+        data: { ingredientIds },
+      });
+      console.log('Kết quả xóa nhiều nguyên liệu:', response.data);
+    } catch (error) {
+      console.error('Error removing ingredients:', error);
+      Alert.alert('Lỗi', 'Không thể xóa nguyên liệu khỏi kho');
+    }
+  }
+
+  const handleFinish = async () => {
+    if (isSuggested) {
+      await handleRemoveIngredients();
+    }
+    navigation.navigate('MainTabs');
+  };
 
   return (
     <ImageBackground
@@ -332,6 +380,7 @@ export const CookingGuide = () => {
             <TouchableOpacity
               className="rounded-full p-2 mr-2 "
               onPress={handleLike}
+              disabled={!globalThis.isLoggedIn}
               // style={{ backgroundColor: isLiked ? '#FDECEA' : 'transparent' }}
               activeOpacity={0.7}
             >
@@ -348,6 +397,7 @@ export const CookingGuide = () => {
             <TouchableOpacity
               className="rounded-full p-2 mr-2"
               onPress={handleFavorite}
+              disabled={!globalThis.isLoggedIn}
               style={{
                 backgroundColor: isFavorite ? '#FDECEA' : 'transparent',
               }}
@@ -431,7 +481,7 @@ export const CookingGuide = () => {
         {/* Nút Hoàn thành món ăn */}
         <View className="absolute bottom-10 left-0 right-0 z-10 flex-row justify-center items-center px-8">
           <TouchableOpacity
-            onPress={() => navigation.navigate('MainTabs')}
+            onPress={handleFinish}
             className="bg-red-800 rounded-full py-3 px-6 flex-row items-center shadow-lg w-2/3"
           >
             <Text className="text-white text-lg font-bold mx-auto">

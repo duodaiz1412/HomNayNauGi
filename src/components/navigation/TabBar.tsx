@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Svg, { Path } from 'react-native-svg';
+import * as ImagePicker from 'expo-image-picker';
 
 import HomeIcon from '../icons/HomeIcon';
 import RecipeIcon from '../icons/RecipeIcon';
@@ -25,7 +26,7 @@ const CAMERA_ICON_COLOR = '#4B5563';
 const ACTIVE_ICON_COLOR = '#FFFFFF';
 const ICON_SIZE_ACTIVE = 26;
 const ICON_SIZE_INACTIVE = 22;
-const ICON_SIZE_CAMERA = 26;
+const ICON_SIZE_CAMERA = 32;
 const TAB_BAR_HEIGHT = 20;
 const ACTIVE_CIRCLE_SIZE = 44;
 const ACTIVE_CIRCLE_TOP_OFFSET = -(ACTIVE_CIRCLE_SIZE / 2) + 5;
@@ -61,8 +62,35 @@ const TabBar = ({ state, descriptors, navigation }) => {
     }
   };
 
-  const handleCameraButtonPress = () => {
-    Alert.alert('Nút Thực phẩm', 'Mở danh mục thực phẩm...');
+  const handleCameraButtonPress = async () => {
+    // Yêu cầu quyền truy cập camera
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert(
+        'Quyền truy cập',
+        'Cần cấp quyền truy cập camera để có thể quét'
+      );
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: 'images',
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        // Điều hướng đến trang xử lý ảnh sau khi chụp
+        navigation.navigate('ScanIngredient', {
+          imageUri: result.assets[0].uri,
+        });
+      }
+    } catch (error) {
+      console.log('Lỗi khi mở camera:', error);
+      Alert.alert('Lỗi', 'Không thể mở camera');
+    }
   };
 
   // Hàm chạy animation floating
@@ -154,13 +182,13 @@ const TabBar = ({ state, descriptors, navigation }) => {
                   >
                     <View className="w-14 h-14 -mt-8 rounded-full bg-[#941C22] items-center justify-center shadow-lg shadow-black/30">
                       <Ionicons
-                        name="fast-food-outline"
+                        name="scan-outline"
                         size={ICON_SIZE_CAMERA}
                         color="white"
                       />
                     </View>
                     <Text className="mt-1 text-[10px] text-[#941C22] font-medium">
-                      Thực phẩm
+                      Quét
                     </Text>
                   </Pressable>
                 );

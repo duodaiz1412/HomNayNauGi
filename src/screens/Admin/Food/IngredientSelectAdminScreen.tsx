@@ -24,7 +24,8 @@ type IngredientSelectScreenRouteProp = RouteProp<
 >;
 
 export const IngredientSelectAdminScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AdminFoodStackParamList>>();
   const route = useRoute<IngredientSelectScreenRouteProp>();
   const {
     recipeForm,
@@ -33,7 +34,9 @@ export const IngredientSelectAdminScreen = () => {
     updateIngredientCategoryFilters,
   } = useFoodManagement();
 
-  const [selectedIngredients, setSelectedIngredients] = useState<RecipeIngredient[]>(recipeForm.ingredients);
+  const [selectedIngredients, setSelectedIngredients] = useState<
+    RecipeIngredient[]
+  >(recipeForm.ingredients);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredients, setIngredients] = useState([]);
@@ -42,11 +45,21 @@ export const IngredientSelectAdminScreen = () => {
   const [hasMore, setHasMore] = useState(true);
 
   // Fetch ingredients with pagination and filtering
-  const fetchIngredients = async (query = '', categoryIds = [], offset = 0, limit = 10) => {
+  const fetchIngredients = async (
+    query = '',
+    categoryIds = [],
+    offset = 0,
+    limit = 10
+  ) => {
     try {
       setLoading(true);
       const response = await api.get('/admin/ingredients/search', {
-        params: { query, ...(categoryIds.length > 0 && { categoryIds: categoryIds.join(',') }), offset, limit },
+        params: {
+          query,
+          ...(categoryIds.length > 0 && { categoryIds: categoryIds.join(',') }),
+          offset,
+          limit,
+        },
       });
       const { data, total } = response.data;
       return { data, total };
@@ -62,31 +75,48 @@ export const IngredientSelectAdminScreen = () => {
     if (loading || (!hasMore && !reset)) return;
     const newOffset = reset ? 0 : offset;
     const categoryIds = ingredientCategoryFilters.map((cat) => cat.id);
-    const { data, total } = await fetchIngredients(searchQuery, categoryIds, newOffset, 10);
+    const { data, total } = await fetchIngredients(
+      searchQuery,
+      categoryIds,
+      newOffset,
+      10
+    );
     const newIngredients = reset ? data : [...ingredients, ...data];
     setIngredients(newIngredients);
     setOffset(newOffset + 10);
     setHasMore(newIngredients.length < total);
   };
 
-  const debouncedSearch = useCallback(debounce((query) => setSearchQuery(query), 500), []);
+  const debouncedSearch = useCallback(
+    debounce((query) => setSearchQuery(query), 500),
+    []
+  );
 
   useEffect(() => {
     loadIngredients(true);
   }, [searchQuery, ingredientCategoryFilters]);
 
   const toggleIngredientSelection = (ingredient) => {
-    if (selectedIngredients.some((item) => item.ingredientId === ingredient.id)) {
-      setSelectedIngredients(selectedIngredients.filter((item) => item.ingredientId !== ingredient.id));
+    if (
+      selectedIngredients.some((item) => item.ingredientId === ingredient.id)
+    ) {
+      setSelectedIngredients(
+        selectedIngredients.filter(
+          (item) => item.ingredientId !== ingredient.id
+        )
+      );
     } else {
-      setSelectedIngredients([...selectedIngredients, {
-        recipeId: '',
-        ingredientId: ingredient.id,
-        quantity: null,
-        unitId: null,
-        ingredient: ingredient,
-        unit: null
-      }]);
+      setSelectedIngredients([
+        ...selectedIngredients,
+        {
+          recipeId: '',
+          ingredientId: ingredient.id,
+          quantity: null,
+          unitId: null,
+          ingredient: ingredient,
+          unit: null,
+        },
+      ]);
     }
   };
 
@@ -95,10 +125,14 @@ export const IngredientSelectAdminScreen = () => {
     navigation.goBack();
   };
 
-  const goToCategoryFilter = () => navigation.navigate('IngredientCategorySelectScreen');
+  const goToCategoryFilter = () =>
+    navigation.navigate('IngredientCategorySelectScreen');
 
   const filteredIngredient = ingredients.filter(
-    (category) => !selectedIngredients.some((selected) => selected.ingredientId === category.id)
+    (category) =>
+      !selectedIngredients.some(
+        (selected) => selected.ingredientId === category.id
+      )
   );
 
   const renderIngredientItem = ({ item }) => (
@@ -136,7 +170,11 @@ export const IngredientSelectAdminScreen = () => {
         onEndReached={() => loadIngredients(false)}
         onEndReachedThreshold={0.5}
         ListFooterComponent={loading ? <Text>Đang tải...</Text> : null}
-        ListEmptyComponent={!loading ? <Text className="text-center">Không tìm thấy danh mục</Text> : null}
+        ListEmptyComponent={
+          !loading ? (
+            <Text className="text-center">Không tìm thấy danh mục</Text>
+          ) : null
+        }
         ListHeaderComponent={
           <View>
             {/* Thanh tìm kiếm và nút lọc */}
@@ -154,7 +192,12 @@ export const IngredientSelectAdminScreen = () => {
                     }}
                   />
                   {searchInput ? (
-                    <TouchableOpacity onPress={() => { setSearchInput(''); setSearchQuery(''); }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSearchInput('');
+                        setSearchQuery('');
+                      }}
+                    >
                       <Ionicons name="close-circle" size={24} color="#454442" />
                     </TouchableOpacity>
                   ) : null}
@@ -163,10 +206,18 @@ export const IngredientSelectAdminScreen = () => {
                   className={`p-3 rounded-lg shadow-sm ${ingredientCategoryFilters.length > 0 ? 'bg-[#941D23]' : 'bg-white'}`}
                   onPress={goToCategoryFilter}
                 >
-                  <Ionicons name="filter" size={24} color={ingredientCategoryFilters.length > 0 ? 'white' : '#454442'} />
+                  <Ionicons
+                    name="filter"
+                    size={24}
+                    color={
+                      ingredientCategoryFilters.length > 0 ? 'white' : '#454442'
+                    }
+                  />
                   {ingredientCategoryFilters.length > 0 && (
                     <View className="absolute -top-2 -right-2 bg-blue-500 rounded-full w-5 h-5 items-center justify-center">
-                      <Text className="text-white text-xs font-bold">{ingredientCategoryFilters.length}</Text>
+                      <Text className="text-white text-xs font-bold">
+                        {ingredientCategoryFilters.length}
+                      </Text>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -175,16 +226,28 @@ export const IngredientSelectAdminScreen = () => {
 
             {/* Bộ lọc danh mục */}
             {ingredientCategoryFilters.length > 0 && (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-4 py-2">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="px-4 py-2"
+              >
                 <TouchableOpacity
                   className="bg-gray-200 rounded-full px-3 py-1 flex-row items-center"
                   onPress={() => updateIngredientCategoryFilters([])}
                 >
                   <Text className="text-gray-700">Xóa bộ lọc</Text>
-                  <Ionicons name="close-circle" size={16} color="#454442" className="ml-1" />
+                  <Ionicons
+                    name="close-circle"
+                    size={16}
+                    color="#454442"
+                    className="ml-1"
+                  />
                 </TouchableOpacity>
                 {ingredientCategoryFilters.map((category) => (
-                  <View key={category.id} className="bg-gray-100 rounded-full px-3 py-1 mr-2 flex-row items-center">
+                  <View
+                    key={category.id}
+                    className="bg-gray-100 rounded-full px-3 py-1 mr-2 flex-row items-center"
+                  >
                     <Text className="text-gray-700">{category.name}</Text>
                   </View>
                 ))}
@@ -194,15 +257,21 @@ export const IngredientSelectAdminScreen = () => {
             {/* Nguyên liệu đã chọn */}
             {selectedIngredients.length > 0 && (
               <View className="px-4 py-2">
-                <Text className="font-medium mb-2">Đã chọn ({selectedIngredients.length})</Text>
+                <Text className="font-medium mb-2">
+                  Đã chọn ({selectedIngredients.length})
+                </Text>
                 <View className="flex-row flex-wrap">
                   {selectedIngredients.map((ingredient) => (
                     <TouchableOpacity
                       key={ingredient.ingredientId}
                       className="bg-[#941D23] rounded-full px-3 py-1 mr-2 mb-2 flex-row items-center"
-                      onPress={() => toggleIngredientSelection(ingredient.ingredient)}
+                      onPress={() =>
+                        toggleIngredientSelection(ingredient.ingredient)
+                      }
                     >
-                      <Text className="text-white mr-1">{ingredient.ingredient?.name}</Text>
+                      <Text className="text-white mr-1">
+                        {ingredient.ingredient?.name}
+                      </Text>
                       <Ionicons name="close-circle" size={16} color="#FFFFFF" />
                     </TouchableOpacity>
                   ))}
