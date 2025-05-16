@@ -14,8 +14,14 @@ import { Ionicons } from '@expo/vector-icons';
 import MyIngredient from '@components/MyIngredient';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import SuggestDish from '@components/SuggestDish/index';
-import { getUserPantry, removeIngredientFromPantry, removeAllIngredientsFromPantry } from '../../api/api';
+import {
+  getUserPantry,
+  removeIngredientFromPantry,
+  removeAllIngredientsFromPantry,
+  findRecipesByIngredients,
+} from '../../api/api';
+import { IngredientSearch, RecipeResponse } from 'src/types';
+import SuggestedRecipe from '@components/SuggestedRecipe';
 
 interface Ingredient {
   id: string;
@@ -34,23 +40,57 @@ export default function RecipeScreen() {
   const [activeTab, setActiveTab] = useState<'ingredients' | 'dishes'>(
     'ingredients'
   );
-  const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>([]);
-  const [suggestedDishes, setSuggestedDishes] = useState<any[]>([]);
+  const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>(
+    []
+  );
+  const [suggestedDishes, setSuggestedDishes] = useState<RecipeResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingDishes, setLoadingDishes] = useState(false);
 
   useEffect(() => {
     fetchPantryData();
   }, []);
+
+  useEffect(() => {
+  }, [suggestedDishes]);
 
   const fetchPantryData = async () => {
     try {
       setLoading(true);
       const data = await getUserPantry();
       setIngredientGroups(data);
+      handleGetSuggestedDish();
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu pantry:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGetSuggestedDish = async () => {
+    try {
+      setLoadingDishes(true);
+      // Lấy tất cả ID nguyên liệu từ ingredientGroups
+      const ingredientIds: IngredientSearch[] = ingredientGroups.reduce(
+        (acc, group) =>
+          acc.concat(
+            group.ingredients.map((ingredient) => ({ id: ingredient.id }))
+          ),
+        [] as IngredientSearch[]
+      );
+
+      if (ingredientIds.length === 0) {
+        setSuggestedDishes([]);
+        return;
+      }
+
+      const response = await findRecipesByIngredients(ingredientIds);
+      setSuggestedDishes(response.data);
+    } catch (error) {
+      console.error('Lỗi khi lấy món ăn gợi ý:', error);
+      Alert.alert('Lỗi', 'Không thể lấy danh sách món ăn gợi ý');
+    } finally {
+      setLoadingDishes(false);
     }
   };
 
@@ -70,34 +110,33 @@ export default function RecipeScreen() {
   };
 
   const handleDeleteAll = async () => {
-    Alert.alert(
-      'Xác nhận',
-      'Bạn có chắc chắn muốn xóa tất cả nguyên liệu?',
-      [
-        {
-          text: 'Hủy',
-          style: 'cancel',
+    Alert.alert('Xác nhận', 'Bạn có chắc chắn muốn xóa tất cả nguyên liệu?', [
+      {
+        text: 'Hủy',
+        style: 'cancel',
+      },
+      {
+        text: 'Xóa',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await removeAllIngredientsFromPantry();
+            // Refresh data after deletion
+            fetchPantryData();
+          } catch (error) {
+            Alert.alert('Lỗi', 'Không thể xóa tất cả nguyên liệu');
+          }
         },
-        {
-          text: 'Xóa',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeAllIngredientsFromPantry();
-              // Refresh data after deletion
-              fetchPantryData();
-            } catch (error) {
-              Alert.alert('Lỗi', 'Không thể xóa tất cả nguyên liệu');
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleAddIngredient = () => {
     navigation.navigate('AddIngredient', {
       isMultiSelect: true,
+      onAddSuccess: () => {
+        fetchPantryData();
+      },
     });
   };
 
@@ -183,10 +222,16 @@ export default function RecipeScreen() {
           </ScrollView>
         ) : (
           <View className="flex-1 px-4">
-            {/* <SuggestDish
-              dishes={suggestedDishes}
-              onDishPress={handleDishPress}
-            /> */}
+            {loadingDishes ? (
+              <View className="flex-1 justify-center items-center">
+                <ActivityIndicator size="large" color="#B91C1C" />
+              </View>
+            ) : (
+              <SuggestedRecipe
+                dishes={suggestedDishes}
+                onDishPress={handleDishPress}
+              />
+            )}
           </View>
         )}
 
