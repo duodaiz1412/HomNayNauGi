@@ -19,7 +19,7 @@ export default function RecipeDetailScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RecipeDetailScreenRouteProp>();
-  const { recipeId } = route.params;
+  const { recipeId, isSuggested } = route.params;
 
   const [recipe, setRecipe] = useState<RecipeDetailTypes | null>(null);
   const [loading, setLoading] = useState(true);
@@ -199,7 +199,7 @@ export default function RecipeDetailScreen() {
   };
 
   const handleStartCooking = (id: string) => {
-    navigation.navigate('CookingGuide', { recipeId: recipeId });
+    navigation.navigate('CookingGuide', { recipeId: recipeId, isSuggested: isSuggested });
   };
 
   return (

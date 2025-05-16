@@ -153,10 +153,10 @@ const SettingsScreen = () => {
               <Text className="text-black font-semibold">Tiếng Việt</Text>
             </View>
 
-            {/* Chế độ tối */}
-            <View className="flex-row justify-between items-center mb-1">
-              <Text className="text-black">Chế độ tối</Text>
-              <Switch value={darkMode} onValueChange={setDarkMode} />
+            {/* Quốc gia */}
+            <View className="flex-row justify-between items-center mb-">
+              <Text className="text-black">Quốc gia</Text>
+              <Text className="text-black font-semibold">Việt Nam</Text>
             </View>
           </View>
 

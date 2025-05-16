@@ -33,8 +33,9 @@ export const CookingGuide = () => {
   const route = useRoute<CookingGuideRouteProp>();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { recipeId } = route.params;
+  const { recipeId, isSuggested } = route.params;
   const [recipe, setRecipe] = useState<RecipeDetailTypes | null>(null);
+  const [ingredients, setIngredients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -83,6 +84,7 @@ export const CookingGuide = () => {
                   `/recipes/detail/${recipeId}?increaseView=false`
                 );
                 setRecipe(newResponse.data.data);
+                setIngredients(newResponse.data.data.recipeIngredients);
                 setIsFavorite(newResponse.data.data.isFavorite);
                 setIsLiked(newResponse.data.data.isLiked);
                 return;
@@ -97,6 +99,7 @@ export const CookingGuide = () => {
 
             // Vẫn hiển thị recipe nhưng không có trạng thái like/favorite
             setRecipe(response.data.data);
+            setIngredients(response.data.data.recipeIngredients);
             setIsFavorite(false);
             setIsLiked(false);
 
@@ -112,6 +115,7 @@ export const CookingGuide = () => {
 
             // Vẫn hiển thị recipe
             setRecipe(response.data.data);
+            setIngredients(response.data.data.recipeIngredients);
             setIsFavorite(false);
             setIsLiked(false);
           }
@@ -119,6 +123,7 @@ export const CookingGuide = () => {
           // Token vẫn hợp lệ hoặc không có token
           console.log('Token is valid or not present, setting recipe data...');
           setRecipe(response.data.data);
+          setIngredients(response.data.data.recipeIngredients);
           setIsFavorite(response.data.data.isFavorite);
           setIsLiked(response.data.data.isLiked);
         }
@@ -271,6 +276,38 @@ export const CookingGuide = () => {
       videoId = parts[parts.length - 1];
     }
   }
+
+  const handleRemoveIngredients = async () => {
+    try {
+      if (!ingredients || ingredients.length === 0) {
+        console.log('Không có nguyên liệu nào để xóa');
+        return;
+      }
+
+      const ingredientIds = ingredients.map((item) => item.ingredient.id);
+      console.log('Danh sách ID nguyên liệu:', ingredientIds);
+      
+      if (ingredientIds.length === 0) {
+        console.log('Không có ID nguyên liệu nào để xóa');
+        return;
+      }
+
+      const response = await api.delete('/pantry/delete-multiple', {
+        data: { ingredientIds },
+      });
+      console.log('Kết quả xóa nhiều nguyên liệu:', response.data);
+    } catch (error) {
+      console.error('Error removing ingredients:', error);
+      Alert.alert('Lỗi', 'Không thể xóa nguyên liệu khỏi kho');
+    }
+  }
+
+  const handleFinish = async () => {
+    if (isSuggested) {
+      await handleRemoveIngredients();
+    }
+    navigation.navigate('MainTabs');
+  };
 
   return (
     <ImageBackground
@@ -444,7 +481,7 @@ export const CookingGuide = () => {
         {/* Nút Hoàn thành món ăn */}
         <View className="absolute bottom-10 left-0 right-0 z-10 flex-row justify-center items-center px-8">
           <TouchableOpacity
-            onPress={() => navigation.navigate('MainTabs')}
+            onPress={handleFinish}
             className="bg-red-800 rounded-full py-3 px-6 flex-row items-center shadow-lg w-2/3"
           >
             <Text className="text-white text-lg font-bold mx-auto">
