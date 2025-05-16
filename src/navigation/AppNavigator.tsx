@@ -60,7 +60,7 @@ export type RootStackParamList = {
   };
   IngredientsScreen: { ingredients: Ingredient[] };
   SearchByRecipeScreen: undefined;
-  ListDishesScreen: { mealId: number };
+  ListDishesScreen: { mealId ?: number; query?:string};
   FilterScreen: undefined;
   ProfileScreen: undefined;
   FavoritesScreen: undefined;
@@ -162,6 +162,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen name="ListDishesScreen" component={ListDishesScreen} />
         <Stack.Screen name="FilterScreen" component={FilterScreen} />
+        <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
         <Stack.Screen
           name="AddIngredient"
           component={AddIngredientScreen}

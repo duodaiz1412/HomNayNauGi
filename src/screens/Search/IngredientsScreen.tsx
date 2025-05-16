@@ -31,7 +31,7 @@ const IngredientsScreen = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [ingredientData, setIngredientData] = useState(
-    (ingredients || []).map((item) => ({ ...item }))
+    (ingredients || []).map(item => ({ ...item }))
   );
   const [loading, setLoading] = useState(false);
 
@@ -42,45 +42,9 @@ const IngredientsScreen = () => {
   const [isLoadingDishes, setIsLoadingDishes] = useState(false);
 
   const handleSubmit = () => {
-    // console.log('Nguyên liệu để tìm món:', ingredientData);
-    navigation.navigate('SearchByIngredientScreen', {
-      ingredients: ingredientData,
-    });
+    console.log('Nguyên liệu để tìm món:', ingredientData);
+    navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData });
   };
-
-  // const handleFindRecipe = async () => {
-  //     if (ingredientData.length > 0) {
-  //       setIsLoadingDishes(true);
-  //       try {
-  //         const searchIngredients = ingredientData.map(ing => ({
-  //           id: ing.id
-  //         }));
-          
-  //         const response = await findRecipesByIngredients(searchIngredients);
-  //         console.log('Kết quả tìm kiếm món ăn:', response);
-  //         setSuggestedDishes(response.data);
-  //         setShowSuggestDish(true);
-  //       } catch (error) {
-  //         Alert.alert('Lỗi', 'Không thể tìm kiếm món ăn. Vui lòng thử lại.');
-  //       } finally {
-  //         setIsLoadingDishes(false);
-  //       }
-  //     } else {
-  //       Alert.alert(
-  //         'Thông báo',
-  //         'Vui lòng có ít nhất một nguyên liệu để tìm kiếm'
-  //       );
-  //     }
-  //   };
-  
-    // const handleDishPress = (id: string) => {
-    //   setShowSuggestDish(false);
-    //   navigation.navigate('RecipeDetail', { recipeId: id });
-    // };
-  
-    // const handleEdit = () => {
-    //   Alert.alert('Thông báo', 'Chức năng chỉnh sửa sẽ được phát triển sau');
-    // };
 
   const handleFindRecipe = async () => {
       if (ingredientData.length > 0) {
@@ -128,12 +92,7 @@ const IngredientsScreen = () => {
             <Ionicons name="create-outline" size={22} color="#333" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleSubmit}>
-            <Ionicons
-              name="add-circle-outline"
-              size={22}
-              color="#333"
-              style={{ marginLeft: 12 }}
-            />
+            <Ionicons name="add-circle-outline" size={22} color="#333" style={{ marginLeft: 12 }} />
           </TouchableOpacity>
         </View>
       </View>
@@ -172,7 +131,7 @@ const IngredientsScreen = () => {
         <Text style={styles.buttonText}>Tìm món ngay 🍜</Text>
       </TouchableOpacity>
 
-      {/* <Modal
+      <Modal
         visible={showSuggestDish}
         animationType="slide"
         onRequestClose={() => setShowSuggestDish(false)}
@@ -199,7 +158,7 @@ const IngredientsScreen = () => {
             />
           )}
         </SafeAreaView>
-      </Modal> */}
+      </Modal>
     </View>
   );
 };
