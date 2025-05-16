@@ -209,6 +209,20 @@ export const getIngredientCategories = async (
   }
 };
 
+export const getUserPantry = async () => {
+  try {
+    const response = await api.get('/pantry/me');
+    console.log('Pantry của người dùng:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      'Lỗi khi lấy pantry của người dùng:',
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
 // Thêm nguyên liệu vào pantry
 export const addToPantry = async (ingredientIds: string[]) => {
   try {
@@ -238,6 +252,36 @@ export const getUserProfile = async () => {
   } catch (error) {
     console.error(
       'Lỗi khi lấy thông tin người dùng:',
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// Xóa một nguyên liệu khỏi pantry
+export const removeIngredientFromPantry = async (ingredientId: string) => {
+  try {
+    console.log('Xóa nguyên liệu khỏi pantry:', ingredientId);
+    const response = await api.delete(`/pantry/${ingredientId}`);
+    console.log('Kết quả xóa nguyên liệu:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      'Lỗi khi xóa nguyên liệu khỏi pantry:',
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const removeAllIngredientsFromPantry = async () => {
+  try {
+    const response = await api.delete('/pantry/delete-all');
+    console.log('Kết quả xóa tất cả nguyên liệu:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      'Lỗi khi xóa tất cả nguyên liệu khỏi pantry:',
       error.response?.data || error.message
     );
     throw error;

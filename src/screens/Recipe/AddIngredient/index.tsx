@@ -168,6 +168,7 @@ const AddIngredientScreen = ({ navigation, route }) => {
       }
 
       Alert.alert('Thông báo', message);
+      route.params?.onAddSuccess?.();
       navigation.goBack();
     } catch (error) {
       Alert.alert('Lỗi', 'Không thể thêm nguyên liệu. Vui lòng thử lại sau');
