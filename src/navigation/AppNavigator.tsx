@@ -6,10 +6,11 @@ import LoginScreen from '../screens/Login/LoginScreen';
 import { RegisterScreen } from '../screens/Login/RegisterScreen';
 import AboutScreen from '../screens/About/AboutScreen';
 import RecipeDetailScreen from '../screens/Recipe/RecipeDetailScreen';
-import {CookingGuide} from '../screens/Recipe/CookingGuide';
+import { CookingGuide } from '../screens/Recipe/CookingGuide';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import AddIngredientScreen from '@screens/Recipe/AddIngredient';
-import AddDishScreen from '../screens/AddDish';
+import AddDishScreen from '../screens/AddDish/AddDishScreen';
+import EditDishScreen from '../screens/AddDish/EditDishScreen';
 import SearchByIngredientScreen from '../screens/Search/SearchByIngredientScreen';
 import IngredientsScreen from '../screens/Search/IngredientsScreen';
 import SearchByRecipeScreen from '../screens/Search/SearchByRecipeScreen';
@@ -18,7 +19,7 @@ import FilterScreen from '../screens/Search/FilterScreen';
 import PersonalScreen from '../screens/Profile/PersonalScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import FavoritesScreen from '../screens/Profile/FavoritesScreen';
-import NotificationsScreen from '../screens/Profile/NotificationsScreen';
+import HistoryScreen from '../screens/Profile/HistoryScreen';
 import AchievementsScreen from '../screens/Profile/AchievementsScreen';
 import SettingsScreen from '../screens/Profile/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/Profile/PrivacyPolicyScreen';
@@ -26,6 +27,11 @@ import SupportScreen from '../screens/Profile/SupportScreen';
 import AboutUsScreen from '../screens/Profile/AboutUsScreen';
 import { AdminDrawerNavigator } from './AdminDrawerNavigator';
 import ScanIngredientScreen from '../screens/ScanIngredient/ScanIngredientScreen';
+
+import { CategorySelectScreen } from '@screens/AddDish/CategorySelectScreen';
+import { IngredientSelectScreen } from '@screens/AddDish/IngredientSelectScreen';
+import { IngredientCategorySelectScreen } from '@screens/AddDish/IngredientCategorySelect';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Ingredient {
   id: string;
@@ -44,11 +50,12 @@ export type RootStackParamList = {
   EditProfileScreen: undefined;
   AddIngredient: { isMultiSelect: boolean };
   AddDish: undefined;
+  EditDishScreen: { recipeId: string };
   SearchByIngredientScreen: {
     ingredients?: {
       id: string;
       name: string;
-      image: string;
+      imageUrl: string;
     }[];
   };
   IngredientsScreen: { ingredients: Ingredient[] };
@@ -58,21 +65,47 @@ export type RootStackParamList = {
   ProfileScreen: undefined;
   FavoritesScreen: undefined;
   HistoryScreen: undefined;
-  NotificationsScreen: undefined;
   AchievementsScreen: undefined;
   SettingsScreen: undefined;
   PrivacyPolicyScreen: undefined;
   SupportScreen: undefined;
   AboutUsScreen: undefined;
   AddDishScreen: undefined;
+  CategorySelectScreen: undefined;
+  IngredientSelectScreen: undefined;
+  IngredientCategorySelectScreen: undefined;
   AdminDrawerNavigator: undefined;
   PersonalScreen: undefined;
-  ScanIngredient: { imageUri: string };
+  ScanIngredient: { imageUri?: string, selectedIngredients?: Ingredient[] };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
+  // useEffect(() => {
+  //   checkFirstLaunch();
+  // }, []);
+
+  // const checkFirstLaunch = async () => {
+  //   try {
+  //     // Kiểm tra xem app đã được khởi chạy trước đó chưa
+  //     const hasLaunched = await AsyncStorage.getItem('hasLaunched');
+
+  //     if (hasLaunched === null) {
+  //       // Lần đầu khởi chạy app, xóa tất cả dữ liệu
+  //       console.log('First launch - clearing AsyncStorage');
+  //       await AsyncStorage.clear();
+
+  //       // Đánh dấu app đã được khởi chạy
+  //       await AsyncStorage.setItem('hasLaunched', 'true');
+  //     } else {
+  //       console.log('App has been launched before');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error checking first launch:', error);
+  //   }
+  // };
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -93,10 +126,7 @@ const AppNavigator = () => {
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="PersonalScreen" component={PersonalScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
-        <Stack.Screen
-          name="NotificationsScreen"
-          component={NotificationsScreen}
-        />
+        <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
         <Stack.Screen
           name="AchievementsScreen"
           component={AchievementsScreen}
@@ -107,13 +137,25 @@ const AppNavigator = () => {
           component={PrivacyPolicyScreen}
         />
         <Stack.Screen name="AddDishScreen" component={AddDishScreen} />
+        <Stack.Screen name="EditDishScreen" component={EditDishScreen} />
+        <Stack.Screen
+          name="CategorySelectScreen"
+          component={CategorySelectScreen}
+        />
+        <Stack.Screen
+          name="IngredientSelectScreen"
+          component={IngredientSelectScreen}
+        />
+        <Stack.Screen
+          name="IngredientCategorySelectScreen"
+          component={IngredientCategorySelectScreen}
+        />
         <Stack.Screen
           name="SearchByIngredientScreen"
           component={SearchByIngredientScreen}
         />
         <Stack.Screen name="SupportScreen" component={SupportScreen} />
         <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
-        <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
         <Stack.Screen
           name="SearchByRecipeScreen"
           component={SearchByRecipeScreen}

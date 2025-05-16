@@ -72,6 +72,8 @@ interface FoodManagementContextType {
   updateRecipe: (id: string, recipe: Partial<Recipe>) => Promise<Recipe>;
   deleteRecipe: (id: string) => Promise<boolean>;
   publicRecipe: (id: string) => Promise<Recipe>;
+  createRecipeForUser: (payload: ClientCreateRecipePayload) => Promise<Recipe>;
+  updateRecipeForUser: (payload: ClientCreateRecipePayload) => Promise<Recipe>;
 
   // Recipe Category CRUD
   getRecipeCategories: () => Promise<RecipeCategory[]>;
@@ -231,7 +233,9 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       return null;
     }
   };
-  const createRecipeWithDetails = async (payload: ClientCreateRecipePayload): Promise<Recipe> => {
+  const createRecipeWithDetails = async (
+    payload: ClientCreateRecipePayload
+  ): Promise<Recipe> => {
     try {
       setIsLoadingRecipes(true);
       const formData = new FormData();
@@ -240,7 +244,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       formData.append('name', payload.name);
       formData.append('description', payload.description || '');
       formData.append('status', payload.status);
-      
+
       // Only append hasNewRecipeImageFile if it's true
       if (payload.hasNewRecipeImageFile) {
         formData.append('hasNewRecipeImageFile', 'true');
@@ -254,19 +258,31 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
 
       if (payload.ingredients && payload.ingredients.length > 0) {
         payload.ingredients.forEach((ing, index) => {
-          formData.append(`ingredients[${index}][ingredientId]`, ing.ingredientId);
+          formData.append(
+            `ingredients[${index}][ingredientId]`,
+            ing.ingredientId
+          );
           if (ing.quantity !== null && ing.quantity !== undefined) {
-            formData.append(`ingredients[${index}][quantity]`, ing.quantity.toString());
+            formData.append(
+              `ingredients[${index}][quantity]`,
+              ing.quantity.toString()
+            );
           }
           if (ing.unitId !== null && ing.unitId !== undefined) {
-            formData.append(`ingredients[${index}][unitId]`, ing.unitId.toString());
+            formData.append(
+              `ingredients[${index}][unitId]`,
+              ing.unitId.toString()
+            );
           }
         });
       }
 
       if (payload.steps && payload.steps.length > 0) {
         payload.steps.forEach((step, index) => {
-          formData.append(`steps[${index}][stepOrder]`, step.stepOrder.toString());
+          formData.append(
+            `steps[${index}][stepOrder]`,
+            step.stepOrder.toString()
+          );
           formData.append(`steps[${index}][instruction]`, step.instruction);
           if (step.imageUrl !== null && step.imageUrl !== undefined) {
             formData.append(`steps[${index}][imageUrl]`, step.imageUrl);
@@ -288,11 +304,20 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       if (payload.calories !== null && payload.calories !== undefined) {
         formData.append('calories', payload.calories.toString());
       }
-      if (payload.carbohydrates !== null && payload.carbohydrates !== undefined) {
+      if (
+        payload.carbohydrates !== null &&
+        payload.carbohydrates !== undefined
+      ) {
         formData.append('carbohydrates', payload.carbohydrates.toString());
       }
-      if (payload.preparationTimeMinutes !== null && payload.preparationTimeMinutes !== undefined) {
-        formData.append('preparationTimeMinutes', payload.preparationTimeMinutes.toString());
+      if (
+        payload.preparationTimeMinutes !== null &&
+        payload.preparationTimeMinutes !== undefined
+      ) {
+        formData.append(
+          'preparationTimeMinutes',
+          payload.preparationTimeMinutes.toString()
+        );
       }
       if (payload.videoUrl) {
         formData.append('videoUrl', payload.videoUrl);
@@ -311,7 +336,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
         });
       }
 
-      console.log("FORMDATA SEND", formData);
+      console.log('FORMDATA SEND', formData);
       const response = await api.post('/admin/recipes/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -322,7 +347,11 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       setRecipes((prev) => [newRecipe, ...prev]);
       return newRecipe;
     } catch (error: any) {
-      console.error('Error creating recipe in context:', error.response?.data || error.message, error.config);
+      console.error(
+        'Error creating recipe in context:',
+        error.response?.data || error.message,
+        error.config
+      );
       const apiError = error.response?.data;
       if (apiError && apiError.message) {
         if (Array.isArray(apiError.message)) {
@@ -626,8 +655,12 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
         ingredientId: ingredient.ingredientId || '',
         quantity: ingredient.quantity || null,
         unitId: ingredient.unitId || null,
-        ingredient: { id: ingredient.ingredientId || '', name: '', imageUrl: null },
-        unit: null
+        ingredient: {
+          id: ingredient.ingredientId || '',
+          name: '',
+          imageUrl: null,
+        },
+        unit: null,
       };
 
       // Trong thực tế, bạn sẽ cập nhật dữ liệu thông qua API
@@ -651,7 +684,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
         quantity: data.quantity !== undefined ? data.quantity : null,
         unitId: data.unitId !== undefined ? data.unitId : null,
         ingredient: { id: ingredientId, name: '', imageUrl: null },
-        unit: null
+        unit: null,
       };
 
       // Trong thực tế, bạn sẽ cập nhật dữ liệu thông qua API
@@ -749,8 +782,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
   const getUnitsOfMeasure = async (): Promise<UnitOfMeasure[]> => {
     try {
       // Giả lập API call
-      const mockUnits: UnitOfMeasure[] = [
-      ];
+      const mockUnits: UnitOfMeasure[] = [];
 
       setUnitsOfMeasure(mockUnits);
       return mockUnits;
@@ -761,35 +793,36 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // Form actions
-const updateBasicInfo = (info: Partial<Recipe>) => {
-  setRecipeForm(prevForm => ({ // prevForm ở đây LUÔN là giá trị state mới nhất
-    ...prevForm, // Lấy toàn bộ giá trị hiện tại của form
-    basicInfo: {
-      ...prevForm.basicInfo, // Lấy giá trị basicInfo hiện tại
-      ...info, // Áp dụng thay đổi mới cho basicInfo
-    },
-  }));
-};
+  const updateBasicInfo = (info: Partial<Recipe>) => {
+    setRecipeForm((prevForm) => ({
+      // prevForm ở đây LUÔN là giá trị state mới nhất
+      ...prevForm, // Lấy toàn bộ giá trị hiện tại của form
+      basicInfo: {
+        ...prevForm.basicInfo, // Lấy giá trị basicInfo hiện tại
+        ...info, // Áp dụng thay đổi mới cho basicInfo
+      },
+    }));
+  };
 
-const updateCategories = (categories: RecipeCategory[]) => {
-  setRecipeForm(prevForm => ({
-    ...prevForm,
-    categories, // Ghi đè categories
-  }));
-};
-const updateIngredients = (ingredients: RecipeIngredient[]) => {
-  setRecipeForm(prevForm => ({
-    ...prevForm,
-    ingredients, // Ghi đè ingredients
-  }));
-};
+  const updateCategories = (categories: RecipeCategory[]) => {
+    setRecipeForm((prevForm) => ({
+      ...prevForm,
+      categories, // Ghi đè categories
+    }));
+  };
+  const updateIngredients = (ingredients: RecipeIngredient[]) => {
+    setRecipeForm((prevForm) => ({
+      ...prevForm,
+      ingredients, // Ghi đè ingredients
+    }));
+  };
 
-const updateSteps = (steps: CookingStep[]) => {
-  setRecipeForm(prevForm => ({
-    ...prevForm,
-    steps, // Ghi đè steps
-  }));
-};
+  const updateSteps = (steps: CookingStep[]) => {
+    setRecipeForm((prevForm) => ({
+      ...prevForm,
+      steps, // Ghi đè steps
+    }));
+  };
 
   const resetForm = () => {
     setRecipeForm({
@@ -800,7 +833,9 @@ const updateSteps = (steps: CookingStep[]) => {
     });
   };
 
-  const updateRecipeWithDetails = async (payload: ClientCreateRecipePayload): Promise<Recipe> => {
+  const updateRecipeWithDetails = async (
+    payload: ClientCreateRecipePayload
+  ): Promise<Recipe> => {
     try {
       setIsLoadingRecipes(true);
       const formData = new FormData();
@@ -810,7 +845,7 @@ const updateSteps = (steps: CookingStep[]) => {
       formData.append('name', payload.name);
       formData.append('description', payload.description || '');
       formData.append('status', payload.status);
-      
+
       // Only append hasNewRecipeImageFile if it's true
       if (payload.hasNewRecipeImageFile) {
         formData.append('hasNewRecipeImageFile', 'true');
@@ -824,19 +859,31 @@ const updateSteps = (steps: CookingStep[]) => {
 
       if (payload.ingredients && payload.ingredients.length > 0) {
         payload.ingredients.forEach((ing, index) => {
-          formData.append(`ingredients[${index}][ingredientId]`, ing.ingredientId);
+          formData.append(
+            `ingredients[${index}][ingredientId]`,
+            ing.ingredientId
+          );
           if (ing.quantity !== null && ing.quantity !== undefined) {
-            formData.append(`ingredients[${index}][quantity]`, ing.quantity.toString());
+            formData.append(
+              `ingredients[${index}][quantity]`,
+              ing.quantity.toString()
+            );
           }
           if (ing.unitId !== null && ing.unitId !== undefined) {
-            formData.append(`ingredients[${index}][unitId]`, ing.unitId.toString());
+            formData.append(
+              `ingredients[${index}][unitId]`,
+              ing.unitId.toString()
+            );
           }
         });
       }
 
       if (payload.steps && payload.steps.length > 0) {
         payload.steps.forEach((step, index) => {
-          formData.append(`steps[${index}][stepOrder]`, step.stepOrder.toString());
+          formData.append(
+            `steps[${index}][stepOrder]`,
+            step.stepOrder.toString()
+          );
           formData.append(`steps[${index}][instruction]`, step.instruction);
           if (step.imageUrl !== null && step.imageUrl !== undefined) {
             formData.append(`steps[${index}][imageUrl]`, step.imageUrl);
@@ -858,11 +905,20 @@ const updateSteps = (steps: CookingStep[]) => {
       if (payload.calories !== null && payload.calories !== undefined) {
         formData.append('calories', payload.calories.toString());
       }
-      if (payload.carbohydrates !== null && payload.carbohydrates !== undefined) {
+      if (
+        payload.carbohydrates !== null &&
+        payload.carbohydrates !== undefined
+      ) {
         formData.append('carbohydrates', payload.carbohydrates.toString());
       }
-      if (payload.preparationTimeMinutes !== null && payload.preparationTimeMinutes !== undefined) {
-        formData.append('preparationTimeMinutes', payload.preparationTimeMinutes.toString());
+      if (
+        payload.preparationTimeMinutes !== null &&
+        payload.preparationTimeMinutes !== undefined
+      ) {
+        formData.append(
+          'preparationTimeMinutes',
+          payload.preparationTimeMinutes.toString()
+        );
       }
       if (payload.videoUrl) {
         formData.append('videoUrl', payload.videoUrl);
@@ -881,7 +937,7 @@ const updateSteps = (steps: CookingStep[]) => {
         });
       }
 
-      console.log("FORMDATA SEND", JSON.stringify(formData,null,2));
+      console.log('FORMDATA SEND', JSON.stringify(formData, null, 2));
       const response = await api.put('/admin/recipes/update', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -889,12 +945,18 @@ const updateSteps = (steps: CookingStep[]) => {
       });
 
       const updatedRecipe = response.data.data as Recipe;
-      setRecipes((prev) => prev.map(recipe => 
-        recipe.id === updatedRecipe.id ? updatedRecipe : recipe
-      ));
+      setRecipes((prev) =>
+        prev.map((recipe) =>
+          recipe.id === updatedRecipe.id ? updatedRecipe : recipe
+        )
+      );
       return updatedRecipe;
     } catch (error: any) {
-      console.error('Error updating recipe in context:', error.response?.data || error.message, error.config);
+      console.error(
+        'Error updating recipe in context:',
+        error.response?.data || error.message,
+        error.config
+      );
       const apiError = error.response?.data;
       if (apiError && apiError.message) {
         if (Array.isArray(apiError.message)) {
@@ -957,8 +1019,13 @@ const updateSteps = (steps: CookingStep[]) => {
         steps: stepsFromForm.map((step) => ({
           stepOrder: step.stepOrder,
           instruction: step.instruction,
-          imageUrl: step.imageUrl && !step.imageUrl.startsWith('file://') ? step.imageUrl : null,
-          hasNewImageFile: !!(step.imageUrl && step.imageUrl.startsWith('file://')),
+          imageUrl:
+            step.imageUrl && !step.imageUrl.startsWith('file://')
+              ? step.imageUrl
+              : null,
+          hasNewImageFile: !!(
+            step.imageUrl && step.imageUrl.startsWith('file://')
+          ),
         })),
         recipeImageFile: recipeImageFileForUpload,
         stepImageFiles: stepImageFilesForUpload,
@@ -981,6 +1048,285 @@ const updateSteps = (steps: CookingStep[]) => {
       setIsLoadingRecipes(false);
     }
   };
+
+  // Thêm hàm mới createRecipeForUser để phân biệt với admin
+  const createRecipeForUser = async (
+    payload: ClientCreateRecipePayload
+  ): Promise<Recipe> => {
+    try {
+      setIsLoadingRecipes(true);
+      const formData = new FormData();
+
+      // 1. Append các trường thông thường
+      formData.append('name', payload.name);
+      formData.append('description', payload.description || '');
+      formData.append('status', payload.status);
+
+      // Only append hasNewRecipeImageFile if it's true
+      if (payload.hasNewRecipeImageFile) {
+        formData.append('hasNewRecipeImageFile', 'true');
+      }
+
+      if (payload.categoryIds && payload.categoryIds.length > 0) {
+        payload.categoryIds.forEach((id) => {
+          formData.append('categoryIds[]', id.toString());
+        });
+      }
+
+      if (payload.ingredients && payload.ingredients.length > 0) {
+        payload.ingredients.forEach((ing, index) => {
+          formData.append(
+            `ingredients[${index}][ingredientId]`,
+            ing.ingredientId
+          );
+          if (ing.quantity !== null && ing.quantity !== undefined) {
+            formData.append(
+              `ingredients[${index}][quantity]`,
+              ing.quantity.toString()
+            );
+          }
+          if (ing.unitId !== null && ing.unitId !== undefined) {
+            formData.append(
+              `ingredients[${index}][unitId]`,
+              ing.unitId.toString()
+            );
+          }
+        });
+      }
+
+      if (payload.steps && payload.steps.length > 0) {
+        payload.steps.forEach((step, index) => {
+          formData.append(
+            `steps[${index}][stepOrder]`,
+            step.stepOrder.toString()
+          );
+          formData.append(`steps[${index}][instruction]`, step.instruction);
+          if (step.imageUrl !== null && step.imageUrl !== undefined) {
+            formData.append(`steps[${index}][imageUrl]`, step.imageUrl);
+          }
+          // Only append hasNewImageFile if it's true
+          if (step.hasNewImageFile) {
+            formData.append(`steps[${index}][hasNewImageFile]`, 'true');
+          }
+        });
+      }
+
+      // Append nutrition info only if they are not null/undefined
+      if (payload.protein !== null && payload.protein !== undefined) {
+        formData.append('protein', payload.protein.toString());
+      }
+      if (payload.fat !== null && payload.fat !== undefined) {
+        formData.append('fat', payload.fat.toString());
+      }
+      if (payload.calories !== null && payload.calories !== undefined) {
+        formData.append('calories', payload.calories.toString());
+      }
+      if (
+        payload.carbohydrates !== null &&
+        payload.carbohydrates !== undefined
+      ) {
+        formData.append('carbohydrates', payload.carbohydrates.toString());
+      }
+      if (
+        payload.preparationTimeMinutes !== null &&
+        payload.preparationTimeMinutes !== undefined
+      ) {
+        formData.append(
+          'preparationTimeMinutes',
+          payload.preparationTimeMinutes.toString()
+        );
+      }
+      if (payload.videoUrl) {
+        formData.append('videoUrl', payload.videoUrl);
+      }
+
+      // Append image files if they exist
+      if (payload.recipeImageFile) {
+        formData.append('images', payload.recipeImageFile as any);
+      }
+
+      if (payload.stepImageFiles && payload.stepImageFiles.length > 0) {
+        payload.stepImageFiles.forEach((file) => {
+          if (file) {
+            formData.append('images', file as any);
+          }
+        });
+      }
+
+      console.log('FORMDATA SEND FOR USER', formData);
+      // Gọi API endpoint dành cho user thường
+      const response = await api.post('/recipes/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const newRecipe = response.data.data as Recipe;
+      setRecipes((prev) => [newRecipe, ...prev]);
+      return newRecipe;
+    } catch (error: any) {
+      console.error(
+        'Error creating recipe as user:',
+        error.response?.data || error.message,
+        error.config
+      );
+      const apiError = error.response?.data;
+      if (apiError && apiError.message) {
+        if (Array.isArray(apiError.message)) {
+          throw new Error(apiError.message.join(', '));
+        }
+        throw new Error(apiError.message);
+      }
+      throw new Error('Không thể tạo công thức từ context (user)');
+    } finally {
+      setIsLoadingRecipes(false);
+    }
+  };
+
+  // Thêm hàm updateRecipeForUser tương tự như updateRecipeWithDetails nhưng dành cho user thường
+  const updateRecipeForUser = async (
+    payload: ClientCreateRecipePayload
+  ): Promise<Recipe> => {
+    try {
+      setIsLoadingRecipes(true);
+      const formData = new FormData();
+
+      // Đảm bảo có ID
+      if (!payload.id) {
+        throw new Error('ID công thức là bắt buộc cho việc cập nhật');
+      }
+
+      // 1. Append các trường thông thường
+      formData.append('id', payload.id);
+      formData.append('name', payload.name);
+      formData.append('description', payload.description || '');
+      formData.append('status', payload.status);
+
+      // Only append hasNewRecipeImageFile if it's true
+      if (payload.hasNewRecipeImageFile) {
+        formData.append('hasNewRecipeImageFile', 'true');
+      }
+
+      if (payload.categoryIds && payload.categoryIds.length > 0) {
+        payload.categoryIds.forEach((id) => {
+          formData.append('categoryIds[]', id.toString());
+        });
+      }
+
+      if (payload.ingredients && payload.ingredients.length > 0) {
+        payload.ingredients.forEach((ing, index) => {
+          formData.append(
+            `ingredients[${index}][ingredientId]`,
+            ing.ingredientId
+          );
+          if (ing.quantity !== null && ing.quantity !== undefined) {
+            formData.append(
+              `ingredients[${index}][quantity]`,
+              ing.quantity.toString()
+            );
+          }
+          if (ing.unitId !== null && ing.unitId !== undefined) {
+            formData.append(
+              `ingredients[${index}][unitId]`,
+              ing.unitId.toString()
+            );
+          }
+        });
+      }
+
+      if (payload.steps && payload.steps.length > 0) {
+        payload.steps.forEach((step, index) => {
+          formData.append(
+            `steps[${index}][stepOrder]`,
+            step.stepOrder.toString()
+          );
+          formData.append(`steps[${index}][instruction]`, step.instruction);
+          if (step.imageUrl !== null && step.imageUrl !== undefined) {
+            formData.append(`steps[${index}][imageUrl]`, step.imageUrl);
+          }
+          // Only append hasNewImageFile if it's true
+          if (step.hasNewImageFile) {
+            formData.append(`steps[${index}][hasNewImageFile]`, 'true');
+          }
+        });
+      }
+
+      // Append nutrition info only if they are not null/undefined
+      if (payload.protein !== null && payload.protein !== undefined) {
+        formData.append('protein', payload.protein.toString());
+      }
+      if (payload.fat !== null && payload.fat !== undefined) {
+        formData.append('fat', payload.fat.toString());
+      }
+      if (payload.calories !== null && payload.calories !== undefined) {
+        formData.append('calories', payload.calories.toString());
+      }
+      if (
+        payload.carbohydrates !== null &&
+        payload.carbohydrates !== undefined
+      ) {
+        formData.append('carbohydrates', payload.carbohydrates.toString());
+      }
+      if (
+        payload.preparationTimeMinutes !== null &&
+        payload.preparationTimeMinutes !== undefined
+      ) {
+        formData.append(
+          'preparationTimeMinutes',
+          payload.preparationTimeMinutes.toString()
+        );
+      }
+      if (payload.videoUrl) {
+        formData.append('videoUrl', payload.videoUrl);
+      }
+
+      // Append image files if they exist
+      if (payload.recipeImageFile) {
+        formData.append('images', payload.recipeImageFile as any);
+      }
+
+      if (payload.stepImageFiles && payload.stepImageFiles.length > 0) {
+        payload.stepImageFiles.forEach((file) => {
+          if (file) {
+            formData.append('images', file as any);
+          }
+        });
+      }
+
+      console.log('FORMDATA SEND FOR USER UPDATE', formData);
+      // Gọi API endpoint dành cho user thường
+      const response = await api.put('/recipes/update', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const updatedRecipe = response.data.data as Recipe;
+      setRecipes((prev) =>
+        prev.map((recipe) =>
+          recipe.id === updatedRecipe.id ? updatedRecipe : recipe
+        )
+      );
+      return updatedRecipe;
+    } catch (error: any) {
+      console.error(
+        'Error updating recipe as user:',
+        error.response?.data || error.message,
+        error.config
+      );
+      const apiError = error.response?.data;
+      if (apiError && apiError.message) {
+        if (Array.isArray(apiError.message)) {
+          throw new Error(apiError.message.join(', '));
+        }
+        throw new Error(apiError.message);
+      }
+      throw new Error('Không thể cập nhật công thức từ context (user)');
+    } finally {
+      setIsLoadingRecipes(false);
+    }
+  };
+
   // Giá trị context
   const value = {
     // State
@@ -1001,6 +1347,8 @@ const updateSteps = (steps: CookingStep[]) => {
     updateRecipe,
     deleteRecipe,
     publicRecipe,
+    createRecipeForUser,
+    updateRecipeForUser,
 
     // Recipe Category CRUD
     getRecipeCategories,

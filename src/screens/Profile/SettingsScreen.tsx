@@ -20,7 +20,8 @@ import { logout, getUserProfile } from 'src/api/api';
 const backgroundImage = require('@assets/background.png');
 
 const SettingsScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [darkMode, setDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -64,7 +65,7 @@ const SettingsScreen = () => {
         name: userData.fullName || 'Chưa cập nhật tên',
         email: userData.email || 'Chưa cập nhật email',
         phone: userData.phoneNumber || '',
-        avatar: userData.avatarUrl || ''
+        avatar: userData.avatarUrl || '',
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -103,7 +104,11 @@ const SettingsScreen = () => {
   }
 
   return (
-    <ImageBackground source={backgroundImage} style={{ flex: 1 }} resizeMode="cover">
+    <ImageBackground
+      source={backgroundImage}
+      style={{ flex: 1 }}
+      resizeMode="cover"
+    >
       <SafeAreaView className="flex-1">
         <ScrollView className="flex-1">
           {/* Header */}
@@ -117,8 +122,12 @@ const SettingsScreen = () => {
           {/* Thông tin tài khoản */}
           <View className="flex-row items-center bg-white rounded-lg mx-4 mb-4 p-4 shadow">
             <View className="w-12 h-12 rounded-full mr-3 overflow-hidden bg-gray-200">
-              <Image 
-                source={userData?.avatar ? { uri: userData.avatar } : require('../../assets/images/avatar-placeholder.jpg')}
+              <Image
+                source={
+                  userData?.avatar
+                    ? { uri: userData.avatar }
+                    : require('../../assets/images/avatar-placeholder.jpg')
+                }
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -127,7 +136,9 @@ const SettingsScreen = () => {
               <Text className="font-bold text-black">{userData?.name}</Text>
               <Text className="text-black">{userData?.email}</Text>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('EditProfileScreen')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('EditProfileScreen')}
+            >
               <Text className="text-black">✏️</Text>
             </TouchableOpacity>
           </View>
@@ -151,9 +162,15 @@ const SettingsScreen = () => {
 
           {/* Nhóm: Bảo mật & quyền riêng tư */}
           <View className="bg-white rounded-lg mx-4 mb-4 p-4 shadow">
-            <Text className="font-bold text-black mb-2">Bảo mật & quyền riêng tư</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('EditProfileScreen')}>
-              <Text className="text-black mb-2">Chỉnh sửa thông tin cá nhân</Text>
+            <Text className="font-bold text-black mb-2">
+              Bảo mật & quyền riêng tư
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('EditProfileScreen')}
+            >
+              <Text className="text-black mb-2">
+                Chỉnh sửa thông tin cá nhân
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -170,7 +187,9 @@ const SettingsScreen = () => {
             onPress={handleLogout}
             className="mx-4 mt-6 mb-4 bg-white rounded-full py-3 border border-[#88131B]"
           >
-            <Text className="text-[#88131B] text-center font-bold">Đăng xuất</Text>
+            <Text className="text-[#88131B] text-center font-bold">
+              Đăng xuất
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>

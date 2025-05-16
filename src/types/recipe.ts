@@ -5,13 +5,11 @@ export enum Unit {
   LIT = 'l',
   CAI = 'cái',
   THIA_CA_PHE = 'thìa cà phê',
-  THIA_CANH = 'thìa canh'
+  THIA_CANH = 'thìa canh',
 }
 
 export interface IngredientDTO {
   id: string;
-  quantity: number;
-  unit: Unit;
 }
 
 export interface RecipeIngredient {
@@ -61,4 +59,4 @@ export interface RecipeSearchResult {
     unit: string;
     isMatched: boolean;
   }[];
-} 
+}

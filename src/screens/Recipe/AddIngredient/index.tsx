@@ -21,7 +21,7 @@ const INGREDIENT_CATEGORIES = [
   'Rau củ quả',
   'Nấm',
   'Trứng sữa',
-  'Khác'
+  'Khác',
 ];
 
 interface Ingredient {
@@ -52,7 +52,9 @@ interface ApiResponse {
 }
 
 const AddIngredientScreen = ({ navigation, route }) => {
-  const [selectedCategory, setSelectedCategory] = useState(INGREDIENT_CATEGORIES[0]);
+  const [selectedCategory, setSelectedCategory] = useState(
+    INGREDIENT_CATEGORIES[0]
+  );
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Ingredient[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -68,26 +70,31 @@ const AddIngredientScreen = ({ navigation, route }) => {
   useEffect(() => {
     const fetchIngredients = async () => {
       if (!hasMore && offset > 0) return;
-      
+
       setIsLoading(true);
       try {
-        const queryParam = search || (selectedCategory !== 'Tất cả' ? selectedCategory : '');
-        const response = await getIngredientCategories(offset, limit, queryParam);
-        
-        // Lấy tất cả ingredients từ tất cả categories
-        const allIngredients = response.data.flatMap(category => 
-          category.ingredientMappings.map(mapping => mapping.ingredient)
+        const queryParam =
+          search || (selectedCategory !== 'Tất cả' ? selectedCategory : '');
+        const response = await getIngredientCategories(
+          offset,
+          limit,
+          queryParam
         );
-        
+
+        // Lấy tất cả ingredients từ tất cả categories
+        const allIngredients = response.data.flatMap((category) =>
+          category.ingredientMappings.map((mapping) => mapping.ingredient)
+        );
+
         // Cập nhật trạng thái hasMore dựa vào total
         setHasMore(offset + limit < response.total);
-        
+
         // Nếu là trang đầu tiên, thay thế hoàn toàn
         if (offset === 0) {
           setIngredients(allIngredients);
         } else {
           // Nếu là trang tiếp theo, thêm vào danh sách hiện tại
-          setIngredients(prev => [...prev, ...allIngredients]);
+          setIngredients((prev) => [...prev, ...allIngredients]);
         }
         setIsLoading(false);
       } catch (err) {
@@ -111,19 +118,19 @@ const AddIngredientScreen = ({ navigation, route }) => {
 
   const handleLoadMore = () => {
     if (!isLoading && hasMore) {
-      setOffset(prev => prev + limit);
+      setOffset((prev) => prev + limit);
     }
   };
 
   const toggleSelect = (item: Ingredient) => {
     if (isMultiSelect) {
-      if (selected.some(i => i.id === item.id)) {
-        setSelected(selected.filter(i => i.id !== item.id));
+      if (selected.some((i) => i.id === item.id)) {
+        setSelected(selected.filter((i) => i.id !== item.id));
       } else {
         setSelected([...selected, item]);
       }
     } else {
-      if (selected.some(i => i.id === item.id)) {
+      if (selected.some((i) => i.id === item.id)) {
         setSelected([]);
       } else {
         setSelected([item]);
@@ -145,12 +152,12 @@ const AddIngredientScreen = ({ navigation, route }) => {
 
     setIsAdding(true);
     try {
-      const ingredientIds = selected.map(item => item.id);
+      const ingredientIds = selected.map((item) => item.id);
       const result = await addToPantry(ingredientIds);
-      
+
       const addedCount = result.addedIngredients.length;
       const skippedCount = result.skippedIngredients.length;
-      
+
       let message = '';
       if (addedCount > 0 && skippedCount > 0) {
         message = `Đã thêm ${addedCount} nguyên liệu mới vào kho.\n${skippedCount} nguyên liệu đã có trong kho được bỏ qua.`;
@@ -210,7 +217,11 @@ const AddIngredientScreen = ({ navigation, route }) => {
               className={`px-4 py-2 min-h-[36p] rounded-full mr-2 ${selectedCategory === item ? 'bg-red-700' : 'bg-gray-200'}`}
             >
               <Text
-                className={selectedCategory === item ? 'text-white' : 'text-gray-700 items-center justify-center align-middle'}
+                className={
+                  selectedCategory === item
+                    ? 'text-white'
+                    : 'text-gray-700 items-center justify-center align-middle'
+                }
               >
                 {item}
               </Text>
@@ -236,10 +247,10 @@ const AddIngredientScreen = ({ navigation, route }) => {
               <TouchableOpacity
                 onPress={() => toggleSelect(item)}
                 className="flex-1 m-2"
-                style={{ maxWidth: '30%'}}
+                style={{ maxWidth: '30%' }}
               >
                 <View
-                  className={`rounded-xl overflow-hidden border ${selected.some(i => i.id === item.id) ? 'border-red-800' : 'border-gray-300'}`}
+                  className={`rounded-xl overflow-hidden border ${selected.some((i) => i.id === item.id) ? 'border-red-800' : 'border-gray-300'}`}
                 >
                   <Image
                     source={{ uri: item.imageUrl }}
@@ -247,7 +258,7 @@ const AddIngredientScreen = ({ navigation, route }) => {
                     resizeMode="cover"
                   />
                   <View className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-white items-center justify-center">
-                    {selected.some(i => i.id === item.id) && (
+                    {selected.some((i) => i.id === item.id) && (
                       <Ionicons
                         name="checkmark-circle"
                         size={18}
@@ -264,9 +275,11 @@ const AddIngredientScreen = ({ navigation, route }) => {
             contentContainerStyle={{ paddingBottom: 16 }}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
-            ListFooterComponent={isLoading && ingredients.length > 0 ? (
-              <ActivityIndicator size="small" color="#B91C1C" />
-            ) : null}
+            ListFooterComponent={
+              isLoading && ingredients.length > 0 ? (
+                <ActivityIndicator size="small" color="#B91C1C" />
+              ) : null
+            }
             ListEmptyComponent={
               !isLoading ? (
                 <Text className="text-center text-gray-500 mt-4">
@@ -289,7 +302,9 @@ const AddIngredientScreen = ({ navigation, route }) => {
             <ActivityIndicator color="white" />
           ) : (
             <Text className="text-white font-bold text-lg">
-              {selected.length > 0 ? `Thêm (${selected.length})` : 'Thêm nguyên liệu'}
+              {selected.length > 0
+                ? `Thêm (${selected.length})`
+                : 'Thêm nguyên liệu'}
             </Text>
           )}
         </TouchableOpacity>

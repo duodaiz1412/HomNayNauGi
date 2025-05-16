@@ -3,47 +3,50 @@ import { AdminFoodManagementScreen } from '@screens/Admin/FoodManagementScreen';
 import { AddFoodScreen } from '@screens/Admin/Food/AddFoodScreen';
 import { EditFoodScreen } from '@screens/Admin/Food/EditFoodScreen';
 import { FoodDetailScreen } from '@screens/Admin/Food/FoodDetailScreen';
-import { CategorySelectScreen } from '@screens/Admin/Food/CategorySelectScreen';
-import { IngredientSelectScreen } from '@screens/Admin/Food/IngredientSelectScreen';
+import { CategorySelectAdminScreen } from '@screens/Admin/Food/CategorySelectAdminScreen';
+import { IngredientSelectAdminScreen } from '@screens/Admin/Food/IngredientSelectAdminScreen';
 import { FoodManagementProvider } from 'src/context/FoodManagementContext';
-import { IngredientCategorySelectScreen } from '@screens/Admin/Food/IngredientCategorySelect';
+import { IngredientCategorySelectAdminScreen } from '@screens/Admin/Food/IngredientCategorySelectAdminScreen';
 
 export type AdminFoodStackParamList = {
   AdminFoodManagementScreen: undefined;
   AddFoodScreen: { selectedCategories?: any[]; selectedIngredients?: any[] };
   EditFoodScreen: { foodId: string };
   FoodDetailScreen: { foodId: string };
-  CategorySelectScreen: { initialSelectedCategories?: any[] }
-  IngredientSelectScreen: { selectedCategories?: any[] }
-  IngredientCategorySelectScreen: { selectedCategories?: any[] }
+  CategorySelectScreen: { initialSelectedCategories?: any[] };
+  IngredientSelectScreen: { selectedCategories?: any[] };
+  IngredientCategorySelectScreen: { selectedCategories?: any[] };
 };
 const Stack = createNativeStackNavigator<AdminFoodStackParamList>();
 
 export const AdminFoodStack = () => {
   return (
-    <FoodManagementProvider>
-      <Stack.Navigator
-        id={undefined}
-        screenOptions={{ headerShown: false }}
-        initialRouteName="AdminFoodManagementScreen"
-      >
-        <Stack.Screen
-          name="AdminFoodManagementScreen"
-          component={AdminFoodManagementScreen}
-        />
-        <Stack.Screen name="AddFoodScreen" component={AddFoodScreen} />
-        <Stack.Screen name="EditFoodScreen" component={EditFoodScreen} />
-        <Stack.Screen name="FoodDetailScreen" component={FoodDetailScreen} />
-        <Stack.Screen
-          name="CategorySelectScreen"
-          component={CategorySelectScreen}
-        />
-        <Stack.Screen
-          name="IngredientSelectScreen"
-          component={IngredientSelectScreen}
-        />
-        <Stack.Screen name="IngredientCategorySelectScreen" component={IngredientCategorySelectScreen} />
-      </Stack.Navigator>
-    </FoodManagementProvider>
+    // <FoodManagementProvider>
+    <Stack.Navigator
+      id={undefined}
+      screenOptions={{ headerShown: false }}
+      initialRouteName="AdminFoodManagementScreen"
+    >
+      <Stack.Screen
+        name="AdminFoodManagementScreen"
+        component={AdminFoodManagementScreen}
+      />
+      <Stack.Screen name="AddFoodScreen" component={AddFoodScreen} />
+      <Stack.Screen name="EditFoodScreen" component={EditFoodScreen} />
+      <Stack.Screen name="FoodDetailScreen" component={FoodDetailScreen} />
+      <Stack.Screen
+        name="CategorySelectScreen"
+        component={CategorySelectAdminScreen}
+      />
+      <Stack.Screen
+        name="IngredientSelectScreen"
+        component={IngredientSelectAdminScreen}
+      />
+      <Stack.Screen
+        name="IngredientCategorySelectScreen"
+        component={IngredientCategorySelectAdminScreen}
+      />
+    </Stack.Navigator>
+    // </FoodManagementProvider>
   );
 };

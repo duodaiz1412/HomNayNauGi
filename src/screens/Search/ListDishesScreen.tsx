@@ -88,7 +88,11 @@ const RecipeListScreen = () => {
       }, [search, selectedCategoryId]);
 
   return (
-    <ImageBackground source={backgroundImage} resizeMode="cover" style={{ flex: 1 }}>
+    <ImageBackground
+      source={backgroundImage}
+      resizeMode="cover"
+      style={{ flex: 1 }}
+    >
       <View style={styles.container}>
 
         <View style={styles.searchBar}>
@@ -140,7 +144,9 @@ const RecipeListScreen = () => {
             <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}>
               <Image source={{ uri: item.imageUrl }} style={styles.image} />
               <View style={styles.cardContent}>
-                <Text style={styles.title} numberOfLines={2}>{item.name}</Text>
+                <Text style={styles.title} numberOfLines={2}>
+                  {item.name}
+                </Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.author}>{item.account.username}</Text>
                   <View style={styles.time}>
@@ -149,10 +155,8 @@ const RecipeListScreen = () => {
                   </View>
                 </View>
               </View>
-              
-             </TouchableOpacity>
+            </TouchableOpacity>
           )}
-         
         />
       </View>
     </ImageBackground>

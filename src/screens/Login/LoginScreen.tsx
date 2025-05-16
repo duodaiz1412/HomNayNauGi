@@ -2,9 +2,22 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { View, Text, Image, SafeAreaView, StatusBar, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert, ImageBackground } from 'react-native';
-import axios from 'axios';  // Đảm bảo đã cài axios
-import AsyncStorage from '@react-native-async-storage/async-storage';  // Đảm bảo đã cài AsyncStorage
+import {
+  View,
+  Text,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  ImageBackground,
+} from 'react-native';
+import axios from 'axios'; // Đảm bảo đã cài axios
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Đảm bảo đã cài AsyncStorage
 import api from 'src/api/api';
 // Đường dẫn ảnh
 const googleIcon = require('@assets/google.png');
@@ -13,46 +26,58 @@ const appleIcon = require('@assets/apple.png');
 const backgroundImage = require('@assets/background.png');
 
 const LoginScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-const handleLogin = async () => {
-  try {
-    // Gọi API login
-    const response = await api.post(`/auth/login`, {
-      loginIdentifier: username.trim(),
-      password: password
-    });
-    
-    const { accessToken, refreshToken } = response.data;
-    await AsyncStorage.setItem('accessToken', accessToken);
-    await AsyncStorage.setItem('refreshToken', refreshToken);
-    globalThis.isLoggedIn = true;
-    // Kiểm tra role để điều hướng
-    if (response.data.user.roles.includes('admin')) {
-      console.log("Danh nhap admin thanh cong   " + accessToken+"           &        "+refreshToken);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'AdminDrawerNavigator' }],
+  const handleLogin = async () => {
+    try {
+      // Gọi API login
+      const response = await api.post(`/auth/login`, {
+        loginIdentifier: username.trim(),
+        password: password,
       });
-    } else {
-      console.log("Danh nhap user thanh cong", accessToken);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainTabs' }],
-      });
+
+      const { accessToken, refreshToken } = response.data;
+      await AsyncStorage.setItem('accessToken', accessToken);
+      await AsyncStorage.setItem('refreshToken', refreshToken);
+      await AsyncStorage.setItem('accountId', response.data.user.id);
+      await AsyncStorage.setItem('accountRole', response.data.user.roles[0]);
+      globalThis.isLoggedIn = true;
+      // Kiểm tra role để điều hướng
+      if (response.data.user.roles.includes('admin')) {
+        console.log(
+          'Danh nhap admin thanh cong   ' +
+            accessToken +
+            '           &        ' +
+            refreshToken
+        );
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'AdminDrawerNavigator' }],
+        });
+      } else {
+        console.log('Danh nhap user thanh cong', accessToken);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs' }],
+        });
+      }
+    } catch (error) {
+      if (error.response) {
+        // Lỗi từ server
+        Alert.alert(
+          'Lỗi đăng nhập',
+          error.response.data.message ||
+            'Tên đăng nhập hoặc mật khẩu không đúng'
+        );
+      } else {
+        // Lỗi kết nối
+        Alert.alert('Lỗi kết nối', 'Không thể kết nối đến server');
+      }
     }
-  } catch (error) {
-    if (error.response) {
-      // Lỗi từ server
-      Alert.alert('Lỗi đăng nhập', error.response.data.message || 'Tên đăng nhập hoặc mật khẩu không đúng');
-    } else {
-      // Lỗi kết nối
-      Alert.alert('Lỗi kết nối', 'Không thể kết nối đến server');
-    }
-  }
-};
+  };
 
   return (
     <KeyboardAvoidingView
@@ -117,9 +142,8 @@ const handleLogin = async () => {
                   Đăng nhập
                 </Text>
               </TouchableOpacity>
-            
 
-              <View className="mb-10">
+              <View className="mb-5">
                 <Text className="text-sm text-gray-500 text-center mb-6">
                   Hoặc đăng nhập bằng
                 </Text>
@@ -147,6 +171,21 @@ const handleLogin = async () => {
                   </TouchableOpacity>
                 </View>
               </View>
+
+              <TouchableOpacity
+                className="mt-6 items-center justify-center"
+                activeOpacity={0.7}
+                onPress={() =>
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'MainTabs' }],
+                  })
+                }
+              >
+                <Text className="text-base text-[#941D23] font-semibold underline">
+                  Tiếp tục mà không đăng nhập
+                </Text>
+              </TouchableOpacity>
 
               <View className="flex-row justify-center items-center mt-5">
                 <Text className="text-sm text-gray-600">

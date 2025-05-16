@@ -5,13 +5,12 @@ import { Platform } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { IngredientSearch } from '../types';
 
-
 const api = axios.create({
-  baseURL: 'http://192.168.0.100:3001',
-  // timeout: 10000,
-  // headers: {
-  //   'Accept': 'application/json',
-  // }
+  baseURL: process.env.BASE_URL,
+  timeout: 50000,
+  headers: {
+    Accept: 'application/json',
+  },
 });
 
 // Interceptor cho request
@@ -55,7 +54,7 @@ api.interceptors.response.use(
         );
 
         const { accessToken } = response.data;
-        console.log("Interceptor: Successfully refreshed token");
+        console.log('Interceptor: Successfully refreshed token');
         // Lưu access token mới vào AsyncStorage
         await AsyncStorage.setItem('accessToken', accessToken);
         globalThis.isLoggedIn = true;
@@ -67,7 +66,12 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.log('Interceptor: Refresh token failed', refreshError);
         // Nếu refresh token cũng hết hạn, xóa tokens và throw error
-        await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+        await AsyncStorage.multiRemove([
+          'accessToken',
+          'refreshToken',
+          'accountId',
+          'accountRole',
+        ]);
         globalThis.isLoggedIn = false;
         return Promise.reject(refreshError);
       }
@@ -80,30 +84,46 @@ api.interceptors.response.use(
 // Hàm xử lý logout
 export const logout = async () => {
   try {
-    // Gọi API logout để blacklist token
-    await api.post('/auth/logout');
+    // Lấy refresh token trước khi gọi API
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+
+    // Chỉ gọi API logout nếu có refresh token
+    if (refreshToken) {
+      // Gọi API logout để blacklist token
+      await api.post('/auth/logout', { refreshToken });
+    }
   } catch (error) {
     console.error('Logout API error:', error);
   } finally {
     // Xóa tokens khỏi AsyncStorage
-    await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+    await AsyncStorage.multiRemove([
+      'accessToken',
+      'refreshToken',
+      'accountId',
+      'accountRole',
+    ]);
     globalThis.isLoggedIn = false;
   }
 };
 
 // Hàm tìm công thức theo danh sách nguyên liệu
-export const findRecipesByIngredients = async (ingredients: IngredientSearch[]) => {
+export const findRecipesByIngredients = async (
+  ingredients: IngredientSearch[]
+) => {
   try {
     console.log('Tìm công thức với nguyên liệu:', ingredients);
-    
+
     const response = await api.post('/recipe-ingredients/find-recipes', {
-      ingredients
+      ingredients,
     });
-    
+
     console.log('Kết quả tìm công thức:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi tìm công thức:', error.response?.data || error.message);
+    console.error(
+      'Lỗi khi tìm công thức:',
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -112,45 +132,51 @@ export const findRecipesByIngredients = async (ingredients: IngredientSearch[]) 
 export const scanIngredient = async (imageUri: string) => {
   try {
     console.log('Bắt đầu scan ảnh với URI:', imageUri);
-    
+
     // Nén ảnh trước khi upload
     const compressedImage = await ImageManipulator.manipulateAsync(
       imageUri,
       [{ resize: { width: 1024 } }], // Giảm kích thước xuống 1024px width
       { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // Nén 70%
     );
-    
+
     console.log('Ảnh sau khi nén:', compressedImage.uri);
-    
+
     const formData = new FormData();
-    
+
     // Tạo file object từ URI của ảnh đã nén
     const filename = compressedImage.uri.split('/').pop() || 'photo.jpg';
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : 'image/jpeg';
-    
+
     formData.append('file', {
-      uri: Platform.OS === 'android' ? compressedImage.uri : compressedImage.uri.replace('file://', ''),
+      uri:
+        Platform.OS === 'android'
+          ? compressedImage.uri
+          : compressedImage.uri.replace('file://', ''),
       name: filename,
-      type: type
+      type: type,
     } as any);
-    
+
     console.log('FormData đã được tạo:', formData);
-    
+
     const response = await api.post('/api/extract-ingredients', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Accept': 'application/json'
+        Accept: 'application/json',
       },
       transformRequest: (data, headers) => {
         return formData;
       },
     });
-    
+
     console.log('Response từ API:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Chi tiết lỗi scan ingredient:', error.response?.data || error.message);
+    console.error(
+      'Chi tiết lỗi scan ingredient:',
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -163,19 +189,22 @@ export const getIngredientCategories = async (
 ) => {
   try {
     console.log('Tìm kiếm danh mục nguyên liệu:', { offset, limit, query });
-    
+
     const response = await api.get('/ingredient-categories/search', {
       params: {
         offset,
         limit,
-        query
-      }
+        query,
+      },
     });
-    
+
     console.log('Kết quả tìm kiếm danh mục:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi tìm kiếm danh mục:', error.response?.data || error.message);
+    console.error(
+      'Lỗi khi tìm kiếm danh mục:',
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -184,15 +213,18 @@ export const getIngredientCategories = async (
 export const addToPantry = async (ingredientIds: string[]) => {
   try {
     console.log('Thêm nguyên liệu vào pantry:', ingredientIds);
-    
+
     const response = await api.post('/pantry/add', {
-      ingredientIds
+      ingredientIds,
     });
-    
+
     console.log('Kết quả thêm vào pantry:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi thêm vào pantry:', error.response?.data || error.message);
+    console.error(
+      'Lỗi khi thêm vào pantry:',
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -201,13 +233,15 @@ export const addToPantry = async (ingredientIds: string[]) => {
 export const getUserProfile = async () => {
   try {
     const response = await api.get('/user-profiles/me');
-    console.log('Thông tin người dùng:', response.data);
+    //console.log('Thông tin người dùng:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi lấy thông tin người dùng:', error.response?.data || error.message);
+    console.error(
+      'Lỗi khi lấy thông tin người dùng:',
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
-
 
 export default api;
