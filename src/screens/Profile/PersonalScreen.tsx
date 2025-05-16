@@ -8,6 +8,7 @@ import {
   ImageBackground,
   ScrollView,
   ActivityIndicator,
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -225,6 +226,35 @@ const PersonalScreen = () => {
     }
   };
 
+  const handleDeleteRecipe = async (recipeId: string) => {
+  Alert.alert(
+    'Xác nhận',
+    'Bạn chắc chắn muốn xóa công thức này chứ?',
+    [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Xóa',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            setLoading(true);
+            // Gọi API xóa công thức, giả sử endpoint: DELETE /recipes/:id
+            await api.delete(`/recipes/${recipeId}`);
+            // Sau khi xóa thành công, tải lại danh sách công thức
+            await fetchRecipes(false);
+          } catch (error) {
+            Alert.alert('Lỗi', 'Xóa công thức thất bại, vui lòng thử lại.');
+            console.error('Error deleting recipe:', error);
+          } finally {
+            setLoading(false);
+          }
+        },
+      },
+    ],
+    { cancelable: true }
+  );
+};
+
   const renderHeader = () => (
     <View className="items-center mt-2 mb-4">
       <View className="flex-row items-center justify-end w-full px-4 mb-4">
@@ -345,16 +375,37 @@ const PersonalScreen = () => {
           ListHeaderComponent={renderHeader}
           renderItem={({ item }) => (
             <TouchableOpacity
-              className="bg-white rounded-xl w-[48%] mb-4 overflow-hidden shadow-md" // Thêm shadow
+              className="bg-white rounded-xl w-[48%] mb-4 overflow-hidden shadow-md"
               onPress={() => handleRecipePress(item.id)}
             >
-              <Image
-                source={{
-                  uri: item.imageUrl || 'https://via.placeholder.com/150',
-                }} // Placeholder nếu không có ảnh
-                className="h-28 w-full"
-                resizeMode="cover"
-              />
+              <View>
+                <Image
+                  source={{
+                    uri: item.imageUrl || 'https://via.placeholder.com/150',
+                  }}
+                  className="h-28 w-full"
+                  resizeMode="cover"
+                />
+                {/* Nút xóa nhỏ góc trên bên phải */}
+                <TouchableOpacity
+                  onPress={() => handleDeleteRecipe(item.id)}
+                  style={{
+                    position: 'absolute',
+                    top: 5,
+                    right: 5,
+                    backgroundColor: 'rgba(255,0,0,0.8)',
+                    borderRadius: 12,
+                    width: 24,
+                    height: 24,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10,
+                  }}
+                >
+                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>−</Text>
+                </TouchableOpacity>
+              </View>
+
               <View className="p-2">
                 <Text
                   className="text-sm font-bold text-black mb-1"
@@ -382,6 +433,7 @@ const PersonalScreen = () => {
               </View>
             </TouchableOpacity>
           )}
+
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             !loading ? ( // Chỉ hiển thị "Chưa có công thức" nếu không đang loading
