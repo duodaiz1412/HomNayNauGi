@@ -274,10 +274,8 @@ export const removeIngredientFromPantry = async (ingredientId: string) => {
   }
 };
 
-// Xóa tất cả nguyên liệu khỏi pantry
 export const removeAllIngredientsFromPantry = async () => {
   try {
-    console.log('Xóa tất cả nguyên liệu khỏi pantry');
     const response = await api.delete('/pantry/delete-all');
     console.log('Kết quả xóa tất cả nguyên liệu:', response.data);
     return response.data;
