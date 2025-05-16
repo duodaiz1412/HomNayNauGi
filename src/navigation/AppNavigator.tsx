@@ -45,10 +45,10 @@ export type RootStackParamList = {
   MainTabs: undefined;
   HomeScreen: undefined;
   About: undefined;
-  RecipeDetail: { recipeId: string };
-  CookingGuide: { recipeId: string };
+  RecipeDetail: { recipeId: string, isSuggested?: boolean };
+  CookingGuide: { recipeId: string, isSuggested?: boolean };
   EditProfileScreen: undefined;
-  AddIngredient: { isMultiSelect: boolean };
+  AddIngredient: { isMultiSelect?: boolean, onAddSuccess?: () => void };
   AddDish: undefined;
   EditDishScreen: { recipeId: string };
   SearchByIngredientScreen: {
