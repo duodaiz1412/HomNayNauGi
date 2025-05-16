@@ -23,18 +23,20 @@ type ScanIngredientRouteProp = RouteProp<RootStackParamList, 'ScanIngredient'>;
 interface DetectedIngredient {
   id: string;
   name: string;
-  image?: string;
+  imageUrl?: string;
 }
 
 const ScanIngredientScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<ScanIngredientRouteProp>();
-  const { imageUri } = route.params || {};
+  const { imageUri, selectedIngredients } = route.params || {};
   const backgroundImage = require('@assets/background.png');
 
   const [isLoading, setIsLoading] = useState(false);
-  const [ingredients, setIngredients] = useState<DetectedIngredient[]>([]);
+  const [ingredients, setIngredients] = useState<DetectedIngredient[]>(
+    selectedIngredients || []
+  );
   const [showSuggestDish, setShowSuggestDish] = useState(false);
   const [suggestedDishes, setSuggestedDishes] = useState([]);
   const [isLoadingDishes, setIsLoadingDishes] = useState(false);
@@ -54,7 +56,7 @@ const ScanIngredientScreen = () => {
               response.ingredients.map((item: any) => ({
                 id: item.id,
                 name: item.name,
-                image: item.imageUrl,
+                imageUrl: item.imageUrl,
               }))
             );
           }
@@ -157,9 +159,9 @@ const ScanIngredientScreen = () => {
                   key={ingredient.id}
                   className="flex-row items-center bg-white rounded-lg px-3 py-3 mb-2 shadow-sm"
                 >
-                  {ingredient.image ? (
+                  {ingredient.imageUrl ? (
                     <Image
-                      source={{ uri: ingredient.image }}
+                      source={{ uri: ingredient.imageUrl }}
                       className="w-10 h-10 rounded-full mr-3"
                     />
                   ) : (

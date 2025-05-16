@@ -55,12 +55,12 @@ export type RootStackParamList = {
     ingredients?: {
       id: string;
       name: string;
-      image: string;
+      imageUrl: string;
     }[];
   };
   IngredientsScreen: { ingredients: Ingredient[] };
   SearchByRecipeScreen: undefined;
-  ListDishesScreen: { mealId: number };
+  ListDishesScreen: { mealId ?: number; query?:string};
   FilterScreen: undefined;
   ProfileScreen: undefined;
   FavoritesScreen: undefined;
@@ -76,7 +76,7 @@ export type RootStackParamList = {
   IngredientCategorySelectScreen: undefined;
   AdminDrawerNavigator: undefined;
   PersonalScreen: undefined;
-  ScanIngredient: { imageUri: string };
+  ScanIngredient: { imageUri?: string, selectedIngredients?: Ingredient[] };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -156,13 +156,13 @@ const AppNavigator = () => {
         />
         <Stack.Screen name="SupportScreen" component={SupportScreen} />
         <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
-        <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
         <Stack.Screen
           name="SearchByRecipeScreen"
           component={SearchByRecipeScreen}
         />
         <Stack.Screen name="ListDishesScreen" component={ListDishesScreen} />
         <Stack.Screen name="FilterScreen" component={FilterScreen} />
+        <Stack.Screen name="IngredientsScreen" component={IngredientsScreen} />
         <Stack.Screen
           name="AddIngredient"
           component={AddIngredientScreen}

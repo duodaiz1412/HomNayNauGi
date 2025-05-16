@@ -1,3 +1,5 @@
+
+// export default IngredientsScreen;
 import React, { useState } from 'react';
 import {
   View,
@@ -7,6 +9,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  Modal,
   ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -14,6 +17,11 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { findRecipesByIngredients, scanIngredient } from '../../api/api';
+import SuggestDish from '../../components/SuggestDish/index';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+
 
 const IngredientsScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'IngredientsScreen'>>();
@@ -23,16 +31,54 @@ const IngredientsScreen = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [ingredientData, setIngredientData] = useState(
-    (ingredients || []).map((item) => ({ ...item }))
+    (ingredients || []).map(item => ({ ...item }))
   );
   const [loading, setLoading] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+  // const [ingredients, setIngredients] = useState<DetectedIngredient[]>([]);
+  const [showSuggestDish, setShowSuggestDish] = useState(false);
+  const [suggestedDishes, setSuggestedDishes] = useState([]);
+  const [isLoadingDishes, setIsLoadingDishes] = useState(false);
+
   const handleSubmit = () => {
-    // console.log('Nguyên liệu để tìm món:', ingredientData);
-    navigation.navigate('SearchByIngredientScreen', {
-      ingredients: ingredientData,
-    });
+    console.log('Nguyên liệu để tìm món:', ingredientData);
+    navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData });
   };
+
+  const handleFindRecipe = async () => {
+      if (ingredientData.length > 0) {
+        setIsLoadingDishes(true);
+        try {
+          const searchIngredients = ingredientData.map(ing => ({
+            id: ing.id
+          }));
+          
+          const response = await findRecipesByIngredients(searchIngredients);
+          console.log('Kết quả tìm kiếm món ăn:', response);
+          setSuggestedDishes(response.data);
+          setShowSuggestDish(true);
+        } catch (error) {
+          Alert.alert('Lỗi', 'Không thể tìm kiếm món ăn. Vui lòng thử lại.');
+        } finally {
+          setIsLoadingDishes(false);
+        }
+      } else {
+        Alert.alert(
+          'Thông báo',
+          'Vui lòng có ít nhất một nguyên liệu để tìm kiếm'
+        );
+      }
+    };
+  
+    const handleDishPress = (id: string) => {
+      setShowSuggestDish(false);
+      navigation.navigate('RecipeDetail', { recipeId: id });
+    };
+  
+    // const handleEdit = () => {
+    //   Alert.alert('Thông báo', 'Chức năng chỉnh sửa sẽ được phát triển sau');
+    // };
 
   return (
     <View style={styles.container}>
@@ -46,12 +92,7 @@ const IngredientsScreen = () => {
             <Ionicons name="create-outline" size={22} color="#333" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleSubmit}>
-            <Ionicons
-              name="add-circle-outline"
-              size={22}
-              color="#333"
-              style={{ marginLeft: 12 }}
-            />
+            <Ionicons name="add-circle-outline" size={22} color="#333" style={{ marginLeft: 12 }} />
           </TouchableOpacity>
         </View>
       </View>
@@ -86,9 +127,38 @@ const IngredientsScreen = () => {
         contentContainerStyle={{ paddingBottom: 120 }}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <TouchableOpacity style={styles.button} onPress={handleFindRecipe}>
         <Text style={styles.buttonText}>Tìm món ngay 🍜</Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={showSuggestDish}
+        animationType="slide"
+        onRequestClose={() => setShowSuggestDish(false)}
+      >
+        <SafeAreaView className="flex-1 bg-white mt-10 p-2">
+          <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
+            <Text className="text-xl font-bold text-[#941D23]">Gợi ý món ăn</Text>
+            <TouchableOpacity onPress={() => setShowSuggestDish(false)}>
+              <Ionicons name="close" size={24} color="#941D23" />
+            </TouchableOpacity>
+          </View>
+
+          {isLoadingDishes ? (
+            <View className="flex-1 items-center justify-center">
+              <ActivityIndicator size="large" color="#941D23" />
+              <Text className="text-lg text-[#941D23] mt-4">
+                Đang tìm kiếm món ăn phù hợp...
+              </Text>
+            </View>
+          ) : (
+            <SuggestDish
+              dishes={suggestedDishes}
+              onDishPress={handleDishPress}
+            />
+          )}
+        </SafeAreaView>
+      </Modal>
     </View>
   );
 };

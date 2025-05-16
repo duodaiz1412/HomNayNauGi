@@ -19,6 +19,8 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import api from 'src/api/api';
 import { StyleSheet } from 'react-native';
 import { Dimensions } from 'react-native';
+import debounce from 'lodash.debounce';
+import Toast from 'react-native-toast-message';
 
 // import { BASE_URL } from '@env';
 
@@ -58,6 +60,7 @@ const SearchScreen = () => {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [search, setSearch] = useState('');
   const screenWidth = Dimensions.get('window').width;
   const itemWidth = (screenWidth - 16 * 2 - 16) / 2;
 
@@ -74,8 +77,6 @@ const SearchScreen = () => {
           params: { limit: 20, offset: 0 },
         });
         setIngredients(res.data.data);
-        console.log('ingredients');
-        console.log(res.data.data);
       } catch (err) {
         console.error('Lỗi khi tải nguyên liệu:', err);
       }
@@ -122,6 +123,47 @@ const SearchScreen = () => {
     fetchMealCategories();
   }, []);
 
+
+  const fetchRecipesSearch = async () => {
+    const query = search.trim();
+    try {
+      setIsLoading(true);
+      const response = await api.get('/recipes/searchName', {
+        params: {
+          query: query,
+          offset: 0,
+          limit: 20,
+        },
+      });
+      let data = response.data.data || [];
+      console.log('-----------------------------------------------');
+      console.log(data);
+      console.log('-----------------------------------------------');
+      console.log(selectedCategoryId);
+
+      if (data.length === 0) {
+        Toast.show({
+          type: 'info',
+          text1: 'Không có kết quả phù hợp',
+        });
+      }
+
+      setRecipes(data);
+    } catch (error) {
+      console.error('Lỗi khi lấy danh mục:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const debounced = debounce(() => {
+      fetchRecipesSearch(search);
+    }, 300);
+    debounced();
+    return () => debounced.cancel();
+  }, [search, selectedCategoryId]);
+
   return (
     <ImageBackground
       source={backgroundImage}
@@ -131,24 +173,20 @@ const SearchScreen = () => {
       <SafeAreaView style={{ flex: 1, backgroundColor: 'transparent' }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Header */}
-          <View className="flex-row items-center p-4">
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Ionicons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
-            <Text className="text-3xl font-bold text-red-800 mx-auto">
-              Tìm kiếm
-            </Text>
-          </View>
-
-          {/* Search Input */}
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               paddingHorizontal: 16,
-              marginTop: 8,
+              marginTop: 12,
             }}
           >
+            {/* Nút quay lại */}
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+
+            {/* Ô tìm kiếm */}
             <View
               style={{
                 flex: 1,
@@ -160,22 +198,49 @@ const SearchScreen = () => {
                 paddingVertical: 8,
                 borderWidth: 1,
                 borderColor: '#ccc',
+                marginLeft: 12,
               }}
             >
               <TextInput
                 placeholder="Tìm kiếm"
-                value={keyword}
-                onChangeText={setKeyword}
+                value={search}
+                onChangeText={setSearch}
+                // onSubmitEditing={() => {
+                //   // if (keyword.trim()) {
+                //   //   navigation.navigate('ListDishesScreen', { query: search.trim() });
+                //   // } else {
+                //   //   Alert.alert('Thông báo', 'Vui lòng nhập từ khóa');
+                //   // }
+                // }}
+                returnKeyType="search"
                 style={{ flex: 1, color: '#333' }}
               />
-              <Ionicons name="search" size={20} color="#888" />
+
+              {/* Icon tìm kiếm */}
+              <TouchableOpacity
+                // onPress={() => {
+                //   if (search.trim()) {
+                //     navigation.navigate('ListDishesScreen', { query: search.trim() });
+                //   } else {
+                //     Alert.alert('Thông báo', 'Vui lòng nhập từ khóa');
+                //   }
+                // }}
+              >
+                <Ionicons name="search" size={20} color="#888" />
+              </TouchableOpacity>
             </View>
+
+            {/* Icon scan QR / ảnh */}
             <TouchableOpacity
               style={{
                 marginLeft: 8,
                 padding: 10,
                 borderRadius: 8,
                 backgroundColor: '#941D23',
+              }}
+              onPress={() => {
+                // Tùy bạn cấu hình điều hướng đến màn hình scan nếu có
+                navigation.navigate('ScanIngredient');
               }}
             >
               <Ionicons name="scan-outline" size={22} color="white" />
