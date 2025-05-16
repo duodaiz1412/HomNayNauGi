@@ -32,9 +32,13 @@ const AddIngredientScreen = ({ navigation }) => {
   // Yêu cầu quyền truy cập ảnh khi component mount
   useEffect(() => {
     (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Quyền truy cập bị từ chối', 'Bạn cần cấp quyền truy cập thư viện ảnh để chọn ảnh');
+        Alert.alert(
+          'Quyền truy cập bị từ chối',
+          'Bạn cần cấp quyền truy cập thư viện ảnh để chọn ảnh'
+        );
       }
     })();
   }, []);
@@ -42,7 +46,7 @@ const AddIngredientScreen = ({ navigation }) => {
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: "images", // dùng enum đúng
+        mediaTypes: 'images', // dùng enum đúng
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,

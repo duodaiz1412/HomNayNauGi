@@ -119,7 +119,7 @@ export const useHomeData = () => {
       setError(null);
 
       const isAuth = await checkAuth();
-      console.log("fetch categori")
+      console.log('fetch categori');
       // Fetch categories
       const categoriesResponse = await api.get('/recipe-categories/random');
       const categories = categoriesResponse.data.data.map(

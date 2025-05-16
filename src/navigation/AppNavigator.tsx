@@ -126,10 +126,7 @@ const AppNavigator = () => {
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="PersonalScreen" component={PersonalScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
-        <Stack.Screen
-          name="HistoryScreen"
-          component={HistoryScreen}
-        />
+        <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
         <Stack.Screen
           name="AchievementsScreen"
           component={AchievementsScreen}

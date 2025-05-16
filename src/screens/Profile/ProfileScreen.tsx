@@ -83,9 +83,21 @@ const ProfileScreen = () => {
   };
 
   const profileOptions = [
-    { icon: '❤️', title: 'Yêu thích', onPress: () => navigation.navigate('FavoritesScreen') },
-    { icon: '🎯', title: 'Lịch sử', onPress: () => navigation.navigate('HistoryScreen') },
-    { icon: '💡', title: 'Thành tựu', onPress: () => navigation.navigate('AchievementsScreen') },
+    {
+      icon: '❤️',
+      title: 'Yêu thích',
+      onPress: () => navigation.navigate('FavoritesScreen'),
+    },
+    {
+      icon: '🎯',
+      title: 'Lịch sử',
+      onPress: () => navigation.navigate('HistoryScreen'),
+    },
+    {
+      icon: '💡',
+      title: 'Thành tựu',
+      onPress: () => navigation.navigate('AchievementsScreen'),
+    },
   ];
 
   const settingsOptions = [

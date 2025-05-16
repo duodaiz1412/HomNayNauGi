@@ -31,7 +31,8 @@ interface ViewHistoryItem {
 }
 
 const HistoryScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [history, setHistory] = useState<ViewHistoryItem[]>([]);
   const [createdRecipes, setCreatedRecipes] = useState<Recipe[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,7 +60,10 @@ const HistoryScreen = () => {
             const viewedAt = item.viewed_at || item.viewedAt; // an toàn lấy trường đúng
 
             const existing = mapLatestView.get(recipeId);
-            if (!existing || new Date(viewedAt) > new Date(existing.viewed_at)) {
+            if (
+              !existing ||
+              new Date(viewedAt) > new Date(existing.viewed_at)
+            ) {
               mapLatestView.set(recipeId, {
                 id: item.id,
                 viewed_at: viewedAt,
@@ -72,8 +76,10 @@ const HistoryScreen = () => {
             }
           });
 
-          const uniqueHistory = Array.from(mapLatestView.values())
-            .sort((a, b) => new Date(b.viewed_at).getTime() - new Date(a.viewed_at).getTime());
+          const uniqueHistory = Array.from(mapLatestView.values()).sort(
+            (a, b) =>
+              new Date(b.viewed_at).getTime() - new Date(a.viewed_at).getTime()
+          );
 
           setHistory(uniqueHistory);
         }
@@ -90,11 +96,11 @@ const HistoryScreen = () => {
   }, []);
 
   // Lọc dữ liệu theo searchQuery
-  const filteredHistory = history.filter(item =>
+  const filteredHistory = history.filter((item) =>
     item.recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredCreated = createdRecipes.filter(recipe =>
+  const filteredCreated = createdRecipes.filter((recipe) =>
     recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -120,7 +126,7 @@ const HistoryScreen = () => {
         const map = new Map<string, DisplayItem>();
 
         // Thêm createdRecipes
-        filteredCreated.forEach(r => {
+        filteredCreated.forEach((r) => {
           map.set(r.id, {
             id: r.id,
             name: r.name,
@@ -131,7 +137,7 @@ const HistoryScreen = () => {
         });
 
         // Thêm hoặc gộp với history
-        filteredHistory.forEach(h => {
+        filteredHistory.forEach((h) => {
           const existing = map.get(h.recipe.id);
           if (existing) {
             // Đã có trong map, gộp thêm viewed_at và đổi type thành 'both'
@@ -154,17 +160,30 @@ const HistoryScreen = () => {
 
         // Trả về mảng các phần tử đã gộp, sắp xếp theo thời gian xem hoặc tạo (mình ưu tiên xem mới nhất)
         return Array.from(map.values()).sort((a, b) => {
-          const timeA = a.viewed_at ? new Date(a.viewed_at).getTime() : a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const timeB = b.viewed_at ? new Date(b.viewed_at).getTime() : b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          const timeA = a.viewed_at
+            ? new Date(a.viewed_at).getTime()
+            : a.createdAt
+              ? new Date(a.createdAt).getTime()
+              : 0;
+          const timeB = b.viewed_at
+            ? new Date(b.viewed_at).getTime()
+            : b.createdAt
+              ? new Date(b.createdAt).getTime()
+              : 0;
           return timeB - timeA;
         });
     }
   })();
 
-  const updateViewHistory = (newViewedRecipe: Recipe, newViewedAt: string = new Date().toISOString()) => {
-    setHistory(prevHistory => {
+  const updateViewHistory = (
+    newViewedRecipe: Recipe,
+    newViewedAt: string = new Date().toISOString()
+  ) => {
+    setHistory((prevHistory) => {
       // Lọc bỏ hết các bản ghi có cùng recipe.id (để tránh trùng)
-      const filteredHistory = prevHistory.filter(item => item.recipe.id !== newViewedRecipe.id);
+      const filteredHistory = prevHistory.filter(
+        (item) => item.recipe.id !== newViewedRecipe.id
+      );
 
       // Tạo bản ghi mới với thời gian xem mới nhất
       const newRecord = {
@@ -182,7 +201,11 @@ const HistoryScreen = () => {
   const generateUniqueId = () => '_' + Math.random().toString(36).substr(2, 9);
 
   return (
-    <ImageBackground source={backgroundImage} style={{ flex: 1 }} resizeMode="cover">
+    <ImageBackground
+      source={backgroundImage}
+      style={{ flex: 1 }}
+      resizeMode="cover"
+    >
       <SafeAreaView className="flex-1">
         <ScrollView className="flex-1">
           {/* Header */}
@@ -191,7 +214,9 @@ const HistoryScreen = () => {
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Text className="text-2xl text-black">⬅️</Text>
               </TouchableOpacity>
-              <Text className="text-2xl font-bold text-black ml-4">Thông báo</Text>
+              <Text className="text-2xl font-bold text-black ml-4">
+                Thông báo
+              </Text>
             </View>
           </View>
 
@@ -210,16 +235,24 @@ const HistoryScreen = () => {
 
           {/* Filter Buttons */}
           <View className="flex-row justify-center space-x-4 mb-4">
-            {(['all', 'created', 'viewed'] as FilterMode[]).map(mode => (
+            {(['all', 'created', 'viewed'] as FilterMode[]).map((mode) => (
               <TouchableOpacity
                 key={mode}
                 className={`px-4 py-2 rounded-full border ${
-                  filterMode === mode ? 'bg-red-700 bg-red-700' : 'bg-white border-gray-300'
+                  filterMode === mode
+                    ? 'bg-red-700 bg-red-700'
+                    : 'bg-white border-gray-300'
                 }`}
                 onPress={() => setFilterMode(mode)}
               >
-                <Text className={`${filterMode === mode ? 'text-white' : 'text-gray-700'} font-semibold`}>
-                  {mode === 'all' ? 'Tất cả' : mode === 'created' ? 'Công thức bạn tạo' : 'Công thức đã xem'}
+                <Text
+                  className={`${filterMode === mode ? 'text-white' : 'text-gray-700'} font-semibold`}
+                >
+                  {mode === 'all'
+                    ? 'Tất cả'
+                    : mode === 'created'
+                      ? 'Công thức bạn tạo'
+                      : 'Công thức đã xem'}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -229,15 +262,23 @@ const HistoryScreen = () => {
           <View className="px-4 pb-8">
             {filterMode === 'created' && (
               <>
-                <Text className="text-lg font-semibold mb-2 text-black">🧑‍🍳 Công thức bạn đã tạo</Text>
+                <Text className="text-lg font-semibold mb-2 text-black">
+                  🧑‍🍳 Công thức bạn đã tạo
+                </Text>
                 {displayedItems.length === 0 && (
-                  <Text className="text-center text-gray-500 mt-4">Không có công thức nào phù hợp.</Text>
+                  <Text className="text-center text-gray-500 mt-4">
+                    Không có công thức nào phù hợp.
+                  </Text>
                 )}
                 {(displayedItems as Recipe[]).map((recipe) => (
                   <TouchableOpacity
                     key={recipe.id}
                     className="bg-white rounded-xl shadow-md mb-4 overflow-hidden"
-                    onPress={() => navigation.navigate('RecipeDetail', { recipeId: recipe.id })}
+                    onPress={() =>
+                      navigation.navigate('RecipeDetail', {
+                        recipeId: recipe.id,
+                      })
+                    }
                   >
                     <Image
                       source={{ uri: recipe.imageUrl }}
@@ -245,28 +286,37 @@ const HistoryScreen = () => {
                       resizeMode="cover"
                     />
                     <View className="p-4">
-                      <Text className="text-lg font-bold mb-1">{recipe.name}</Text>
+                      <Text className="text-lg font-bold mb-1">
+                        {recipe.name}
+                      </Text>
                       <Text className="text-xs text-gray-500">
                         Đã tạo vào{' '}
-                        {new Date(recipe.createdAt ?? '').toLocaleString('vi-VN', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })}
+                        {new Date(recipe.createdAt ?? '').toLocaleString(
+                          'vi-VN',
+                          {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          }
+                        )}
                       </Text>
                     </View>
                   </TouchableOpacity>
                 ))}
               </>
             )}
-            
+
             {filterMode === 'viewed' && (
               <>
-                <Text className="text-lg font-semibold mb-2 text-black">👁️ Công thức đã xem</Text>
+                <Text className="text-lg font-semibold mb-2 text-black">
+                  👁️ Công thức đã xem
+                </Text>
                 {displayedItems.length === 0 && (
-                  <Text className="text-center text-gray-500 mt-4">Không có công thức đã xem nào phù hợp.</Text>
+                  <Text className="text-center text-gray-500 mt-4">
+                    Không có công thức đã xem nào phù hợp.
+                  </Text>
                 )}
                 {(displayedItems as ViewHistoryItem[]).map((item) => (
                   <TouchableOpacity
@@ -274,7 +324,9 @@ const HistoryScreen = () => {
                     className="bg-white rounded-xl shadow-md mb-4 overflow-hidden"
                     onPress={() => {
                       updateViewHistory(item.recipe);
-                      navigation.navigate('RecipeDetail', { recipeId: item.recipe.id });
+                      navigation.navigate('RecipeDetail', {
+                        recipeId: item.recipe.id,
+                      });
                     }}
                   >
                     <Image
@@ -283,7 +335,9 @@ const HistoryScreen = () => {
                       resizeMode="cover"
                     />
                     <View className="p-4">
-                      <Text className="text-lg font-bold mb-1">{item.recipe.name}</Text>
+                      <Text className="text-lg font-bold mb-1">
+                        {item.recipe.name}
+                      </Text>
                       <Text className="text-xs text-gray-500">
                         Bạn đã xem vào lúc{' '}
                         {new Date(item.viewed_at).toLocaleString('vi-VN', {
@@ -299,19 +353,23 @@ const HistoryScreen = () => {
                 ))}
               </>
             )}
-            
+
             {filterMode === 'all' && (
               <>
                 {displayedItems.length === 0 && (
-                  <Text className="text-center text-gray-500 mt-4">Không có công thức nào phù hợp.</Text>
+                  <Text className="text-center text-gray-500 mt-4">
+                    Không có công thức nào phù hợp.
+                  </Text>
                 )}
-                {displayedItems.map(item => (
+                {displayedItems.map((item) => (
                   <TouchableOpacity
                     key={item.id}
                     className="bg-white rounded-xl shadow-md mb-4 overflow-hidden"
                     onPress={() => {
                       if (item.type === 'created' || item.type === 'both') {
-                        navigation.navigate('RecipeDetail', { recipeId: item.id });
+                        navigation.navigate('RecipeDetail', {
+                          recipeId: item.id,
+                        });
                       } else {
                         updateViewHistory({
                           id: item.id,
@@ -319,7 +377,9 @@ const HistoryScreen = () => {
                           imageUrl: item.imageUrl,
                           createdAt: undefined,
                         });
-                        navigation.navigate('RecipeDetail', { recipeId: item.id });
+                        navigation.navigate('RecipeDetail', {
+                          recipeId: item.id,
+                        });
                       }
                     }}
                   >
@@ -329,7 +389,9 @@ const HistoryScreen = () => {
                       resizeMode="cover"
                     />
                     <View className="p-4">
-                      <Text className="text-lg font-bold mb-1">{item.name}</Text>
+                      <Text className="text-lg font-bold mb-1">
+                        {item.name}
+                      </Text>
                       {/* Hiển thị cả createdAt và viewed_at nếu có */}
                       {item.createdAt && (
                         <Text className="text-xs text-gray-500 mb-1">
@@ -358,7 +420,6 @@ const HistoryScreen = () => {
                     </View>
                   </TouchableOpacity>
                 ))}
-
               </>
             )}
           </View>

@@ -369,9 +369,15 @@ const PersonalScreen = () => {
                     : 'N/A'}
                 </Text>
                 <View className="flex-row justify-between mt-1">
-                  <Text className="text-xs text-gray-500">👁 {item.viewCount}</Text>
-                  <Text className="text-xs text-gray-500">👍{item.likeCount}</Text>
-                  <Text className="text-xs text-gray-500">❤️ {item.favoriteCount}</Text>
+                  <Text className="text-xs text-gray-500">
+                    👁 {item.viewCount}
+                  </Text>
+                  <Text className="text-xs text-gray-500">
+                    👍{item.likeCount}
+                  </Text>
+                  <Text className="text-xs text-gray-500">
+                    ❤️ {item.favoriteCount}
+                  </Text>
                 </View>
               </View>
             </TouchableOpacity>

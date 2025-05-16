@@ -26,7 +26,7 @@ const HomeScreen = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  
+
   const navigation2 = useNavigation<NativeStackNavigationProp<TabParamList>>();
   const {
     isLoading,
@@ -35,7 +35,7 @@ const HomeScreen = () => {
     activeCategoryId,
     handleCategoryPress,
     isAuthenticated,
-    fetchRecipeFeed
+    fetchRecipeFeed,
   } = useHomeData();
 
   // Kiểm tra role admin
@@ -43,18 +43,18 @@ const HomeScreen = () => {
     const checkAdminRole = async () => {
       try {
         const role = await AsyncStorage.getItem('accountRole');
-        console.log(role)
-        if(role ==='admin'){
-                  navigation.reset({
-          index: 0,
-          routes: [{ name: 'AdminDrawerNavigator' }],
-        });
+        console.log(role);
+        if (role === 'admin') {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'AdminDrawerNavigator' }],
+          });
         }
       } catch (error) {
         console.error('Error checking admin role:', error);
       }
     };
-    
+
     checkAdminRole();
   }, []);
 
@@ -68,7 +68,7 @@ const HomeScreen = () => {
   // Hàm tải thêm
   const handleLoadMore = async () => {
     if (isLoadingMore || !homeData?.recipeFeedHasMore) return;
-    
+
     setIsLoadingMore(true);
     const currentLength = homeData.recipeFeed?.length || 0;
     await fetchRecipeFeed('recommended', currentLength);
@@ -82,7 +82,6 @@ const HomeScreen = () => {
       navigation.navigate('Login');
     }
   };
-
 
   if (isLoading) {
     return (
@@ -125,8 +124,10 @@ const HomeScreen = () => {
                 className="flex-row items-center"
               >
                 <Image
-                  source={{ 
-                    uri: homeData.user?.avatar || 'https://via.placeholder.com/200'
+                  source={{
+                    uri:
+                      homeData.user?.avatar ||
+                      'https://via.placeholder.com/200',
                   }}
                   className="w-20 h-20 rounded-full mr-3"
                 />
@@ -161,7 +162,7 @@ const HomeScreen = () => {
           </View>
 
           {/* Banner */}
-                    {homeData.banner && (
+          {homeData.banner && (
             <TouchableOpacity
               className="mx-4 mb-4 rounded-2xl p-4 flex-row items-center"
               style={{ backgroundColor: '#941D23' }}
@@ -315,14 +316,13 @@ const HomeScreen = () => {
 
           {/* Featured Dishes Section */}
           <View className="px-4 pt-2 pb-6">
-
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingRight: 15, paddingTop: 40 }}
             >
-              {homeData.featuredByCategory && 
-              homeData.featuredByCategory[activeCategoryId] && 
+              {homeData.featuredByCategory &&
+              homeData.featuredByCategory[activeCategoryId] &&
               homeData.featuredByCategory[activeCategoryId].length > 0 ? (
                 homeData.featuredByCategory[activeCategoryId].map((item) => (
                   <TouchableOpacity
@@ -352,7 +352,9 @@ const HomeScreen = () => {
                 ))
               ) : (
                 <View className="flex-1 justify-center items-center mb-4 mt-4 w-full">
-                  <Text className="text-gray-500 text-3xl">Không có món ăn nổi bật nào</Text>
+                  <Text className="text-gray-500 text-3xl">
+                    Không có món ăn nổi bật nào
+                  </Text>
                 </View>
               )}
             </ScrollView>
@@ -365,7 +367,7 @@ const HomeScreen = () => {
                 Khám phá món ăn
               </Text>
             </View>
-            
+
             {homeData.recipeFeed && homeData.recipeFeed.length > 0 ? (
               <FlatList
                 data={homeData.recipeFeed}
@@ -373,34 +375,42 @@ const HomeScreen = () => {
                 scrollEnabled={false}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}
+                    onPress={() =>
+                      navigation.navigate('RecipeDetail', { recipeId: item.id })
+                    }
                     className="bg-white rounded-xl mb-4 shadow-md overflow-hidden"
                   >
                     <View className="flex-row">
                       {/* Ảnh món ăn bên trái */}
-                      <Image 
-                        source={{ uri: item.imageUrl }} 
+                      <Image
+                        source={{ uri: item.imageUrl }}
                         className="w-36 h-32"
                         resizeMode="cover"
                       />
-                      
+
                       {/* Thông tin món ăn bên phải */}
                       <View className="flex-1 p-3 justify-between relative">
                         <View>
-                          <Text className="font-bold text-gray-800 text-lg" numberOfLines={1}>
+                          <Text
+                            className="font-bold text-gray-800 text-lg"
+                            numberOfLines={1}
+                          >
                             {item.name}
                           </Text>
-                          <Text className="text-gray-600 text-sm mt-1" numberOfLines={1}>
+                          <Text
+                            className="text-gray-600 text-sm mt-1"
+                            numberOfLines={1}
+                          >
                             {item.description}
                           </Text>
                         </View>
-                        
+
                         {/* Thông tin tác giả */}
                         <View className="flex-row justify-between items-center mt-2">
                           <View className="flex-row items-center">
-                            <Image 
+                            <Image
                               source={{ uri: item.author.avatar }}
-                              className="w-6 h-6 rounded-full" 
+                              className="w-6 h-6 rounded-full"
                             />
                             <Text className="text-gray-700 ml-2 text-xs">
                               {item.author.name}
@@ -419,10 +429,12 @@ const HomeScreen = () => {
                   isLoadingMore ? (
                     <View className="py-4 items-center">
                       <ActivityIndicator size="small" color="#941D23" />
-                      <Text className="text-gray-500 text-xs mt-2">Đang tải thêm...</Text>
+                      <Text className="text-gray-500 text-xs mt-2">
+                        Đang tải thêm...
+                      </Text>
                     </View>
                   ) : homeData.recipeFeedHasMore ? (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       className="py-4 items-center"
                       onPress={handleLoadMore}
                     >
@@ -430,7 +442,9 @@ const HomeScreen = () => {
                     </TouchableOpacity>
                   ) : (
                     <View className="py-4 items-center">
-                      <Text className="text-gray-500 text-xs">Bạn đã xem hết danh sách</Text>
+                      <Text className="text-gray-500 text-xs">
+                        Bạn đã xem hết danh sách
+                      </Text>
                     </View>
                   )
                 }
@@ -450,4 +464,3 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-
