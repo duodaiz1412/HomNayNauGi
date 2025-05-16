@@ -51,15 +51,18 @@ export default function RecipeScreen() {
     fetchPantryData();
   }, []);
 
+  // Add a useEffect to trigger handleGetSuggestedDish when ingredientGroups changes
   useEffect(() => {
-  }, [suggestedDishes]);
+    if (ingredientGroups.length > 0) {
+      handleGetSuggestedDish();
+    }
+  }, [ingredientGroups]);
 
   const fetchPantryData = async () => {
     try {
       setLoading(true);
       const data = await getUserPantry();
       setIngredientGroups(data);
-      handleGetSuggestedDish();
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu pantry:', error);
     } finally {
@@ -194,7 +197,13 @@ export default function RecipeScreen() {
 
           <TouchableOpacity
             className={`flex-1 pb-2 ${activeTab === 'dishes' ? 'border-b-2 border-red-800' : ''}`}
-            onPress={() => setActiveTab('dishes')}
+            onPress={() => {
+              setActiveTab('dishes');
+              // Manually trigger dish refresh when switching to dishes tab
+              if (ingredientGroups.length > 0) {
+                handleGetSuggestedDish();
+              }
+            }}
           >
             <View className="flex-row items-center justify-center">
               <Text

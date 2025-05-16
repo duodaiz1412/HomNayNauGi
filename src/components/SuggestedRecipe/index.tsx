@@ -26,6 +26,7 @@ const SuggestedRecipe: React.FC<SuggestedRecipeProps> = ({ dishes, onDishPress }
   const handleDishPress = (id: string) => {
     navigation.navigate('RecipeDetail', {
       recipeId: id,
+      isSuggested: true,
     });
   };
 
