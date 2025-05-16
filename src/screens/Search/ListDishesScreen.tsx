@@ -16,7 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mockData } from '../../MockData/Data';
 
 const backgroundImage = require('../../assets/background.png');
-const recipeData = mockData.recipes.map(recipe => ({
+const recipeData = mockData.recipes.map((recipe) => ({
   id: recipe.id,
   name: recipe.name,
   image: recipe.image,
@@ -25,15 +25,22 @@ const recipeData = mockData.recipes.map(recipe => ({
 }));
 
 const RecipeListScreen = () => {
-      const navigation =
-          useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
-    <ImageBackground source={backgroundImage} resizeMode="cover" style={{ flex: 1 }}>
+    <ImageBackground
+      source={backgroundImage}
+      resizeMode="cover"
+      style={{ flex: 1 }}
+    >
       <View style={styles.container}>
         {/* Back + Search Bar */}
         <View style={styles.searchContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
             <Ionicons name="arrow-back" size={20} color="#888" />
           </TouchableOpacity>
           <TextInput placeholder="Bữa sáng" style={styles.searchInput} />
@@ -44,7 +51,10 @@ const RecipeListScreen = () => {
           {/* <TouchableOpacity style={styles.tagRed}>
             <Text style={styles.tagTextWhite}>Bộ lọc • 4</Text>
           </TouchableOpacity> */}
-          <TouchableOpacity style={styles.tagRed} onPress={() => navigation.navigate('FilterScreen')}>
+          <TouchableOpacity
+            style={styles.tagRed}
+            onPress={() => navigation.navigate('FilterScreen')}
+          >
             <Text style={styles.tagTextWhite}>Bộ lọc • </Text>
           </TouchableOpacity>
 
@@ -64,10 +74,19 @@ const RecipeListScreen = () => {
           contentContainerStyle={{ paddingBottom: 100 }}
           columnWrapperStyle={{ justifyContent: 'space-between' }}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('RecipeDetail', { recipeId: parseInt(item.id) })}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate('RecipeDetail', {
+                  recipeId: parseInt(item.id),
+                })
+              }
+            >
               <Image source={{ uri: item.image }} style={styles.image} />
               <View style={styles.cardContent}>
-                <Text style={styles.title} numberOfLines={2}>{item.name}</Text>
+                <Text style={styles.title} numberOfLines={2}>
+                  {item.name}
+                </Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.author}>{item.author}</Text>
                   <View style={styles.time}>
@@ -76,10 +95,8 @@ const RecipeListScreen = () => {
                   </View>
                 </View>
               </View>
-              
-             </TouchableOpacity>
+            </TouchableOpacity>
           )}
-         
         />
       </View>
     </ImageBackground>

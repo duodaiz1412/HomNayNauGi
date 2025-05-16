@@ -19,7 +19,9 @@ import api from 'src/api/api';
 
 export const AdminIngredientCategoryManagementScreen = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AdminIngredientCategoryStackParamList>>();
+    useNavigation<
+      NativeStackNavigationProp<AdminIngredientCategoryStackParamList>
+    >();
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
@@ -35,7 +37,7 @@ export const AdminIngredientCategoryManagementScreen = () => {
       });
       const { data, total } = response.data;
 
-      console.log("Danh sach danh muc nguyen lieu", data);
+      console.log('Danh sach danh muc nguyen lieu', data);
 
       return { data, total };
     } catch (error) {
@@ -93,24 +95,34 @@ export const AdminIngredientCategoryManagementScreen = () => {
               source={{ uri: item.imageUrl }}
               className="w-20 h-20 rounded-xl"
               resizeMode="cover"
-            /> 
+            />
           </View>
           <View className="flex-1 ml-4">
             <View className="flex-row items-center justify-between">
-              <Text className="text-lg font-bold text-gray-800 flex-1 mr-2">{item.name}</Text>
+              <Text className="text-lg font-bold text-gray-800 flex-1 mr-2">
+                {item.name}
+              </Text>
               <View className="flex-row">
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('EditIngredientCategoryScreen', { ingredientCategoryId: item.id })}
+                  onPress={() =>
+                    navigation.navigate('EditIngredientCategoryScreen', {
+                      ingredientCategoryId: item.id,
+                    })
+                  }
                   className="w-8 h-8 items-center justify-center rounded-full bg-[#88131b]/5 mr-2"
                 >
                   <Ionicons name="create-outline" size={18} color="#88131b" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() =>
-                    Alert.alert('Xác nhận', `Bạn có chắc muốn xóa ${item.name}?`, [
-                      { text: 'Hủy', style: 'cancel' },
-                      { text: 'Xóa', onPress: () => deleteCategory(item.id) },
-                    ])
+                    Alert.alert(
+                      'Xác nhận',
+                      `Bạn có chắc muốn xóa ${item.name}?`,
+                      [
+                        { text: 'Hủy', style: 'cancel' },
+                        { text: 'Xóa', onPress: () => deleteCategory(item.id) },
+                      ]
+                    )
                   }
                   className="w-8 h-8 items-center justify-center rounded-full bg-red-50"
                 >
@@ -121,7 +133,9 @@ export const AdminIngredientCategoryManagementScreen = () => {
             <View className="flex-row items-center mt-2">
               <View className="flex-row items-center bg-[#88131b]/5 px-3 py-1 rounded-full">
                 <Ionicons name="leaf-outline" size={14} color="#88131b" />
-                <Text className="text-xs text-[#88131b] ml-1 font-medium">Danh mục nguyên liệu</Text>
+                <Text className="text-xs text-[#88131b] ml-1 font-medium">
+                  Danh mục nguyên liệu
+                </Text>
               </View>
             </View>
           </View>
@@ -170,7 +184,9 @@ export const AdminIngredientCategoryManagementScreen = () => {
         onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <View className="px-4 mb-6">
-            <Text className="text-2xl font-bold text-gray-800">Danh mục nguyên liệu</Text>
+            <Text className="text-2xl font-bold text-gray-800">
+              Danh mục nguyên liệu
+            </Text>
             <Text className="text-base text-gray-500 mt-1">
               Quản lý và tổ chức các danh mục nguyên liệu trong hệ thống
             </Text>
@@ -180,7 +196,9 @@ export const AdminIngredientCategoryManagementScreen = () => {
           loading ? (
             <View className="items-center justify-center py-8">
               <View className="w-10 h-10 border-3 border-[#88131b] border-t-transparent rounded-full animate-spin" />
-              <Text className="text-gray-500 mt-4 font-medium">Đang tải danh mục...</Text>
+              <Text className="text-gray-500 mt-4 font-medium">
+                Đang tải danh mục...
+              </Text>
             </View>
           ) : null
         }
@@ -190,16 +208,23 @@ export const AdminIngredientCategoryManagementScreen = () => {
               <View className="w-24 h-24 bg-[#88131b]/5 rounded-full items-center justify-center mb-6">
                 <Ionicons name="leaf-outline" size={40} color="#88131b" />
               </View>
-              <Text className="text-xl font-bold text-gray-800 mb-2">Không tìm thấy danh mục</Text>
+              <Text className="text-xl font-bold text-gray-800 mb-2">
+                Không tìm thấy danh mục
+              </Text>
               <Text className="text-base text-gray-500 text-center">
-                Hãy thử tìm kiếm với từ khóa khác hoặc thêm danh mục mới vào hệ thống
+                Hãy thử tìm kiếm với từ khóa khác hoặc thêm danh mục mới vào hệ
+                thống
               </Text>
               <TouchableOpacity
                 className="mt-6 bg-[#88131b] px-6 py-3 rounded-full flex-row items-center"
-                onPress={() => navigation.navigate('AddIngredientCategoryScreen')}
+                onPress={() =>
+                  navigation.navigate('AddIngredientCategoryScreen')
+                }
               >
                 <Ionicons name="add" size={20} color="white" />
-                <Text className="text-white font-medium ml-2">Thêm danh mục mới</Text>
+                <Text className="text-white font-medium ml-2">
+                  Thêm danh mục mới
+                </Text>
               </TouchableOpacity>
             </View>
           ) : null

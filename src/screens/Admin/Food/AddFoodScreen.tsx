@@ -23,7 +23,16 @@ import { RecipeStatus, UnitOfMeasure } from 'src/types';
 import { useFoodManagement } from 'src/context/FoodManagementContext';
 import { useEffect, useState } from 'react';
 import api from 'src/api/api';
-import { Picker } from '@react-native-picker/picker';
+
+// Add YouTube URL validation function
+const isValidYouTubeUrl = (url) => {
+  if (!url) return true; // Empty URL is considered valid (optional field)
+
+  const youtubeRegex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|shorts\/|v\/|)([a-zA-Z0-9_-]{11})$/;
+  return youtubeRegex.test(url);
+};
+
 const statusOptions = [
   { label: 'Nháp', value: RecipeStatus.DRAFT },
   { label: 'Riêng tư', value: RecipeStatus.PRIVATE },
@@ -62,7 +71,10 @@ export const AddFoodScreen = () => {
       try {
         const response = await api.get('/admin/unit-of-measure/all');
 
-        console.log('////////////////\n DON VI NE ',JSON.stringify( response.data,null,2));
+        console.log(
+          '////////////////\n DON VI NE ',
+          JSON.stringify(response.data, null, 2)
+        );
         setUnitsOfMeasure(response.data);
       } catch (e: any) {
         setErrorUnits(e.message || 'An unknown error occurred');
@@ -158,7 +170,7 @@ export const AddFoodScreen = () => {
             text: 'OK',
             onPress: () => {
               resetForm();
-              navigation.navigate('AdminFoodManagementScreen')
+              navigation.navigate('AdminFoodManagementScreen');
             },
           },
         ]);
@@ -275,11 +287,23 @@ export const AddFoodScreen = () => {
               <View className="mb-4">
                 <Text className="text-gray-700 mb-1">URL video hướng dẫn</Text>
                 <TextInput
-                  className="border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder="Nhập URL video hướng dẫn"
+                  className={`border ${!isValidYouTubeUrl(basicInfo.videoUrl) ? 'border-red-500' : basicInfo.videoUrl ? 'border-green-500' : 'border-gray-300'} rounded-lg px-3 py-2`}
+                  placeholder="Nhập URL video hướng dẫn (YouTube)"
                   value={basicInfo.videoUrl || ''}
                   onChangeText={(value) => updateBasicInfo({ videoUrl: value })}
                 />
+                {basicInfo.videoUrl &&
+                  !isValidYouTubeUrl(basicInfo.videoUrl) && (
+                    <Text className="text-red-500 text-xs mt-1">
+                      URL không hợp lệ. Vui lòng nhập URL YouTube hợp lệ.
+                    </Text>
+                  )}
+                {basicInfo.videoUrl &&
+                  isValidYouTubeUrl(basicInfo.videoUrl) && (
+                    <Text className="text-green-500 text-xs mt-1">
+                      URL YouTube hợp lệ.
+                    </Text>
+                  )}
               </View>
               <View className="space-y-2">
                 <Text className="text-gray-800 text-base font-semibold">
@@ -294,7 +318,7 @@ export const AddFoodScreen = () => {
                         key={value}
                         onPress={() => updateBasicInfo({ status: value })}
                         className={`px-4 py-1.5 rounded-full mx-0.5
-            ${isActive ? 'bg-red-500' : 'bg-white'}
+            ${isActive ? 'bg-[#941D23]' : 'bg-white'}
           `}
                       >
                         <Text
@@ -615,6 +639,61 @@ export const AddFoodScreen = () => {
           </ScrollView>
         )}
       </KeyboardAvoidingView>
+
+      {/* Unit Selection Modal */}
+      <Modal
+        visible={showUnitModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowUnitModal(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/40">
+          <View className="bg-white rounded-2xl w-5/6 overflow-hidden ">
+            {/* Header modal */}
+            <View className="bg-red-800 px-4 py-4 flex-row justify-between items-center">
+              <Text className="text-lg font-bold text-white">
+                Chọn đơn vị đo lường
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowUnitModal(false)}
+                className="w-8 h-8 rounded-full items-center justify-center"
+                style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}
+              >
+                <Ionicons name="close" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            {/* List units */}
+            <FlatList
+              data={unitsOfMeasure}
+              keyExtractor={(item) => item.id.toString()}
+              style={{ maxHeight: 300 }}
+              contentContainerStyle={{ paddingHorizontal: 8 }}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  className="py-4 px-4 border-b border-gray-100 flex-row items-center"
+                  onPress={() => selectUnit(item.id)}
+                >
+                  <View className="w-9 h-9 rounded-full bg-red-100 items-center justify-center mr-3">
+                    {/* <Text className="text-red-800 font-bold">{item.symbol || item.unitName.charAt(0)}</Text> */}
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-gray-800 font-medium text-base">
+                      {item.unitName}
+                    </Text>
+                    {item.symbol && (
+                      <Text className="text-gray-500 text-xs mt-1">
+                        Ký hiệu: {item.symbol}
+                      </Text>
+                    )}
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color="#941D23" />
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect} from 'react';
 // import {
 //   View,
@@ -20,10 +19,6 @@
 // import api from 'src/api/api';
 // import debounce from 'lodash.debounce';
 // import Toast from 'react-native-toast-message';
-
-
-
-
 
 // interface Recipe {
 //   id: string;
@@ -128,12 +123,6 @@
 //     }
 //   };
 
-
-
-
-
-
-
 // //     try {
 // //       const cleanKw = kw?.trim();
 // //       if (!cleanKw) {
@@ -168,7 +157,6 @@
 // //     return () => debounced.cancel();
 // //   }, [search]);
 
-  
 // //   const fetchCategories = async () => {
 // //   try {
 // //     setLoading(true);
@@ -252,7 +240,7 @@
 //               style={[styles.categoryItem, selectedCategory === cat.name && styles.categoryItemActive]}
 //               onPress={() => {
 //                 setSelectedCategory(cat.name);
-//                 setSelectedCategoryId(cat.id); 
+//                 setSelectedCategoryId(cat.id);
 //               }}
 //             >
 //               <Image source={{ uri: cat.imageUrl }} style={styles.categoryIcon} />
@@ -267,8 +255,8 @@
 //           data={recipes}
 //           keyExtractor={(item) => item.id}
 //           renderItem={({ item }) => (
-            
-//             <TouchableOpacity style={styles.recipeCard} 
+
+//             <TouchableOpacity style={styles.recipeCard}
 //             key = {item.id}
 //             onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}>
 //               <Image source={{ uri: item.imageUrl }} style={styles.recipeImage} />
@@ -384,9 +372,7 @@
 //   authorName: { fontSize: 13, color: '#666' },
 // });
 
-
 // export default RecipeScreen;
-
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -410,12 +396,15 @@ import Toast from 'react-native-toast-message';
 const background = require('../../assets/background.png');
 
 const RecipeScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [selectedCategory, setSelectedCategory] = useState('Phở');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null
+  );
   const [recipes, setRecipes] = useState([]);
 
   const fetchCategories = async () => {
@@ -557,15 +546,26 @@ const RecipeScreen = () => {
           {categories.map((cat) => (
             <TouchableOpacity
               key={cat.id}
-              style={[styles.categoryItem, selectedCategory === cat.name && styles.categoryItemActive]}
+              style={[
+                styles.categoryItem,
+                selectedCategory === cat.name && styles.categoryItemActive,
+              ]}
               onPress={() => {
                 setSelectedCategory(cat.name);
                 setSelectedCategoryId(cat.id);
                 setSearch(cat.name);
               }}
             >
-              <Image source={{ uri: cat.imageUrl }} style={styles.categoryIcon} />
-              <Text style={[styles.categoryText, selectedCategory === cat.name && styles.categoryTextActive]}>
+              <Image
+                source={{ uri: cat.imageUrl }}
+                style={styles.categoryIcon}
+              />
+              <Text
+                style={[
+                  styles.categoryText,
+                  selectedCategory === cat.name && styles.categoryTextActive,
+                ]}
+              >
                 {cat.name}
               </Text>
             </TouchableOpacity>
@@ -578,13 +578,21 @@ const RecipeScreen = () => {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.recipeCard}
-              onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}
+              onPress={() =>
+                navigation.navigate('RecipeDetail', { recipeId: item.id })
+              }
             >
-              <Image source={{ uri: item.imageUrl }} style={styles.recipeImage} />
+              <Image
+                source={{ uri: item.imageUrl }}
+                style={styles.recipeImage}
+              />
               <View style={styles.recipeInfo}>
                 <Text style={styles.recipeDescription}>{item.name}</Text>
                 <View style={styles.authorRow}>
-                  <Image source={{ uri: item.authorAvatar }} style={styles.authorAvatar} />
+                  <Image
+                    source={{ uri: item.authorAvatar }}
+                    style={styles.authorAvatar}
+                  />
                   <Text style={styles.authorName}>{item.author}</Text>
                 </View>
               </View>
@@ -601,9 +609,20 @@ const RecipeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 60 },
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 16,
+    paddingTop: 60,
+  },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 30 },
-  title: { flex: 1, textAlign: 'center', fontSize: 24, fontWeight: 'bold', color: '#941D23' },
+  title: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#941D23',
+  },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',

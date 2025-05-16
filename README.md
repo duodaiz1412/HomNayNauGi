@@ -5,21 +5,25 @@
 ## Tính năng chính ✨
 
 ### 1. Trang chủ
+
 - Hiển thị các món ăn đề xuất dựa trên sở thích
 - Danh sách món ăn phổ biến
 - Tìm kiếm nhanh chóng
 
 ### 2. Thực phẩm
+
 - Kho công thức nấu ăn phong phú
 - Phân loại theo danh mục
 - Hướng dẫn chi tiết từng bước
 
 ### 3. Món ngon
+
 - Lưu trữ các công thức yêu thích
 - Dễ dàng truy cập nhanh
 - Chia sẻ với bạn bè
 
 ### 4. Trang cá nhân
+
 - Quản lý thông tin người dùng
 - Lịch sử nấu ăn
 - Cài đặt ứng dụng
@@ -27,12 +31,15 @@
 ## Cấu trúc dự án 📁
 
 ### Navigation
+
 - `TabNavigator.tsx`: Quản lý thanh điều hướng chính
 - `AppNavigator.tsx`: Quản lý luồng điều hướng tổng thể
 - `components/navigation/TabBar.tsx`: Component thanh điều hướng tùy chỉnh
 
 ### Icons
+
 Sử dụng React Native SVG với Feather Icons:
+
 - `HomeIcon.tsx`: Icon trang chủ
 - `RecipeIcon.tsx`: Icon công thức
 - `FavoriteIcon.tsx`: Icon yêu thích
@@ -41,12 +48,14 @@ Sử dụng React Native SVG với Feather Icons:
 ## Cài đặt và Chạy 🚀
 
 ### Yêu cầu hệ thống
+
 - Node.js >= 14
 - Yarn hoặc npm
 - Android Studio (cho Android)
 - Xcode (cho iOS)
 
 ### Cài đặt
+
 ```bash
 # Cài đặt dependencies
 yarn install
@@ -56,6 +65,7 @@ yarn start
 ```
 
 ### Chạy ứng dụng
+
 ```bash
 # Chạy trên Android
 yarn android

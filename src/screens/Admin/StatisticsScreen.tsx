@@ -44,47 +44,88 @@ export const StatisticsScreen = () => {
 
   // Chuyển đổi categoryData thành định dạng phù hợp với PieChart
   const categoryData = [
-    { name: 'Phở', population: 0.3, color: '#941D23', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-    { name: 'Bánh mì', population: 0.2, color: '#FF3B30', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-    { name: 'Cơm', population: 0.15, color: '#FF9500', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-    { name: 'Bún', population: 0.1, color: '#FFCC00', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-    { name: 'Gỏi cuốn', population: 0.15, color: '#34C759', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-    { name: 'Khác', population: 0.1, color: '#5AC8FA', legendFontColor: '#7F7F7F', legendFontSize: 12 },
+    {
+      name: 'Phở',
+      population: 0.3,
+      color: '#941D23',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 12,
+    },
+    {
+      name: 'Bánh mì',
+      population: 0.2,
+      color: '#FF3B30',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 12,
+    },
+    {
+      name: 'Cơm',
+      population: 0.15,
+      color: '#FF9500',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 12,
+    },
+    {
+      name: 'Bún',
+      population: 0.1,
+      color: '#FFCC00',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 12,
+    },
+    {
+      name: 'Gỏi cuốn',
+      population: 0.15,
+      color: '#34C759',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 12,
+    },
+    {
+      name: 'Khác',
+      population: 0.1,
+      color: '#5AC8FA',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 12,
+    },
   ];
 
   const topDishes = [
     {
       id: '1',
       name: 'Phở Hà Nội',
-      image: 'https://cdn.pixabay.com/photo/2023/05/27/12/39/noodle-soup-8021418_1280.png',
+      image:
+        'https://cdn.pixabay.com/photo/2023/05/27/12/39/noodle-soup-8021418_1280.png',
       likes: 1245,
       views: 5678,
     },
     {
       id: '2',
       name: 'Bánh Mì Pate',
-      image: 'https://cdn.pixabay.com/photo/2018/06/10/20/30/bread-3467243_1280.jpg',
+      image:
+        'https://cdn.pixabay.com/photo/2018/06/10/20/30/bread-3467243_1280.jpg',
       likes: 987,
       views: 3456,
     },
     {
       id: '3',
       name: 'Bún Bò Huế',
-      image: 'https://cdn.pixabay.com/photo/2017/09/16/19/21/salad-2756467_1280.jpg',
+      image:
+        'https://cdn.pixabay.com/photo/2017/09/16/19/21/salad-2756467_1280.jpg',
       likes: 876,
       views: 2987,
     },
     {
       id: '4',
       name: 'Gỏi Cuốn',
-      image: 'https://cdn.pixabay.com/photo/2016/03/27/22/16/spring-roll-1284442_1280.jpg',
+      image:
+        'https://cdn.pixabay.com/photo/2016/03/27/22/16/spring-roll-1284442_1280.jpg',
       likes: 543,
       views: 1876,
     },
     {
       id: '5',
       name: 'Cơm Tấm Sườn Nướng',
-      image: 'https://cdn.pixabay.com/photo/2016/03/27/22/16/rice-1284444_1280.jpg',
+      image:
+        'https://cdn.pixabay.com/photo/2016/03/27/22/16/rice-1284444_1280.jpg',
       likes: 765,
       views: 2345,
     },

@@ -25,7 +25,6 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": ["READ_MEDIA_IMAGES"]
-
     },
     "web": {
       "favicon": "./assets/favicon.png"

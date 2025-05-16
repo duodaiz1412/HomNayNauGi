@@ -23,13 +23,15 @@ const IngredientsScreen = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [ingredientData, setIngredientData] = useState(
-    (ingredients || []).map(item => ({ ...item }))
+    (ingredients || []).map((item) => ({ ...item }))
   );
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
     // console.log('Nguyên liệu để tìm món:', ingredientData);
-    navigation.navigate('SearchByIngredientScreen', { ingredients: ingredientData });
+    navigation.navigate('SearchByIngredientScreen', {
+      ingredients: ingredientData,
+    });
   };
 
   return (
@@ -44,7 +46,12 @@ const IngredientsScreen = () => {
             <Ionicons name="create-outline" size={22} color="#333" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleSubmit}>
-            <Ionicons name="add-circle-outline" size={22} color="#333" style={{ marginLeft: 12 }} />
+            <Ionicons
+              name="add-circle-outline"
+              size={22}
+              color="#333"
+              style={{ marginLeft: 12 }}
+            />
           </TouchableOpacity>
         </View>
       </View>

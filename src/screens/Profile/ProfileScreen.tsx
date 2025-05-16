@@ -21,7 +21,8 @@ const backgroundImage = require('@assets/background.png');
 const defaultAvatar = require('@assets/images/avatar-placeholder.jpg');
 
 const ProfileScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -65,7 +66,7 @@ const ProfileScreen = () => {
         name: userData.fullName || 'Chưa cập nhật tên',
         email: userData.email || 'Chưa cập nhật email',
         phone: userData.phoneNumber || '',
-        avatar: userData.avatarUrl || ''
+        avatar: userData.avatarUrl || '',
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -82,16 +83,44 @@ const ProfileScreen = () => {
   };
 
   const profileOptions = [
-    { icon: '❤️', title: 'Yêu thích', onPress: () => navigation.navigate('FavoritesScreen') },
-    { icon: '🔔', title: 'Thông báo', onPress: () => navigation.navigate('NotificationsScreen') },
-    { icon: '💡', title: 'Thành tựu', onPress: () => navigation.navigate('AchievementsScreen') },
+    {
+      icon: '❤️',
+      title: 'Yêu thích',
+      onPress: () => navigation.navigate('FavoritesScreen'),
+    },
+    {
+      icon: '🔔',
+      title: 'Thông báo',
+      onPress: () => navigation.navigate('NotificationsScreen'),
+    },
+    {
+      icon: '💡',
+      title: 'Thành tựu',
+      onPress: () => navigation.navigate('AchievementsScreen'),
+    },
   ];
 
   const settingsOptions = [
-    { icon: '⚙️', title: 'Cài đặt', onPress: () => navigation.navigate('SettingsScreen') },
-    { icon: '🔒', title: 'Chính sách bảo mật', onPress: () => navigation.navigate('PrivacyPolicyScreen') },
-    { icon: '❓', title: 'Hỗ trợ', onPress: () => navigation.navigate('SupportScreen') },
-    { icon: 'ℹ️', title: 'Về chúng tôi', onPress: () => navigation.navigate('AboutUsScreen') },
+    {
+      icon: '⚙️',
+      title: 'Cài đặt',
+      onPress: () => navigation.navigate('SettingsScreen'),
+    },
+    {
+      icon: '🔒',
+      title: 'Chính sách bảo mật',
+      onPress: () => navigation.navigate('PrivacyPolicyScreen'),
+    },
+    {
+      icon: '❓',
+      title: 'Hỗ trợ',
+      onPress: () => navigation.navigate('SupportScreen'),
+    },
+    {
+      icon: 'ℹ️',
+      title: 'Về chúng tôi',
+      onPress: () => navigation.navigate('AboutUsScreen'),
+    },
   ];
 
   const handleLogout = async () => {
@@ -119,9 +148,13 @@ const ProfileScreen = () => {
   }
 
   return (
-    <ImageBackground source={backgroundImage} style={{ flex: 1 }} resizeMode="cover">
+    <ImageBackground
+      source={backgroundImage}
+      style={{ flex: 1 }}
+      resizeMode="cover"
+    >
       <SafeAreaView className="flex-1">
-        <ScrollView 
+        <ScrollView
           className="flex-1"
           refreshControl={
             <RefreshControl
@@ -135,13 +168,19 @@ const ProfileScreen = () => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Text className="text-2xl">⬅️</Text>
             </TouchableOpacity>
-            <Text className="text-2xl font-bold text-black ml-4">Tài khoản</Text>
+            <Text className="text-2xl font-bold text-black ml-4">
+              Tài khoản
+            </Text>
           </View>
 
           <View className="flex-row items-center p-4 bg-white rounded-lg mx-4 mb-4 shadow">
             <View className="w-20 h-20 rounded-full mr-4 overflow-hidden bg-gray-200">
               <Image
-                source={userData?.avatar ? { uri: userData.avatar } : require('../../assets/images/avatar-placeholder.jpg')}
+                source={
+                  userData?.avatar
+                    ? { uri: userData.avatar }
+                    : require('../../assets/images/avatar-placeholder.jpg')
+                }
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -150,16 +189,12 @@ const ProfileScreen = () => {
               <Text className="text-xl font-bold text-black mb-1">
                 {userData?.name}
               </Text>
-              <Text className="text-gray-600 mb-1">
-                {userData?.email}
-              </Text>
+              <Text className="text-gray-600 mb-1">{userData?.email}</Text>
               {userData?.phone && (
-                <Text className="text-gray-600">
-                  {userData.phone}
-                </Text>
+                <Text className="text-gray-600">{userData.phone}</Text>
               )}
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => navigation.navigate('EditProfileScreen')}
               className="bg-gray-100 p-2 rounded-full"
             >
@@ -174,7 +209,9 @@ const ProfileScreen = () => {
                 key={index}
                 onPress={option.onPress}
                 className={`flex-row items-center p-4 bg-white ${
-                  index !== profileOptions.length - 1 ? 'border-b border-[#88131B]' : ''
+                  index !== profileOptions.length - 1
+                    ? 'border-b border-[#88131B]'
+                    : ''
                 }`}
               >
                 <Text className="text-2xl mr-3">{option.icon}</Text>
@@ -190,7 +227,9 @@ const ProfileScreen = () => {
                 key={index}
                 onPress={option.onPress}
                 className={`flex-row items-center p-4 bg-white ${
-                  index !== settingsOptions.length - 1 ? 'border-b border-[#88131B]' : ''
+                  index !== settingsOptions.length - 1
+                    ? 'border-b border-[#88131B]'
+                    : ''
                 }`}
               >
                 <Text className="text-2xl mr-3">{option.icon}</Text>
@@ -203,7 +242,9 @@ const ProfileScreen = () => {
             onPress={handleLogout}
             className="mx-4 mt-6 mb-4 bg-white rounded-full py-3 border border-[#88131B]"
           >
-            <Text className="text-[#88131B] text-center text-lg font-bold">Đăng xuất</Text>
+            <Text className="text-[#88131B] text-center text-lg font-bold">
+              Đăng xuất
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>

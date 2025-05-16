@@ -39,15 +39,19 @@ interface SelectedIngredient {
   name: string;
 }
 
-type SearchByIngredientRouteProp = RouteProp<RootStackParamList, 'SearchByIngredientScreen'>;
+type SearchByIngredientRouteProp = RouteProp<
+  RootStackParamList,
+  'SearchByIngredientScreen'
+>;
 
 const SearchByIngredientScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const route =
-    useRoute<SearchByIngredientRouteProp>();
+  const route = useRoute<SearchByIngredientRouteProp>();
   const initialIngredients = route.params?.ingredients || [];
-  const [selectedIngredients, setSelectedIngredients] = useState<SelectedIngredient[]>([]);
+  const [selectedIngredients, setSelectedIngredients] = useState<
+    SelectedIngredient[]
+  >([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -59,7 +63,9 @@ const SearchByIngredientScreen = () => {
 
   useEffect(() => {
     if (initialIngredients.length > 0) {
-      setSelectedIngredients(initialIngredients.map((i) => ({name: i.name, id: i.id})));
+      setSelectedIngredients(
+        initialIngredients.map((i) => ({ name: i.name, id: i.id }))
+      );
     }
   }, [initialIngredients]);
 
@@ -95,7 +101,7 @@ const SearchByIngredientScreen = () => {
       console.error('Lỗi khi tìm nguyên liệu:', error);
     } finally {
       setLoading(false);
-    } 
+    }
   };
 
   const fetchIngredients = async (query = '', offset = 0, limit = 10) => {
@@ -143,7 +149,7 @@ const SearchByIngredientScreen = () => {
       const selectedDetail = selectedIngredients.map((ing) => ({
         id: ing.id,
       }));
-      console.log("selectedDetail", selectedDetail)
+      console.log('selectedDetail', selectedDetail);
       const response = await findRecipesByIngredients(selectedDetail);
       console.log('Kết quả tìm kiếm món ăn:', response);
       setSearchResults(response.data);
@@ -245,7 +251,9 @@ const SearchByIngredientScreen = () => {
                     <Ionicons name="close" size={12} color="#fff" />
                   </TouchableOpacity>
                 </TouchableOpacity>
-                <Text style={{ marginTop: 4, fontSize: 12 }}>{ingredient.name}</Text>
+                <Text style={{ marginTop: 4, fontSize: 12 }}>
+                  {ingredient.name}
+                </Text>
               </View>
             );
           })}
@@ -275,7 +283,9 @@ const SearchByIngredientScreen = () => {
             ) : null
           }
           renderItem={({ item }) => {
-            const isSelected = selectedIngredients.some((i) => i.id === item.id);
+            const isSelected = selectedIngredients.some(
+              (i) => i.id === item.id
+            );
             return (
               <TouchableOpacity
                 onPress={() => toggleIngredient(item)}

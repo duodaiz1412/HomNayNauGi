@@ -50,14 +50,11 @@ const AddIngredientScreen = ({ navigation }) => {
       <ScrollView className="flex-1">
         <View className="p-6">
           {/* Image Upload Section */}
-          <TouchableOpacity 
-            onPress={pickImage}
-            className="items-center mb-8"
-          >
+          <TouchableOpacity onPress={pickImage} className="items-center mb-8">
             {image ? (
               <View className="relative">
-                <Image 
-                  source={{ uri: image }} 
+                <Image
+                  source={{ uri: image }}
                   className="w-48 h-48 rounded-2xl"
                 />
                 <View className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md">
@@ -76,7 +73,9 @@ const AddIngredientScreen = ({ navigation }) => {
           <View className="space-y-6 flex flex-col gap-3">
             {/* Name Input */}
             <View>
-              <Text className="text-gray-700 font-medium mb-2">Tên nguyên liệu</Text>
+              <Text className="text-gray-700 font-medium mb-2">
+                Tên nguyên liệu
+              </Text>
               <TextInput
                 className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                 value={name}
@@ -88,7 +87,9 @@ const AddIngredientScreen = ({ navigation }) => {
 
             {/* Type Picker */}
             <View>
-              <Text className="text-gray-700 font-medium mb-2">Loại thực phẩm</Text>
+              <Text className="text-gray-700 font-medium mb-2">
+                Loại thực phẩm
+              </Text>
               <View className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
                 <Picker
                   selectedValue={type}
@@ -96,9 +97,9 @@ const AddIngredientScreen = ({ navigation }) => {
                   style={{ height: 50 }}
                 >
                   {foodTypes.map((foodType) => (
-                    <Picker.Item 
-                      key={foodType} 
-                      label={foodType} 
+                    <Picker.Item
+                      key={foodType}
+                      label={foodType}
                       value={foodType}
                     />
                   ))}

@@ -29,8 +29,10 @@ const EditProfileScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') alert('Ứng dụng cần quyền truy cập thư viện ảnh!');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted')
+        alert('Ứng dụng cần quyền truy cập thư viện ảnh!');
 
       try {
         const { data } = await getUserProfile();
@@ -110,7 +112,12 @@ const EditProfileScreen = () => {
     }
   };
 
-  if (loading) return <SafeAreaView style={styles.container}><Text>Đang tải...</Text></SafeAreaView>;
+  if (loading)
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>Đang tải...</Text>
+      </SafeAreaView>
+    );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -131,7 +138,11 @@ const EditProfileScreen = () => {
 
           <TouchableOpacity onPress={pickImage} style={styles.avatarContainer}>
             <Image
-              source={avatar ? { uri: avatar } : require('../../assets/images/avatar-placeholder.jpg')}
+              source={
+                avatar
+                  ? { uri: avatar }
+                  : require('../../assets/images/avatar-placeholder.jpg')
+              }
               style={styles.avatar}
             />
             <Text style={styles.avatarLabel}>Chọn ảnh đại diện</Text>
@@ -139,13 +150,27 @@ const EditProfileScreen = () => {
 
           <View style={styles.form}>
             <Text style={styles.label}>Tên</Text>
-            <TextInput value={name} onChangeText={setName} style={styles.input} />
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              style={styles.input}
+            />
 
             <Text style={styles.label}>Số điện thoại</Text>
-            <TextInput value={phone} onChangeText={setPhone} style={styles.input} keyboardType="phone-pad" />
+            <TextInput
+              value={phone}
+              onChangeText={setPhone}
+              style={styles.input}
+              keyboardType="phone-pad"
+            />
 
             <Text style={styles.label}>Email</Text>
-            <TextInput value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" />
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+              keyboardType="email-address"
+            />
 
             <Text style={styles.label}>Địa chỉ</Text>
             <TextInput
@@ -171,7 +196,13 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   back: { fontSize: 24 },
   title: { fontSize: 22, fontWeight: 'bold', marginLeft: 16 },
-  error: { color: '#900', backgroundColor: '#fdd', padding: 10, borderRadius: 6, marginBottom: 10 },
+  error: {
+    color: '#900',
+    backgroundColor: '#fdd',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
   avatarContainer: { alignSelf: 'center', alignItems: 'center' },
   avatar: { width: 100, height: 100, borderRadius: 50 },
   avatarLabel: { fontSize: 12, color: '#666', marginTop: 4 },

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import api, { getUserProfile } from 'src/api/api';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -34,7 +43,7 @@ const NotificationsScreen: React.FC = () => {
   // Lấy thông tin user để có accountId
   useEffect(() => {
     getUserProfile()
-      .then(res => {
+      .then((res) => {
         if (res.data && res.data.id) {
           setAccountId(res.data.id);
         } else {
@@ -51,8 +60,9 @@ const NotificationsScreen: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    api.get(`/view-history/account/${accountId}`)
-      .then(response => {
+    api
+      .get(`/view-history/account/${accountId}`)
+      .then((response) => {
         if (Array.isArray(response.data)) {
           setViewHistory(response.data);
         } else {
@@ -60,7 +70,7 @@ const NotificationsScreen: React.FC = () => {
           setError('Định dạng dữ liệu không hợp lệ.');
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Lỗi khi tải lịch sử xem:', err);
         setError('Không thể tải lịch sử xem.');
       })
@@ -91,7 +101,9 @@ const NotificationsScreen: React.FC = () => {
   if (viewHistory.length === 0) {
     return (
       <View style={styles.centeredView}>
-        <Text style={styles.emptyText}>Bạn chưa xem công thức nào gần đây.</Text>
+        <Text style={styles.emptyText}>
+          Bạn chưa xem công thức nào gần đây.
+        </Text>
       </View>
     );
   }
@@ -100,14 +112,16 @@ const NotificationsScreen: React.FC = () => {
     <FlatList
       contentContainerStyle={styles.listContentContainer}
       data={viewHistory}
-      keyExtractor={item => item.id.toString()}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.itemContainer}
           onPress={() => handlePressItem(item.recipe.id)}
         >
           <Image
-            source={{ uri: item.recipe.imageUrl || 'https://via.placeholder.com/80' }}
+            source={{
+              uri: item.recipe.imageUrl || 'https://via.placeholder.com/80',
+            }}
             style={styles.itemImage}
           />
           <View style={styles.itemTextContainer}>
@@ -150,8 +164,18 @@ const styles = StyleSheet.create({
   },
   itemImage: { width: 80, height: 80, borderRadius: 8, marginRight: 12 },
   itemTextContainer: { flex: 1, justifyContent: 'center' },
-  itemTitle: { fontWeight: 'bold', fontSize: 17, color: '#333', marginBottom: 4 },
-  itemDescription: { fontSize: 14, color: '#555', marginBottom: 6, lineHeight: 20 },
+  itemTitle: {
+    fontWeight: 'bold',
+    fontSize: 17,
+    color: '#333',
+    marginBottom: 4,
+  },
+  itemDescription: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 6,
+    lineHeight: 20,
+  },
   itemViewedAt: { fontSize: 12, color: '#777' },
 });
 
