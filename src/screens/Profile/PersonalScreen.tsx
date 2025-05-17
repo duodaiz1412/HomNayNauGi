@@ -92,20 +92,7 @@ const PersonalScreen = () => {
     }
   }, []);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await api.get('/recipe-categories/search');
-      if (response.data && response.data.data) {
-        const categoriesData = [
-          { id: 0, name: 'Tất cả' }, // Danh mục "Tất cả"
-          ...response.data.data,
-        ];
-        setCategories(categoriesData);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  }, []);
+  
 
   const fetchRecipes = useCallback(
     async (showLoadingIndicator = true) => {
@@ -180,7 +167,6 @@ const PersonalScreen = () => {
           // Gọi song song và không cần setLoading riêng lẻ trong từng hàm
           await Promise.all([
             fetchUserData(false),
-            fetchCategories(),
             fetchRecipes(false), // Fetch initial recipes (all or based on default selectedCategory)
           ]);
         } else {
@@ -197,7 +183,7 @@ const PersonalScreen = () => {
     };
 
     checkLoginStatus();
-  }, [fetchUserData, fetchCategories, fetchRecipes, navigation]);
+  }, [fetchUserData, fetchRecipes, navigation]);
 
   // useEffect để fetch lại recipes khi selectedCategory thay đổi (và đã login)
   useEffect(() => {
@@ -225,6 +211,15 @@ const PersonalScreen = () => {
       console.error('Error navigating:', error);
     }
   };
+
+  const handleEditRecipe = async (recipeId: string) => {
+    try {
+      //console.log('Navigate to EditRecipe with id:', recipeId);
+      navigation.navigate('EditDishScreen', { recipeId });
+    } catch (error) {
+      console.error('Error navigating:', error);
+    }
+  }
 
   const handleDeleteRecipe = async (recipeId: string) => {
   Alert.alert(
@@ -320,6 +315,7 @@ const PersonalScreen = () => {
         >
           <Text className="text-white text-xl">＋</Text>
         </TouchableOpacity>
+
       </View>
 
       <ScrollView
@@ -360,102 +356,102 @@ const PersonalScreen = () => {
   }
 
   return (
-    <ImageBackground
-      source={backgroundImage}
-      style={{ flex: 1 }}
-      resizeMode="cover"
-    >
-      <SafeAreaView className="flex-1">
-        <FlatList
-          data={recipes}
-          numColumns={2}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
-          ListHeaderComponent={renderHeader}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              className="bg-white rounded-xl w-[48%] mb-4 overflow-hidden shadow-md"
-              onPress={() => handleRecipePress(item.id)}
-            >
-              <View>
-                <Image
-                  source={{
-                    uri: item.imageUrl || 'https://via.placeholder.com/150',
-                  }}
-                  className="h-28 w-full"
-                  resizeMode="cover"
-                />
-                {/* Nút xóa nhỏ góc trên bên phải */}
-                <TouchableOpacity
-                  onPress={() => handleDeleteRecipe(item.id)}
-                  style={{
-                    position: 'absolute',
-                    top: 5,
-                    right: 5,
-                    backgroundColor: 'rgba(255,0,0,0.8)',
-                    borderRadius: 12,
-                    width: 24,
-                    height: 24,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 10,
-                  }}
-                >
-                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>−</Text>
-                </TouchableOpacity>
-              </View>
+  <ImageBackground
+    source={backgroundImage}
+    style={{ flex: 1 }}
+    resizeMode="cover"
+  >
+    <SafeAreaView className="flex-1">
+      <FlatList
+        data={recipes}
+        numColumns={2}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        ListHeaderComponent={renderHeader}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            className="bg-white rounded-xl w-[48%] mb-4 overflow-hidden shadow-md"
+            onPress={() => handleRecipePress(item.id)}
+          >
+            <View>
+              <Image
+                source={{ uri: item.imageUrl || 'https://via.placeholder.com/150' }}
+                className="h-28 w-full"
+                resizeMode="cover"
+              />
+              {/* Nút xóa nhỏ góc trên bên phải */}
+              <TouchableOpacity
+                onPress={() => handleDeleteRecipe(item.id)}
+                style={{
+                  position: 'absolute',
+                  top: 5,
+                  right: 5,
+                  backgroundColor: 'rgba(255,0,0,0.8)',
+                  borderRadius: 12,
+                  width: 24,
+                  height: 24,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>−</Text>
+              </TouchableOpacity>
+            </View>
 
-              <View className="p-2">
-                <Text
-                  className="text-sm font-bold text-black mb-1"
-                  numberOfLines={1}
-                >
-                  {item.name}
-                </Text>
+            <View className="p-2">
+              <Text
+                className="text-sm font-bold text-black mb-1"
+                numberOfLines={1}
+              >
+                {item.name}
+              </Text>
+
+              <View className="flex-row justify-between items-center mt-1">
+                {/* Thời gian chuẩn bị bên trái */}
                 <Text className="text-xs text-gray-500">
                   ⏱{' '}
                   {item.preparationTimeMinutes
                     ? `${item.preparationTimeMinutes} phút`
                     : 'N/A'}
                 </Text>
-                <View className="flex-row justify-between mt-1">
-                  <Text className="text-xs text-gray-500">
-                    👁 {item.viewCount}
-                  </Text>
-                  <Text className="text-xs text-gray-500">
-                    👍{item.likeCount}
-                  </Text>
-                  <Text className="text-xs text-gray-500">
-                    ❤️ {item.favoriteCount}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
 
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            !loading ? ( // Chỉ hiển thị "Chưa có công thức" nếu không đang loading
-              <View className="items-center justify-center py-8 mt-4">
-                <Text className="text-gray-500 text-lg">
-                  Chưa có công thức nào
-                </Text>
-                <Text className="text-gray-400 text-sm mt-1">
-                  Hãy thử thêm công thức mới nhé!
-                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('EditDishScreen', { recipeId: item.id })}
+                  className="bg-[#88131B] px-3 py-1 rounded-full"
+                >
+                  <Text className="text-white text-sm font-semibold">Chỉnh sửa</Text>
+                </TouchableOpacity>
+
               </View>
-            ) : (
-              // Nếu đang loading và recipes rỗng (sau header), có thể hiển thị một spinner nhỏ ở đây
-              <View className="items-center justify-center py-8 mt-4">
-                <ActivityIndicator size="small" color="#88131B" />
+
+              <View className="flex-row justify-between mt-1">
+                <Text className="text-xs text-gray-500">👁 {item.viewCount}</Text>
+                <Text className="text-xs text-gray-500">👍{item.likeCount}</Text>
+                <Text className="text-xs text-gray-500">❤️ {item.favoriteCount}</Text>
               </View>
-            )
-          }
-        />
-      </SafeAreaView>
-    </ImageBackground>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        ListEmptyComponent={
+          !loading ? (
+            <View className="items-center justify-center py-8 mt-4">
+              <Text className="text-gray-500 text-lg">Chưa có công thức nào</Text>
+              <Text className="text-gray-400 text-sm mt-1">Hãy thử thêm công thức mới nhé!</Text>
+            </View>
+          ) : (
+            <View className="items-center justify-center py-8 mt-4">
+              <ActivityIndicator size="small" color="#88131B" />
+            </View>
+          )
+        }
+      />
+    </SafeAreaView>
+  </ImageBackground>
   );
-};
+}
 
 export default PersonalScreen;
