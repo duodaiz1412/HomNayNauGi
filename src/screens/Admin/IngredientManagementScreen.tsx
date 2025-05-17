@@ -609,20 +609,6 @@ export const IngredientManagementScreen = () => {
           </Text>
         </View>
       </View>
-
-      <View className="mt-3">
-        <Text className="font-medium text-sm mb-2 text-gray-800">🧬 Dinh dưỡng (trên 100g):</Text>
-        <View className="flex-row justify-between">
-          {['protein', 'fat', 'carbs', 'calories'].map((key, idx) => (
-            <View key={key} className={`flex-1 bg-gray-100 p-2 ${idx < 3 ? 'mr-1' : ''} rounded-md items-center`}>
-              <Text className="text-xs text-gray-500">
-                {{ protein: 'Đạm', fat: 'Béo', carbs: 'Tinh bột', calories: 'Calo' }[key]}
-              </Text>
-              <Text className="text-sm font-bold">{item.nutrition?.[key] || '0g'}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
     </View>
   );
 
