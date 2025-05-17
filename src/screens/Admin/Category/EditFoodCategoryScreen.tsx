@@ -35,6 +35,7 @@ export const EditFoodCategoryScreen = () => {
 
   const [categoryName, setCategoryName] = useState('');
   const [categoryImg, setCategoryImg] = useState(null);
+  
 
   // Fetch category data
   useEffect(() => {

@@ -3,6 +3,7 @@ import { useFoodManagement } from 'src/context/FoodManagementContext';
 import { Recipe, RecipeStatus } from 'src/types';
 import api from 'src/api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AxiosResponse } from 'axios';
 
 interface UseRecipeFormProps {
   recipeId?: string; // Nếu có, sẽ tải dữ liệu công thức hiện có
@@ -50,6 +51,7 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
         } else {
           response = await api.get(`/recipes/get-recipe/${recipeId}`);
         }
+
         const recipe = response.data;
         console.log('\nRECIPE GET', recipe);
         if (!recipe) {
@@ -470,7 +472,7 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
 
       const { basicInfo, categories, ingredients, steps } = recipeForm;
 
-           // --- VALIDATION CƠ BẢN (luôn thực hiện) ---
+      // --- VALIDATION CƠ BẢN (luôn thực hiện) ---
       if (!basicInfo.name || basicInfo.name.trim() === '') {
         setError('Tên món ăn là bắt buộc.');
         setIsLoading(false); // Quan trọng: reset loading

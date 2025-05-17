@@ -173,7 +173,7 @@ export const AdminDrawerNavigator = () => {
           },
         })}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="AdminPostManagement"
         component={AdminPostManagementScreen}
         options={{
@@ -182,7 +182,7 @@ export const AdminDrawerNavigator = () => {
             <Ionicons name="document-text-outline" size={22} color={color} />
           ),
         }}
-      />
+      /> */}
 
       <Drawer.Screen
         name="AdminStatistics"

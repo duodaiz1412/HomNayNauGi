@@ -36,6 +36,7 @@ const statusOptions = [
   { label: 'Công khai', value: RecipeStatus.PUBLIC },
 ];
 const EditDishScreen = () => {
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<EditDishScreenRouteProp>();

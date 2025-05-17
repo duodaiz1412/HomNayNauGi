@@ -36,6 +36,7 @@ const statusOptions = [
   { label: 'Công khai', value: RecipeStatus.PUBLIC },
 ];
 const AddDishScreen = () => {
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {
