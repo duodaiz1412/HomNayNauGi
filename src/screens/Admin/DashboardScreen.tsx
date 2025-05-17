@@ -88,7 +88,6 @@ export const AdminDashboardScreen = () => {
 
   return (
     <SafeAreaView className="flex-1">
-    <SafeAreaView className="flex-1">
       {/* Header */}
       <AdminHeader title="Tổng quan" />
 
