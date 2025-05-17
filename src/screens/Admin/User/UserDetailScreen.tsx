@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,231 +10,123 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AdminHeader } from '@components/AdminHeader/AdminHeader';
-import { AdminUserStackParamList } from '@navigation/AdminUserStack';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import api from 'src/api/api';
+import { AdminHeader } from '@components/AdminHeader/AdminHeader'; 
+import { AdminUserStackParamList } from '@navigation/AdminUserStack';
+
+// Định nghĩa kiểu route param
 type UserDetailScreenRouteProp = RouteProp<
   AdminUserStackParamList,
   'UserDetailScreen'
 >;
+
 export const UserDetailScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AdminUserStackParamList>>();
   const route = useRoute<UserDetailScreenRouteProp>();
   const { userId } = route.params;
 
+  // State quản lý dữ liệu
   const [isFetching, setIsFetching] = useState(true);
-  const [activeTab, setActiveTab] = useState('posts');
-  const [userData, setUserData] = useState(null);
+  const [activeTab, setActiveTab] = useState<'recipes' | 'favorites' | 'activity'>(
+    'recipes'
+  );
+  const [userData, setUserData] = useState<{
+    id: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    bio: string;
+    avatar: string;
+    isAdmin: boolean;
+    isActive: boolean;
+    joinDate: string;
+    likes: number;          
+    postsCount: number;     
+    favoritesCount: number;
+  } | null>(null);
 
-  // Mock data for user posts
-  const userPosts = [
-    {
-      id: '1',
-      title: 'Cách làm Phở Bò ngon đúng vị Hà Nội',
-      image:
-        'https://cdn.pixabay.com/photo/2023/05/27/12/39/noodle-soup-8021418_1280.png',
-      date: '15/04/2023',
-      likes: 245,
-      comments: 32,
-    },
-    {
-      id: '2',
-      title: 'Bí quyết làm Bánh Mì giòn ngon như tiệm',
-      image:
-        'https://cdn.pixabay.com/photo/2018/06/10/20/30/bread-3467243_1280.jpg',
-      date: '20/04/2023',
-      likes: 120,
-      comments: 15,
-    },
-    {
-      id: '3',
-      title: 'Cách nấu Bún Bò Huế chuẩn vị miền Trung',
-      image:
-        'https://cdn.pixabay.com/photo/2017/09/16/19/21/salad-2756467_1280.jpg',
-      date: '25/04/2023',
-      likes: 189,
-      comments: 27,
-    },
-  ];
+  const [userRecipes, setUserRecipes] = useState<any[]>([]);  
+  const [userFavorites, setUserFavorites] = useState<any[]>([]);
+  const [userActivity, setUserActivity] = useState<any[]>([]);
+  
 
-  // Mock data for user favorites
-  const userFavorites = [
-    {
-      id: '1',
-      name: 'Phở Hà Nội',
-      image:
-        'https://cdn.pixabay.com/photo/2023/05/27/12/39/noodle-soup-8021418_1280.png',
-      author: 'Quốc Anh',
-      date: '10/03/2023',
-    },
-    {
-      id: '2',
-      name: 'Bánh Mì Pate',
-      image:
-        'https://cdn.pixabay.com/photo/2018/06/10/20/30/bread-3467243_1280.jpg',
-      author: 'Bảo Ngọc',
-      date: '15/03/2023',
-    },
-    {
-      id: '4',
-      name: 'Gỏi Cuốn',
-      image:
-        'https://cdn.pixabay.com/photo/2016/03/27/22/16/spring-roll-1284442_1280.jpg',
-      author: 'Thu Hà',
-      date: '05/04/2023',
-    },
-  ];
-
-  // Mock data for user activity
-  const userActivity = [
-    {
-      id: '1',
-      type: 'like',
-      content: 'Đã thích món Phở Bò',
-      date: 'Hôm nay, 10:30',
-    },
-    {
-      id: '2',
-      type: 'comment',
-      content: 'Đã bình luận về món Bánh Mì Pate',
-      date: 'Hôm qua, 15:45',
-    },
-    {
-      id: '3',
-      type: 'save',
-      content: 'Đã lưu món Bún Bò Huế',
-      date: '20/04/2023, 09:15',
-    },
-    {
-      id: '4',
-      type: 'post',
-      content: 'Đã đăng món Gỏi Cuốn',
-      date: '15/04/2023, 14:20',
-    },
-    {
-      id: '5',
-      type: 'follow',
-      content: 'Đã theo dõi Quốc Anh',
-      date: '10/04/2023, 08:30',
-    },
-  ];
-
-  // Fetch user data
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      // Mock data for the selected user
-      const userData = {
-        id: userId,
-        fullName: 'Trung Phong',
-        email: 'trungphongtrinh678@gmail.com',
-        phone: '0348139449',
-        bio: 'Xin chào, nếu bạn đang tìm kiếm những món ăn Việt thì xin chúc mừng, bạn đến đúng nơi rồi đây!',
-        avatar:
-          'https://cdn.pixabay.com/photo/2021/07/03/20/06/woman-6384768_1280.jpg',
-        isAdmin: false,
-        isActive: true,
-        joinDate: '01/01/2023',
-        followers: 245,
-        following: 120,
-        posts: 12,
-        favorites: 35,
-      };
-
-      setUserData(userData);
-      setIsFetching(false);
-    }, 1000);
+    if (!userId) return;
+    setIsFetching(true);
+    api.get(`/admin/user-profiles/${userId}/details`)
+      .then((response) => {
+        const data = response.data.data;
+        setUserData({
+          id: data.id,
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          bio: data.bio,
+          avatar: data.avatar,
+          isAdmin: data.isAdmin,
+          isActive: data.isActive,
+          joinDate: data.joinDate,
+          likes: data.likes ?? 0,  // giả sử API có trả về số lượt thích
+          postsCount: data.posts ? data.posts.length : 0,  // vẫn dùng posts làm công thức
+          favoritesCount: data.favorites ? data.favorites.length : 0,
+        });
+        setUserRecipes(data.posts ?? []);
+        setUserFavorites(data.favorites ?? []);
+        setUserActivity(data.activity ?? []);
+      })
+      .catch((error) => {
+        console.error('Lỗi khi lấy thông tin user:', error);
+      })
+      .then(() => setIsFetching(false));
   }, [userId]);
 
-  // Render post item
-  const renderPostItem = ({ item }) => (
-    <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
+  // Hàm render từng công thức
+  const renderRecipeItem = ({ item }: { item: any }) => (
+    <View
+      key={item.id}
+      className="mb-4 rounded-md bg-white p-4 shadow-sm"
+      style={{ borderWidth: 1, borderColor: '#ddd' }}
+    >
+      <Text className="font-semibold text-lg mb-2">{item.title}</Text>
+      <Text className="text-gray-600">{item.content}</Text>
+      <Text className="mt-2 text-xs text-gray-400">
+        Đăng lúc: {new Date(item.createdAt).toLocaleString()}
+      </Text>
+    </View>
+  );
+
+  // Hàm render món yêu thích giữ nguyên
+  const renderFavoriteItem = ({ item }: { item: any }) => (
+    <View
+      key={item.id}
+      className="mb-4 rounded-md bg-white p-4 shadow-sm flex-row items-center"
+      style={{ borderWidth: 1, borderColor: '#ddd' }}
+    >
       <Image
-        source={{ uri: item.image }}
-        className="w-full h-40 rounded-lg mb-3"
+        source={{ uri: item.imageUrl }}
+        style={{ width: 60, height: 60, borderRadius: 6, marginRight: 12 }}
       />
-      <Text className="font-bold text-base mb-2">{item.title}</Text>
-      <View className="flex-row justify-between items-center">
-        <Text className="text-gray-500 text-xs">{item.date}</Text>
-        <View className="flex-row">
-          <View className="flex-row items-center mr-4">
-            <Ionicons name="heart" size={14} color="#FF3B30" />
-            <Text className="text-gray-500 text-xs ml-1">{item.likes}</Text>
-          </View>
-          <View className="flex-row items-center">
-            <Ionicons name="chatbubble" size={14} color="#007AFF" />
-            <Text className="text-gray-500 text-xs ml-1">{item.comments}</Text>
-          </View>
-        </View>
+      <View className="flex-1">
+        <Text className="font-semibold text-lg">{item.name}</Text>
+        <Text className="text-gray-600">{item.description}</Text>
       </View>
     </View>
   );
 
-  // Render favorite item
-  const renderFavoriteItem = ({ item }) => (
-    <View className="bg-white rounded-xl p-4 shadow-sm mb-4 flex-row">
-      <Image
-        source={{ uri: item.image }}
-        className="w-20 h-20 rounded-lg mr-3"
-      />
-      <View className="flex-1">
-        <Text className="font-bold text-base mb-1">{item.name}</Text>
-        <Text className="text-gray-500 text-xs mb-2">
-          Đăng bởi: {item.author}
-        </Text>
-        <Text className="text-gray-500 text-xs">{item.date}</Text>
-      </View>
-    </View>
-  );
-
-  // Render activity item
-  const renderActivityItem = ({ item }) => (
-    <View className="bg-white rounded-xl p-4 shadow-sm mb-4 flex-row items-center">
-      <View
-        className={`rounded-full p-2 mr-3 ${
-          item.type === 'like'
-            ? 'bg-red-100'
-            : item.type === 'comment'
-              ? 'bg-blue-100'
-              : item.type === 'save'
-                ? 'bg-green-100'
-                : item.type === 'post'
-                  ? 'bg-purple-100'
-                  : 'bg-yellow-100'
-        }`}
-      >
-        <Ionicons
-          name={
-            item.type === 'like'
-              ? 'heart'
-              : item.type === 'comment'
-                ? 'chatbubble'
-                : item.type === 'save'
-                  ? 'bookmark'
-                  : item.type === 'post'
-                    ? 'document-text'
-                    : 'person-add'
-          }
-          size={16}
-          color={
-            item.type === 'like'
-              ? '#FF3B30'
-              : item.type === 'comment'
-                ? '#007AFF'
-                : item.type === 'save'
-                  ? '#34C759'
-                  : item.type === 'post'
-                    ? '#AF52DE'
-                    : '#FF9500'
-          }
-        />
-      </View>
-      <View className="flex-1">
-        <Text className="text-gray-800">{item.content}</Text>
-        <Text className="text-gray-500 text-xs mt-1">{item.date}</Text>
-      </View>
+  // Hàm render hoạt động giữ nguyên
+  const renderActivityItem = ({ item }: { item: any }) => (
+    <View
+      key={item.id}
+      className="mb-4 rounded-md bg-white p-4 shadow-sm"
+      style={{ borderWidth: 1, borderColor: '#ddd' }}
+    >
+      <Text>{item.description}</Text>
+      <Text className="mt-2 text-xs text-gray-400">
+        {new Date(item.timestamp).toLocaleString()}
+      </Text>
     </View>
   );
 
@@ -251,32 +143,38 @@ export const UserDetailScreen = () => {
     );
   }
 
+  if (!userData) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center bg-gray-50">
+        <Text className="text-red-500">Không tìm thấy thông tin người dùng</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
       <AdminHeader title="Hồ sơ người dùng" />
-
       <ScrollView className="flex-1">
-        {/* User Profile */}
         <View className="bg-white p-4 shadow-sm">
           <View className="flex-row items-center">
             <Image
               source={{ uri: userData.avatar }}
               className="w-20 h-20 rounded-full mr-4"
+              style={{ width: 80, height: 80, borderRadius: 40, marginRight: 16 }}
             />
             <View className="flex-1">
               <Text className="text-xl font-bold">{userData.fullName}</Text>
-              <Text className="text-gray-500 text-xs mb-1">
-                {userData.email}
-              </Text>
+              <Text className="text-gray-500 text-xs mb-1">{userData.email}</Text>
               <Text className="text-gray-500 text-xs">{userData.phone}</Text>
               <View
-                className={`mt-2 px-2 py-0.5 rounded-full self-start ${
-                  userData.isActive ? 'bg-green-100' : 'bg-red-100'
-                }`}
+                className="mt-2 px-2 py-0.5 rounded-full self-start"
+                style={{
+                  backgroundColor: userData.isActive ? '#d1fae5' : '#fee2e2',
+                }}
               >
                 <Text
-                  className={`text-xs ${userData.isActive ? 'text-green-600' : 'text-red-600'}`}
+                  className="text-xs"
+                  style={{ color: userData.isActive ? '#059669' : '#b91c1c' }}
                 >
                   {userData.isActive ? 'Hoạt động' : 'Không hoạt động'}
                 </Text>
@@ -286,21 +184,20 @@ export const UserDetailScreen = () => {
 
           <Text className="text-gray-700 mt-4">{userData.bio}</Text>
 
-          <View className="flex-row justify-between mt-4 pt-4 border-t border-gray-100">
+          <View
+            className="flex-row justify-between mt-4 pt-4 border-t border-gray-100"
+            style={{ borderColor: '#e5e7eb' }}
+          >
             <View className="items-center">
-              <Text className="text-lg font-bold">{userData.posts}</Text>
-              <Text className="text-gray-500 text-xs">Bài viết</Text>
+              <Text className="text-lg font-bold">{userData.postsCount}</Text>
+              <Text className="text-gray-500 text-xs">Công thức</Text>
             </View>
             <View className="items-center">
-              <Text className="text-lg font-bold">{userData.followers}</Text>
-              <Text className="text-gray-500 text-xs">Người theo dõi</Text>
+              <Text className="text-lg font-bold">{userData.likes}</Text>
+              <Text className="text-gray-500 text-xs">Lượt thích</Text>
             </View>
             <View className="items-center">
-              <Text className="text-lg font-bold">{userData.following}</Text>
-              <Text className="text-gray-500 text-xs">Đang theo dõi</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-lg font-bold">{userData.favorites}</Text>
+              <Text className="text-lg font-bold">{userData.favoritesCount}</Text>
               <Text className="text-gray-500 text-xs">Yêu thích</Text>
             </View>
           </View>
@@ -321,92 +218,105 @@ export const UserDetailScreen = () => {
         </View>
 
         {/* Tabs */}
-        <View className="flex-row bg-white mt-4 border-b border-gray-200">
+        <View
+          className="flex-row bg-white mt-4 border-b border-gray-200"
+          style={{ borderColor: '#e5e7eb' }}
+        >
           <TouchableOpacity
-            className={`flex-1 py-3 ${activeTab === 'posts' ? 'border-b-2 border-[#941D23]' : ''}`}
-            onPress={() => setActiveTab('posts')}
+            className={`flex-1 py-3 ${
+              activeTab === 'recipes' ? 'border-b-2 border-[#941D23]' : ''
+            }`}
+            onPress={() => setActiveTab('recipes')}
+            style={{
+              borderBottomWidth: activeTab === 'recipes' ? 2 : 0,
+              borderBottomColor: activeTab === 'recipes' ? '#941D23' : undefined,
+            }}
           >
             <Text
-              className={`text-center font-medium ${activeTab === 'posts' ? 'text-[#941D23]' : 'text-gray-500'}`}
+              className={`text-center font-medium ${
+                activeTab === 'recipes' ? 'text-[#941D23]' : 'text-gray-500'
+              }`}
+              style={{ color: activeTab === 'recipes' ? '#941D23' : '#6B7280' }}
             >
-              Bài viết
+              Công thức
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`flex-1 py-3 ${activeTab === 'favorites' ? 'border-b-2 border-[#941D23]' : ''}`}
+            className={`flex-1 py-3 ${
+              activeTab === 'favorites' ? 'border-b-2 border-[#941D23]' : ''
+            }`}
             onPress={() => setActiveTab('favorites')}
+            style={{
+              borderBottomWidth: activeTab === 'favorites' ? 2 : 0,
+              borderBottomColor: activeTab === 'favorites' ? '#941D23' : undefined,
+            }}
           >
             <Text
-              className={`text-center font-medium ${activeTab === 'favorites' ? 'text-[#941D23]' : 'text-gray-500'}`}
+              className={`text-center font-medium ${
+                activeTab === 'favorites' ? 'text-[#941D23]' : 'text-gray-500'
+              }`}
+              style={{ color: activeTab === 'favorites' ? '#941D23' : '#6B7280' }}
             >
               Yêu thích
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`flex-1 py-3 ${activeTab === 'activity' ? 'border-b-2 border-[#941D23]' : ''}`}
+            className={`flex-1 py-3 ${
+              activeTab === 'activity' ? 'border-b-2 border-[#941D23]' : ''
+            }`}
             onPress={() => setActiveTab('activity')}
+            style={{
+              borderBottomWidth: activeTab === 'activity' ? 2 : 0,
+              borderBottomColor: activeTab === 'activity' ? '#941D23' : undefined,
+            }}
           >
             <Text
-              className={`text-center font-medium ${activeTab === 'activity' ? 'text-[#941D23]' : 'text-gray-500'}`}
+              className={`text-center font-medium ${
+                activeTab === 'activity' ? 'text-[#941D23]' : 'text-gray-500'
+              }`}
+              style={{ color: activeTab === 'activity' ? '#941D23' : '#6B7280' }}
             >
               Hoạt động
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Tab Content */}
+        {/* Nội dung tab */}
         <View className="p-4">
-          {activeTab === 'posts' && (
-            <>
-              {userPosts.length > 0 ? (
-                userPosts.map((post) => renderPostItem({ item: post }))
+          {activeTab === 'recipes' && (
+            <View>
+              {userRecipes.length === 0 ? (
+                <Text className="text-center text-gray-400 mt-8">
+                  Người dùng chưa tạo công thức nào.
+                </Text>
               ) : (
-                <View className="items-center justify-center py-8">
-                  <Ionicons
-                    name="document-text-outline"
-                    size={48}
-                    color="#CCCCCC"
-                  />
-                  <Text className="text-gray-500 mt-2">
-                    Không có bài viết nào
-                  </Text>
-                </View>
+                userRecipes.map((item) => renderRecipeItem({ item }))
               )}
-            </>
+            </View>
           )}
 
           {activeTab === 'favorites' && (
-            <>
-              {userFavorites.length > 0 ? (
-                userFavorites.map((favorite) =>
-                  renderFavoriteItem({ item: favorite })
-                )
+            <View>
+              {userFavorites.length === 0 ? (
+                <Text className="text-center text-gray-400 mt-8">
+                  Người dùng chưa thêm món yêu thích nào.
+                </Text>
               ) : (
-                <View className="items-center justify-center py-8">
-                  <Ionicons name="heart-outline" size={48} color="#CCCCCC" />
-                  <Text className="text-gray-500 mt-2">
-                    Không có món ăn yêu thích nào
-                  </Text>
-                </View>
+                userFavorites.map((item) => renderFavoriteItem({ item }))
               )}
-            </>
+            </View>
           )}
 
           {activeTab === 'activity' && (
-            <>
-              {userActivity.length > 0 ? (
-                userActivity.map((activity) =>
-                  renderActivityItem({ item: activity })
-                )
+            <View>
+              {userActivity.length === 0 ? (
+                <Text className="text-center text-gray-400 mt-8">
+                  Người dùng chưa có hoạt động nào.
+                </Text>
               ) : (
-                <View className="items-center justify-center py-8">
-                  <Ionicons name="time-outline" size={48} color="#CCCCCC" />
-                  <Text className="text-gray-500 mt-2">
-                    Không có hoạt động nào gần đây
-                  </Text>
-                </View>
+                userActivity.map((item) => renderActivityItem({ item }))
               )}
-            </>
+            </View>
           )}
         </View>
       </ScrollView>
