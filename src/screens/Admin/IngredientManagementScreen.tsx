@@ -564,9 +564,12 @@ export const IngredientManagementScreen = () => {
     try {
       const url = categoryId === 'all'
         ? '/ingredients'
-        : `/ingredient-categories/${categoryId}/ingredients`;
+        : `/ingredient-categories/search/${categoryId}`;
       const response = await api.get(url);
-      const data = Array.isArray(response.data) ? response.data : response.data?.data ?? [];
+      const data = categoryId === 'all' 
+        ? (Array.isArray(response.data) ? response.data : response.data?.data ?? [])
+        : response.data?.data?.ingredientMappings?.map(mapping => mapping.ingredient) ?? [];
+      
       setIngredients(data);
     } catch (error) {
       console.error('Lỗi khi lấy nguyên liệu:', error);
@@ -608,6 +611,24 @@ export const IngredientManagementScreen = () => {
             {item.inStock ? 'Còn hàng' : 'Hết hàng'}
           </Text>
         </View>
+      </View>
+
+      <View className="flex-row justify-end mt-4">
+        <TouchableOpacity className="flex-row items-center px-3 py-1.5 bg-blue-100 rounded-full mr-2">
+          <Ionicons name="eye-outline" size={14} color="#007AFF" />
+          <Text className="text-blue-600 text-xs ml-1">Chi tiết</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-row items-center px-3 py-1.5 bg-green-100 rounded-full mr-2"
+          onPress={() => navigation.navigate('EditIngredientScreen', { ingredientId: item.id })}
+        >
+          <Ionicons name="create-outline" size={14} color="#34C759" />
+          <Text className="text-green-600 text-xs ml-1">Sửa</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="flex-row items-center px-3 py-1.5 bg-red-100 rounded-full">
+          <Ionicons name="trash-outline" size={14} color="#FF3B30" />
+          <Text className="text-red-600 text-xs ml-1">Xóa</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
