@@ -30,11 +30,13 @@ const EditProfileScreen = () => {
     (async () => {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
+        
       if (status !== 'granted')
         alert('Ứng dụng cần quyền truy cập thư viện ảnh!');
 
       try {
         const { data } = await getUserProfile();
+        
         
         setName(data.fullName || '');
         setPhone(data.phoneNumber || '');
