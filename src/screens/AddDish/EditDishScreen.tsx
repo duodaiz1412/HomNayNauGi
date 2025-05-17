@@ -38,8 +38,6 @@ const statusOptions = [
 const EditDishScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<EditDishScreenRouteProp>();
   const recipeId = route.params?.recipeId;
 

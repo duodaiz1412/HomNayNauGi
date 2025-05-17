@@ -38,8 +38,6 @@ const statusOptions = [
 const AddDishScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {
     form,
     isLoading,
