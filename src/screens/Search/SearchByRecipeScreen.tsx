@@ -21,13 +21,24 @@ import Toast from 'react-native-toast-message';
 const background = require('../../assets/background.png');
 
 const RecipeScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [selectedCategory, setSelectedCategory] = useState('Phở');
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [recipes, setRecipes] = useState([]);
+const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+const [selectedCategory, setSelectedCategory] = useState('Phở');
+const [categories, setCategories] = useState([]);
+const [loading, setLoading] = useState(false);
+const [search, setSearch] = useState('');
+const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+const [recipes, setRecipes] = useState([]);
+  // const [categories, setCategories] = useState([]);
+const [showMore, setShowMore] = useState(false);
+
+const MAX_VISIBLE = 6;
+
+const visibleCategories = showMore
+  ? categories
+  : categories.slice(0, MAX_VISIBLE);
+
+const hiddenExists = categories.length > MAX_VISIBLE;
+
 
   const fetchCategories = async () => {
     try {
@@ -114,7 +125,7 @@ const RecipeScreen = () => {
           <Ionicons name="search" size={20} color="#888" />
         </View>
 
-        <View style={styles.categoryWrap}>
+        {/* <View style={styles.categoryWrap}>
           {categories.map((cat) => (
             <TouchableOpacity
               key={cat.id}
@@ -131,7 +142,47 @@ const RecipeScreen = () => {
               </Text>
             </TouchableOpacity>
           ))}
+        </View> */}
+
+        <View style={styles.categoryWrap}>
+          {visibleCategories.map((cat) => (
+            <TouchableOpacity
+              key={cat.id}
+              style={[
+                styles.categoryItem,
+                selectedCategory === cat.name && styles.categoryItemActive,
+              ]}
+              onPress={() => {
+                setSelectedCategory(cat.name);
+                setSelectedCategoryId(cat.id);
+                setSearch(cat.name);
+              }}
+            >
+              <Image source={{ uri: cat.imageUrl }} style={styles.categoryIcon} />
+              <Text
+                style={[
+                  styles.categoryText,
+                  selectedCategory === cat.name && styles.categoryTextActive,
+                ]}
+              >
+                {cat.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+
+          {hiddenExists && (
+            <TouchableOpacity
+              style={[styles.categoryItem, styles.moreCategoryItem]}
+              onPress={() => setShowMore((prev) => !prev)}
+            >
+              <Text style={styles.categoryText}>
+                {showMore ? 'Ẩn bớt' : '+ Món khác'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
+
+
 
         <FlatList
           data={recipes}
@@ -188,6 +239,17 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 20,
   },
+
+  moreCategoryItem: {
+  backgroundColor: '#eee',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingHorizontal: 12,
+  paddingVertical: 8,
+  borderRadius: 12,
+  margin: 4,
+  },
+
   categoryItem: {
     backgroundColor: '#f4f4f4',
     paddingVertical: 8,
