@@ -81,3 +81,5 @@ Mọi đóng góp đều được hoan nghênh! Vui lòng tạo issue hoặc pul
 ## Giấy phép 📄
 
 Dự án này được cấp phép theo giấy phép MIT - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+
+Docs: https://docs.google.com/spreadsheets/d/1HuffxEiOndCi2Jq4GVZiYUTm7Wt4ezXcYoVfzCjDnhE/edit?gid=164062685#gid=164062685
