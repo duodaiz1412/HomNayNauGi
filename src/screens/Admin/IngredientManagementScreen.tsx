@@ -564,9 +564,12 @@ export const IngredientManagementScreen = () => {
     try {
       const url = categoryId === 'all'
         ? '/ingredients'
-        : `/ingredient-categories/${categoryId}/ingredients`;
+        : `/ingredient-categories/search/${categoryId}`;
       const response = await api.get(url);
-      const data = Array.isArray(response.data) ? response.data : response.data?.data ?? [];
+      const data = categoryId === 'all' 
+        ? (Array.isArray(response.data) ? response.data : response.data?.data ?? [])
+        : response.data?.data?.ingredientMappings?.map(mapping => mapping.ingredient) ?? [];
+      
       setIngredients(data);
     } catch (error) {
       console.error('Lỗi khi lấy nguyên liệu:', error);
@@ -610,18 +613,22 @@ export const IngredientManagementScreen = () => {
         </View>
       </View>
 
-      <View className="mt-3">
-        <Text className="font-medium text-sm mb-2 text-gray-800">🧬 Dinh dưỡng (trên 100g):</Text>
-        <View className="flex-row justify-between">
-          {['protein', 'fat', 'carbs', 'calories'].map((key, idx) => (
-            <View key={key} className={`flex-1 bg-gray-100 p-2 ${idx < 3 ? 'mr-1' : ''} rounded-md items-center`}>
-              <Text className="text-xs text-gray-500">
-                {{ protein: 'Đạm', fat: 'Béo', carbs: 'Tinh bột', calories: 'Calo' }[key]}
-              </Text>
-              <Text className="text-sm font-bold">{item.nutrition?.[key] || '0g'}</Text>
-            </View>
-          ))}
-        </View>
+      <View className="flex-row justify-end mt-4">
+        <TouchableOpacity className="flex-row items-center px-3 py-1.5 bg-blue-100 rounded-full mr-2">
+          <Ionicons name="eye-outline" size={14} color="#007AFF" />
+          <Text className="text-blue-600 text-xs ml-1">Chi tiết</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-row items-center px-3 py-1.5 bg-green-100 rounded-full mr-2"
+          onPress={() => navigation.navigate('EditIngredientScreen', { ingredientId: item.id })}
+        >
+          <Ionicons name="create-outline" size={14} color="#34C759" />
+          <Text className="text-green-600 text-xs ml-1">Sửa</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="flex-row items-center px-3 py-1.5 bg-red-100 rounded-full">
+          <Ionicons name="trash-outline" size={14} color="#FF3B30" />
+          <Text className="text-red-600 text-xs ml-1">Xóa</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
