@@ -52,7 +52,7 @@ const ProfileScreen = () => {
     try {
       setLoading(true);
       const response = await getUserProfile();
-      console.log('Raw profile response:', response);
+      //console.log('Raw profile response:', response);
 
       if (!response || !response.data) {
         console.error('Invalid response format');

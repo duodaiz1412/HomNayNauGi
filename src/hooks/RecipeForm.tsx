@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useFoodManagement } from 'src/context/FoodManagementContext';
 import { Recipe, RecipeStatus } from 'src/types';
 import api from 'src/api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface UseRecipeFormProps {
   recipeId?: string; // Nếu có, sẽ tải dữ liệu công thức hiện có
@@ -41,8 +42,14 @@ export const useRecipeForm = ({ recipeId }: UseRecipeFormProps = {}) => {
       try {
         setIsLoading(true);
         setError(null);
+        const role = await AsyncStorage.getItem('accountRole');
+        let response;
 
-        const response = await api.get(`/admin/recipes/get-recipe/${recipeId}`);
+        if (role === 'admin') {
+          response = await api.get(`/admin/recipes/get-recipe/${recipeId}`);
+        } else {
+          response = await api.get(`/recipes/get-recipe/${recipeId}`);
+        }
         const recipe = response.data;
         console.log('\nRECIPE GET', recipe);
         if (!recipe) {

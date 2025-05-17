@@ -40,13 +40,15 @@ export const UserManagementScreen = () => {
     fetchUsers();
   }, []);
 
+  // console.log('userId được truyền:', userId);
+
   
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await getAllUserProfiles();
-      console.log('===> User data:', data[0]);
+      //console.log('===> API trả về:', data);
       setUsers(data);
     } catch (err) {
       setError('Lấy danh sách người dùng thất bại');
@@ -101,16 +103,21 @@ export const UserManagementScreen = () => {
     );
   };
 
+  console.log('=======================================');
+
+
   const renderUserItem = ({ item }: { item: any }) => {
     const name = item.fullName ?? 'Không tên';
     const email = item.email ?? 'Không có email';
     const role = item.account?.username === 'admin' ? 'admin' : 'user';
     const status = item.account?.status ?? 'inactive';
+    console.log('Avatar của user:', item.avatarUrl);
+
 
     return (
       <View className="bg-white rounded-xl p-4 shadow-sm mb-4 flex-row">
         <Image
-          source={{ uri: item.avatar }}
+          source={{ uri: item.avatarUrl }}
           className="w-16 h-16 rounded-full mr-3"
         />
         <View className="flex-1">
@@ -146,26 +153,13 @@ export const UserManagementScreen = () => {
             </View>
           </View>
 
-          <View className="flex-row mt-2">
-            <View className="flex-row items-center mr-4">
-              <Ionicons name="document-text-outline" size={14} color="#454442" />
-              <Text className="text-gray-500 text-xs ml-1">
-                {item.posts || 0} bài viết
-              </Text>
-            </View>
-            <View className="flex-row items-center">
-              <Ionicons name="people-outline" size={14} color="#454442" />
-              <Text className="text-gray-500 text-xs ml-1">
-                {item.followers || 0} người theo dõi
-              </Text>
-            </View>
-          </View>
+          
 
           <View className="flex-row mt-2 justify-end">
             <TouchableOpacity
               className="mr-2 bg-blue-100 px-3 py-1.5 rounded-full flex-row items-center"
               onPress={() =>
-                navigation.navigate('UserDetailScreen', { userId: item.id })
+                navigation.navigate('UserDetailScreen', { userId: item.accountId })
               }
             >
               <Ionicons name="eye-outline" size={14} color="#007AFF" />
