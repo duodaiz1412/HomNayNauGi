@@ -92,21 +92,6 @@ const PersonalScreen = () => {
     }
   }, []);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await api.get('/recipe-categories/search');
-      if (response.data && response.data.data) {
-        const categoriesData = [
-          { id: 0, name: 'Tất cả' }, // Danh mục "Tất cả"
-          ...response.data.data,
-        ];
-        setCategories(categoriesData);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  }, []);
-
   const fetchRecipes = useCallback(
     async (showLoadingIndicator = true) => {
       if (showLoadingIndicator) setLoading(true);
@@ -180,7 +165,6 @@ const PersonalScreen = () => {
           // Gọi song song và không cần setLoading riêng lẻ trong từng hàm
           await Promise.all([
             fetchUserData(false),
-            fetchCategories(),
             fetchRecipes(false), // Fetch initial recipes (all or based on default selectedCategory)
           ]);
         } else {
@@ -197,7 +181,7 @@ const PersonalScreen = () => {
     };
 
     checkLoginStatus();
-  }, [fetchUserData, fetchCategories, fetchRecipes, navigation]);
+  }, [fetchUserData, fetchRecipes, navigation]);
 
   // useEffect để fetch lại recipes khi selectedCategory thay đổi (và đã login)
   useEffect(() => {
