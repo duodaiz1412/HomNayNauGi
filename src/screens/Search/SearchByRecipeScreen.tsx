@@ -54,7 +54,7 @@ const hiddenExists = categories.length > MAX_VISIBLE;
       setCategories(categoriesData);
 
     } catch (error) {
-      console.error('Lỗi khi lấy danh mục:', error);
+      // console.error('Lỗi khi lấy danh mục:', error);
     } finally {
       setLoading(false);
     }
@@ -90,7 +90,7 @@ const hiddenExists = categories.length > MAX_VISIBLE;
 
       setRecipes(data);
     } catch (error) {
-      console.error('Lỗi khi lấy danh mục:', error);
+      // console.error('Lỗi khi lấy danh mục:', error);
     } finally {
       setLoading(false);
     }

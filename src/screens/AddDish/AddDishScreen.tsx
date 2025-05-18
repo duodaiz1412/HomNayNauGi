@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Alert,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
@@ -63,6 +64,13 @@ const AddDishScreen = () => {
   const [isLoadingUnits, setIsLoadingUnits] = useState(false);
   const [errorUnits, setErrorUnits] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedUnitModal, setSelectedUnitModal] = useState<{
+    visible: boolean;
+    ingredientIndex: number;
+  }>({
+    visible: false,
+    ingredientIndex: -1,
+  });
   // Fetch units of measure
   useEffect(() => {
     const fetchUnitsOfMeasure = async () => {
@@ -531,39 +539,20 @@ const AddDishScreen = () => {
                             keyboardType="numeric"
                           />
                           <View className="w-32 h-full bg-white border border-gray-200 rounded-xl">
-                            <Picker
-                              selectedValue={ingredient.unitId}
-                              onValueChange={(v) =>
-                                handleIngredientChange(idx, 'unit', v)
-                              }
-                              style={{
-                                height: 50,
-                                color: '#4B5563',
-                                fontSize: 16,
-                              }}
-                              dropdownIconColor="#4B5563"
-                              mode="dropdown"
+                            <TouchableOpacity
+                              onPress={() => setSelectedUnitModal({
+                                visible: true,
+                                ingredientIndex: idx
+                              })}
+                              className="h-[46px] px-4 flex-row items-center justify-between"
                             >
-                              <Picker.Item
-                                label="Đơn vị"
-                                value={null}
-                                color="#9CA3AF"
-                                style={{ fontSize: 16 }}
-                              />
-                              {unitsOfMeasure.map((unit) => (
-                                <Picker.Item
-                                  key={unit.id}
-                                  label={
-                                    unit.symbol
-                                      ? `${unit.unitName} (${unit.symbol})`
-                                      : unit.unitName
-                                  }
-                                  value={unit.id}
-                                  color="#4B5563"
-                                  style={{ fontSize: 16 }}
-                                />
-                              ))}
-                            </Picker>
+                              <Text className="text-gray-800 text-base">
+                                {ingredient.unitId
+                                  ? getUnitName(ingredient.unitId)
+                                  : 'Đơn vị'}
+                              </Text>
+                              <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
+                            </TouchableOpacity>
                           </View>
                         </View>
                       </View>
@@ -783,6 +772,49 @@ const AddDishScreen = () => {
             </TouchableOpacity>
           </View>
         </ScrollView>
+
+        {/* Modal chọn đơn vị */}
+        <Modal
+          visible={selectedUnitModal.visible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setSelectedUnitModal({ visible: false, ingredientIndex: -1 })}
+        >
+          <View className="flex-1 justify-end bg-black/50">
+            <View className="bg-white rounded-t-3xl">
+              <View className="p-4 border-b border-gray-200 flex-row justify-between items-center">
+                <Text className="text-lg font-semibold text-gray-800">Chọn đơn vị</Text>
+                <TouchableOpacity
+                  onPress={() => setSelectedUnitModal({ visible: false, ingredientIndex: -1 })}
+                >
+                  <Ionicons name="close" size={24} color="#4B5563" />
+                </TouchableOpacity>
+              </View>
+              <ScrollView className="max-h-[60vh]">
+                {unitsOfMeasure.map((unit) => (
+                  <TouchableOpacity
+                    key={unit.id}
+                    onPress={() => {
+                      handleIngredientChange(
+                        selectedUnitModal.ingredientIndex,
+                        'unit',
+                        unit.id
+                      );
+                      setSelectedUnitModal({ visible: false, ingredientIndex: -1 });
+                    }}
+                    className="p-4 border-b border-gray-100"
+                  >
+                    <Text className="text-gray-800 text-base">
+                      {unit.symbol
+                        ? `${unit.unitName} (${unit.symbol})`
+                        : unit.unitName}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </ImageBackground>
     </SafeAreaView>
   );

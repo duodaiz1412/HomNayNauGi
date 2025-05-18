@@ -79,7 +79,7 @@ export const useStatisticData = () => {
         ],
       };
     } catch (error: any) {
-      console.error('Error fetching views data:', error);
+      // console.error('Error fetching views data:', error);
       if (error.response && error.response.status === 404) {
         console.log('API not found: /admin/statistics/timeline');
       }
@@ -101,7 +101,7 @@ export const useStatisticData = () => {
         favorites: dish.favoriteCount,
       }));
     } catch (error: any) {
-      console.error('Error fetching top dishes:', error);
+      // console.error('Error fetching top dishes:', error);
       if (error.response && error.response.status === 404) {
         console.log('API not found: /admin/statistics/top-recipes');
       }

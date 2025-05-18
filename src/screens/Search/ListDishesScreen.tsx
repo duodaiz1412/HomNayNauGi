@@ -39,7 +39,7 @@ const RecipeListScreen = () => {
       console.log(recipesData);
       setRecipes(recipesData);
     } catch (error) {
-      console.error('Lỗi khi lấy danh mục:', error);
+      // console.error('Lỗi khi lấy danh mục:', error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ const RecipeListScreen = () => {
 
       setRecipes(data);
       } catch (error) {
-        console.error('Lỗi khi lấy danh mục:', error);
+        // console.error('Lỗi khi lấy danh mục:', error);
       } finally {
         setLoading(false);
       }

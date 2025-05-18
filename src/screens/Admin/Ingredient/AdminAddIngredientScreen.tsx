@@ -165,7 +165,6 @@ export const AddIngredientScreen = () => {
       const response = await api.post('/admin/ingredients/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Accept: 'application/json',
         },
         transformRequest: (data, headers) => {
           return formData; // Return the FormData object directly

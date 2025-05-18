@@ -183,7 +183,7 @@ export const AdminDrawerNavigator = () => {
           ),
         }}
       /> */}
-
+{/* 
       <Drawer.Screen
         name="AdminStatistics"
         component={StatisticsScreen}
@@ -193,7 +193,7 @@ export const AdminDrawerNavigator = () => {
             <Ionicons name="bar-chart-outline" size={22} color={color} />
           ),
         }}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 };

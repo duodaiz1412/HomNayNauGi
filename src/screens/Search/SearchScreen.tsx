@@ -21,6 +21,7 @@ import { StyleSheet } from 'react-native';
 import { Dimensions } from 'react-native';
 import debounce from 'lodash.debounce';
 import Toast from 'react-native-toast-message';
+import * as ImagePicker from 'expo-image-picker';
 
 // import { BASE_URL } from '@env';
 
@@ -123,6 +124,36 @@ const SearchScreen = () => {
     fetchMealCategories();
   }, []);
 
+  const handleCameraButtonPress = async () => {
+    // Yêu cầu quyền truy cập camera
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert(
+        'Quyền truy cập',
+        'Cần cấp quyền truy cập camera để có thể quét'
+      );
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: 'images',
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        // Điều hướng đến trang xử lý ảnh sau khi chụp
+        navigation.navigate('ScanIngredient', {
+          imageUri: result.assets[0].uri,
+        });
+      }
+    } catch (error) {
+      console.log('Lỗi khi mở camera:', error);
+      Alert.alert('Lỗi', 'Không thể mở camera');
+    }
+  };
 
   const fetchRecipesSearch = async () => {
     const query = search.trim();
@@ -132,6 +163,7 @@ const SearchScreen = () => {
         params: {
           query: query,
           offset: 0,
+          status: "public",
           limit: 20,
         },
       });
@@ -150,7 +182,7 @@ const SearchScreen = () => {
 
       setRecipes(data);
     } catch (error) {
-      console.error('Lỗi khi lấy danh mục:', error);
+      // console.error('Lỗi khi lấy danh mục:', error);
     } finally {
       setIsLoading(false);
     }
@@ -218,13 +250,13 @@ const SearchScreen = () => {
 
               {/* Icon tìm kiếm */}
               <TouchableOpacity
-                // onPress={() => {
-                //   if (search.trim()) {
-                //     navigation.navigate('ListDishesScreen', { query: search.trim() });
-                //   } else {
-                //     Alert.alert('Thông báo', 'Vui lòng nhập từ khóa');
-                //   }
-                // }}
+              // onPress={() => {
+              //   if (search.trim()) {
+              //     navigation.navigate('ListDishesScreen', { query: search.trim() });
+              //   } else {
+              //     Alert.alert('Thông báo', 'Vui lòng nhập từ khóa');
+              //   }
+              // }}
               >
                 <Ionicons name="search" size={20} color="#888" />
               </TouchableOpacity>
@@ -239,8 +271,7 @@ const SearchScreen = () => {
                 backgroundColor: '#941D23',
               }}
               onPress={() => {
-                // Tùy bạn cấu hình điều hướng đến màn hình scan nếu có
-                navigation.navigate('ScanIngredient');
+                handleCameraButtonPress();
               }}
             >
               <Ionicons name="scan-outline" size={22} color="white" />

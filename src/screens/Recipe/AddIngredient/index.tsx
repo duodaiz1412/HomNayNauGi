@@ -18,9 +18,12 @@ const INGREDIENT_CATEGORIES = [
   'Gia vị',
   'Thịt',
   'Thuỷ hải sản',
-  'Rau củ quả',
-  'Nấm',
+  'Rau củ',
+  'Đậu & nấm',
   'Trứng sữa',
+  'Tinh bột',
+  'Rượu giấm',
+  'Chế biến sẵn',
   'Khác',
 ];
 
@@ -197,7 +200,7 @@ const AddIngredientScreen = ({ navigation, route }) => {
       </View>
       <View className="p-4 ">
         {/* Thanh tìm kiếm */}
-        <View className="flex-row items-center bg-gray-100 h-14 rounded-xl px-3 mb-4">
+        {/* <View className="flex-row items-center bg-gray-100 h-14 rounded-xl px-3 mb-4">
           <Ionicons name="search" size={24} color="#888" />
           <TextInput
             className="flex-1 py-2 px-2 bg-transparent text-lg"
@@ -205,7 +208,7 @@ const AddIngredientScreen = ({ navigation, route }) => {
             value={search}
             onChangeText={setSearch}
           />
-        </View>
+        </View> */}
         {/* Slider loại nguyên liệu */}
         <FlatList
           data={INGREDIENT_CATEGORIES}

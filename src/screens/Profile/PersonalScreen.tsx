@@ -101,7 +101,6 @@ const PersonalScreen = () => {
         const params: any = {
           limit: 20,
           offset: 0,
-          status: 'draft', // Hoặc trạng thái phù hợp cho công thức của người dùng
           query: '',
         };
 

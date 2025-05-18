@@ -166,9 +166,9 @@ const HomeScreen = () => {
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity onPress={() => navigation.navigate('AddDishScreen')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('AddDishScreen')}>
               <Ionicons name="search-outline" size={28} color="#4B4B4B" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           {/* Banner */}

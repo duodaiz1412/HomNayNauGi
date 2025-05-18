@@ -44,7 +44,7 @@ export const CategorySelectionModal = ({
         setCategories(response.data.data);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      // console.error('Error fetching categories:', error);
       Alert.alert(
         'Lỗi',
         'Không thể tải danh mục nguyên liệu. Vui lòng thử lại sau.'

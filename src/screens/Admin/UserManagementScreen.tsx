@@ -18,6 +18,16 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AdminUserStackParamList } from '@navigation/AdminUserStack';
 import api from '../../api/api';
 
+export const deleteUserProfile = async (userId: number | string) => {
+  try {
+    const response = await api.delete(`/admin/user-profiles/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi xóa user:', error);
+    throw error;
+  }
+};
+
 export const UserManagementScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AdminUserStackParamList>>();
@@ -29,12 +39,9 @@ export const UserManagementScreen = () => {
 
   const getAllUserProfiles = async () => {
     const response = await api.get('/admin/user-profiles');
-    return response.data;
+    return response.data.data;
   };
 
-  const deleteUserProfile = async (userId: number | string) => {
-    await api.delete(`/admin/user-profiles/${userId}`);
-  };
 
   useEffect(() => {
     fetchUsers();
@@ -79,6 +86,8 @@ export const UserManagementScreen = () => {
     });
   }, [users, searchQuery, selectedFilter]);
 
+  
+
   const handleDeleteUser = (userId: number | string, userName: string) => {
     Alert.alert(
       'Xác nhận xóa',
@@ -109,6 +118,7 @@ export const UserManagementScreen = () => {
   const renderUserItem = ({ item }: { item: any }) => {
     const name = item.fullName ?? 'Không tên';
     const email = item.email ?? 'Không có email';
+    const avatarUrl = item.avatarUrl ?? 'https://via.placeholder.com/150';
     const role = item.account?.username === 'admin' ? 'admin' : 'user';
     const status = item.account?.status ?? 'inactive';
     console.log('Avatar của user:', item.avatarUrl);

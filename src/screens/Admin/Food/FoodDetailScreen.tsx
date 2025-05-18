@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import { AdminFoodStackParamList } from '@navigation/AdminFoodStack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AdminHeader } from '@components/AdminHeader/AdminHeader';
 import api from 'src/api/api';
-import { Recipe } from 'src/types';
+import { Recipe, RecipeStatus } from 'src/types';
 import LikeSolid from '@components/icons/LikeSolid';
 import { formatNumber } from 'src/ultils/formatNumber';
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe';
@@ -30,6 +30,11 @@ export const FoodDetailScreen = () => {
 
   const [isFetching, setIsFetching] = useState(true);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [showIngredients, setShowIngredients] = useState(true);
+  const [showSteps, setShowSteps] = useState(true);
+  const [showCategories, setShowCategories] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playerRef = useRef<YoutubeIframeRef>(null);
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -104,6 +109,8 @@ export const FoodDetailScreen = () => {
     );
   }
 
+  const videoId = getVideoId(recipe.videoUrl);
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <AdminHeader title="Chi tiết món ăn" />
@@ -145,6 +152,30 @@ export const FoodDetailScreen = () => {
           </View>
         </View>
 
+        {videoId ? (
+          <View className="mt-2 bg-white p-4">
+            <Text className="text-lg font-bold mb-2">Video hướng dẫn</Text>
+            <View className="overflow-hidden rounded-lg">
+              <YoutubePlayer
+                ref={playerRef}
+                height={220}
+                play={isPlaying}
+                videoId={videoId}
+                onChangeState={(state) => {
+                  if (state === 'playing') setIsPlaying(true);
+                  else if (state === 'paused' || state === 'ended')
+                    setIsPlaying(false);
+                }}
+                initialPlayerParams={{
+                  controls: true,
+                  fs: 1,
+                  playsInline: true,
+                  modestbranding: true,
+                }}
+              />
+            </View>
+          </View>
+        ) : null}
         {/* Stats */}
         <View className="flex-row justify-around bg-white py-4 shadow-sm">
           <View className="items-center">
@@ -176,11 +207,82 @@ export const FoodDetailScreen = () => {
             <Text className="text-gray-500 text-sm mt-1">Yêu thích</Text>
           </View>
         </View>
+        <View className="flex-row items-center mb-2 mx-4">
+          <Image
+            source={{
+              uri:
+                recipe.account?.userProfile?.avatarUrl ||
+                'https://ui-avatars.com/api/?name=' +
+                  encodeURIComponent(
+                    recipe.account?.userProfile?.displayName ||
+                      recipe.account?.name ||
+                      'User'
+                  ),
+            }}
+            className="w-10 h-10 rounded-full"
+          />
+          <Text className="ml-3 text-base font-bold text-[#4B4B4B]">
+            {recipe.account?.userProfile?.fullName ||
+              recipe.account?.name ||
+              'Ẩn danh'}
+          </Text>
+        </View>
 
         {/* Description */}
         <View className="bg-white p-4 mt-2">
           <Text className="text-lg font-bold mb-2">Mô tả</Text>
           <Text className="text-gray-700">{recipe.description}</Text>
+        </View>
+
+        {/* Categories */}
+        <View className="bg-white p-4 mt-2">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-lg font-bold">Danh mục</Text>
+            <TouchableOpacity
+              onPress={() => setShowCategories((prev) => !prev)}
+            >
+              <Ionicons
+                name={showCategories ? 'chevron-up' : 'chevron-down'}
+                size={22}
+                color="#941D23"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {showCategories && (
+            <View className="mt-3">
+              {recipe.categoryMappings && recipe.categoryMappings.length > 0 ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  className="py-2"
+                >
+                  {recipe.categoryMappings.map((category, index) => (
+                    <View key={index} className="mr-4 items-center">
+                      <View className="bg-gray-100 w-20 h-20 rounded-full overflow-hidden">
+                        <Image
+                          source={{
+                            uri:
+                              category.recipeCategory.imageUrl ||
+                              'https://via.placeholder.com/150',
+                          }}
+                          className="w-full h-full"
+                          resizeMode="cover"
+                        />
+                      </View>
+                      <Text className="text-center mt-2 text-gray-700 font-medium">
+                        {category.recipeCategory.name}
+                      </Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              ) : (
+                <Text className="text-gray-500 italic mt-2">
+                  Không có danh mục
+                </Text>
+              )}
+            </View>
+          )}
         </View>
 
         {/* Nutrition */}
@@ -189,69 +291,138 @@ export const FoodDetailScreen = () => {
           <View className="flex-row justify-between bg-gray-50 p-3 rounded-lg">
             <View className="items-center">
               <Text className="text-gray-500 text-xs">Đạm</Text>
-              <Text className="text-gray-700 font-bold">{recipe.protein}g</Text>
+              <Text className="text-gray-700 font-bold">
+                {formatNumber(recipe.protein, ' g')}
+              </Text>
             </View>
             <View className="items-center">
               <Text className="text-gray-500 text-xs">Béo</Text>
-              <Text className="text-gray-700 font-bold">{recipe.fat}g</Text>
+              <Text className="text-gray-700 font-bold">
+                {formatNumber(recipe.fat, ' g')}
+              </Text>
             </View>
             <View className="items-center">
               <Text className="text-gray-500 text-xs">Tinh bột</Text>
               <Text className="text-gray-700 font-bold">
-                {recipe.carbohydrates}g
+                {formatNumber(recipe.carbohydrates, ' g')}
               </Text>
             </View>
             <View className="items-center">
               <Text className="text-gray-500 text-xs">Calo</Text>
-              <Text className="text-gray-700 font-bold">{recipe.calories}</Text>
+              <Text className="text-gray-700 font-bold">
+                {formatNumber(recipe.calories, ' Calo')}
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Ingredients */}
         <View className="bg-white p-4 mt-2">
-          <Text className="text-lg font-bold mb-2">Nguyên liệu</Text>
-          {recipe.recipeIngredients?.map((ingredient, index) => (
-            <View
-              key={index}
-              className="flex-row justify-between py-2 border-b border-gray-100"
+          <View className="flex-row items-center justify-between">
+            <Text className="text-lg font-bold">
+              Nguyên liệu ({recipe.recipeIngredients?.length || 0})
+            </Text>
+            <TouchableOpacity
+              onPress={() => setShowIngredients((prev) => !prev)}
             >
-              <Text className="text-gray-700">
-                {ingredient.ingredient.name}
-              </Text>
-              <Text className="text-gray-500">
-                {ingredient.quantity} {ingredient.unit.symbol}
-              </Text>
+              <Ionicons
+                name={showIngredients ? 'chevron-up' : 'chevron-down'}
+                size={22}
+                color="#941D23"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {showIngredients && (
+            <View className="mt-3">
+              {recipe.recipeIngredients?.map((ingredient, index) => (
+                <View
+                  key={index}
+                  className="flex-row items-center bg-gray-50 rounded-xl px-3 py-3 mb-3"
+                >
+                  {/* Ảnh nguyên liệu */}
+                  <View className="w-14 h-14 bg-white rounded-xl items-center justify-center mr-3 overflow-hidden">
+                    <Image
+                      source={{ uri: ingredient.ingredient.imageUrl }}
+                      className="w-12 h-12"
+                      resizeMode="cover"
+                    />
+                  </View>
+                  {/* Tên nguyên liệu */}
+                  <Text className="flex-1 text-gray-700 font-medium">
+                    {ingredient.ingredient.name}
+                  </Text>
+                  {/* Số lượng + đơn vị */}
+                  <Text className="text-gray-700 font-bold">
+                    {`${formatNumber(ingredient.quantity)} ${ingredient.unit?.unitName || ''}`}
+                  </Text>
+                </View>
+              ))}
             </View>
-          ))}
+          )}
         </View>
 
         {/* Steps */}
-        <View className="bg-white p-4 mt-2 mb-4">
-          <Text className="text-lg font-bold mb-2">Các bước thực hiện</Text>
-          {recipe.cookingSteps?.map((step, index) => (
-            <View key={step.id} className="mb-4">
-              <View className="flex-row items-center mb-2">
-                <View className="w-8 h-8 rounded-full bg-[#941D23] items-center justify-center">
-                  <Text className="text-white font-bold">{step.stepOrder}</Text>
+        <View className="bg-white p-4 mt-2">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-lg font-bold">Các bước thực hiện</Text>
+            <TouchableOpacity onPress={() => setShowSteps((prev) => !prev)}>
+              <Ionicons
+                name={showSteps ? 'chevron-up' : 'chevron-down'}
+                size={22}
+                color="#941D23"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {showSteps && (
+            <View className="mt-3">
+              {recipe.cookingSteps?.map((step, index) => (
+                <View
+                  key={index}
+                  className="mt-4 bg-white rounded-2xl flex-row items-center shadow-md px-4 py-4"
+                  style={{
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 8,
+                    elevation: 4,
+                  }}
+                >
+                  {/* Ảnh minh họa bên trái */}
+                  {step.imageUrl ? (
+                    <Image
+                      source={{ uri: step.imageUrl }}
+                      className="w-24 h-24 rounded-xl mr-4"
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <Image
+                      source={{
+                        uri: 'https://res.cloudinary.com/dq3fcbnk6/image/upload/v1747151197/enzngyecuwmvfoppe0pa.jpg',
+                      }}
+                      className="w-24 h-24 rounded-xl mr-4"
+                      resizeMode="cover"
+                    />
+                  )}
+
+                  {/* Nội dung bên phải */}
+                  <View className="flex-1">
+                    <Text className="text-lg font-bold text-[#4B4B4B] mb-1">
+                      Bước {step.stepOrder}:
+                    </Text>
+                    <Text className="text-base text-[#4B4B4B]">
+                      {step.instruction}
+                    </Text>
+                  </View>
                 </View>
-                <Text className="text-gray-700 font-bold ml-2">
-                  Bước {step.stepOrder}
-                </Text>
-              </View>
-              <Text className="text-gray-600 mb-2">{step.instruction}</Text>
-              {step.imageUrl && (
-                <Image
-                  source={{ uri: step.imageUrl }}
-                  className="w-full h-48 rounded-lg"
-                />
-              )}
+              ))}
             </View>
-          ))}
+          )}
         </View>
 
         {/* Metadata */}
-        <View className="bg-white p-4 mt-2 mb-4">
+        <View className="bg-white p-4 mt-2">
           <Text className="text-lg font-bold mb-2">Thông tin khác</Text>
           <View className="flex-row justify-between py-2 border-b border-gray-100">
             <Text className="text-gray-500">Trạng thái</Text>
@@ -279,7 +450,7 @@ export const FoodDetailScreen = () => {
             <Text className="text-gray-500">Người tạo</Text>
             <View className="flex-row items-center">
               <Text className="text-gray-700">
-                {recipe.account?.userProfile.fullName}
+                {recipe.account?.userProfile?.fullName || 'Chưa có thông tin'}
               </Text>
             </View>
           </View>
@@ -304,9 +475,9 @@ export const FoodDetailScreen = () => {
         </View>
 
         {/* Action Buttons */}
-        <View className="flex-row justify-center p-4 bg-white shadow-lg">
+        <View className="flex-row justify-center p-4 bg-white mt-2 shadow-lg mb-6">
           <TouchableOpacity
-            className="bg-blue-500 px-4 py-2 rounded-lg flex-row items-center mr-4"
+            className="bg-blue-500 px-5 py-3 rounded-lg flex-row items-center mr-4"
             onPress={() =>
               navigation.navigate('EditFoodScreen', { foodId: recipe.id })
             }

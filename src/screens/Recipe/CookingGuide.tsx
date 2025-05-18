@@ -200,50 +200,47 @@ export const CookingGuide = () => {
         'Bạn cần đăng nhập để lưu công thức này. Chuyển đến trang đăng nhập?',
         [
           { text: 'Không', style: 'cancel' },
-          { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') },
+          { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') }
         ]
       );
       return;
     }
+  
     try {
-      // Lưu giá trị hiện tại để hoàn tác nếu có lỗi
+      // Lưu trạng thái hiện tại
       const currentIsFavorite = isFavorite;
       const currentTotalFavorites = recipe.totalFavorites;
-
-      // Cập nhật UI ngay lập tức
+  
+      // Cập nhật optimistic UI
       const newIsFavorite = !currentIsFavorite;
       setIsFavorite(newIsFavorite);
-
-      // Cập nhật số lượng favorites
+  
       const newTotalFavorites = newIsFavorite
         ? currentTotalFavorites + 1
         : Math.max(0, currentTotalFavorites - 1);
-
-      // Chỉ cập nhật thuộc tính totalFavorites
-      setRecipe((prevRecipe) => ({
+  
+      setRecipe(prevRecipe => ({
         ...prevRecipe,
-        totalFavorites: newTotalFavorites,
+        totalFavorites: newTotalFavorites
       }));
-
+  
       // Gọi API
       const response = await api.post(`/recipes/${recipe.id}/favorite`);
-
-      // Xử lý trường hợp response không khớp với dự đoán
+  
+      // Đồng bộ lại nếu server trả khác
       if (response.data.isFavorite !== newIsFavorite) {
-        console.log(
-          'Server response differs from client prediction, syncing state'
-        );
+        console.log('Server response differs from client prediction, syncing state');
         setIsFavorite(response.data.isFavorite);
-        // Cập nhật lại totalFavorites nếu cần
-        setRecipe((prevRecipe) => ({
+  
+        setRecipe(prevRecipe => ({
           ...prevRecipe,
           totalFavorites: response.data.isFavorite
             ? currentTotalFavorites + 1
-            : Math.max(0, currentTotalFavorites - 1),
+            : Math.max(0, currentTotalFavorites - 1)
         }));
       }
     } catch (err) {
-      console.error('Error toggling favorite:', err);
+      // console.error('Error toggling favorite:', err);
       alert('Có lỗi khi lưu yêu thích!');
     }
   };

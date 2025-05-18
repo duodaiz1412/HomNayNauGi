@@ -229,7 +229,7 @@ export const FoodManagementProvider: React.FC<{ children: ReactNode }> = ({
       const recipe = recipes.find((r) => r.id === id) || null;
       return recipe;
     } catch (error) {
-      console.error('Error fetching recipe:', error);
+      // console.error('Error fetching recipe:', error);
       return null;
     }
   };

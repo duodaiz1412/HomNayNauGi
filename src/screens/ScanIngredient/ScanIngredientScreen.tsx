@@ -140,17 +140,6 @@ const ScanIngredientScreen = () => {
                 </Text>
               </View>
 
-              <View className="flex-row items-center">
-                <TouchableOpacity onPress={handleEdit} className="p-2 ml-2">
-                  <Ionicons name="create-outline" size={22} color="#333" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleAddNewIngredient}
-                  className="p-2 ml-2"
-                >
-                  <Ionicons name="add-outline" size={24} color="#333" />
-                </TouchableOpacity>
-              </View>
             </View>
 
             <ScrollView className="flex-1 mb-20">

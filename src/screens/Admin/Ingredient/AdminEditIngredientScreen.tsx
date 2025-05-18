@@ -228,7 +228,6 @@ export const EditIngredientScreen = () => {
       const response = await api.put('/admin/ingredients/update', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Accept: 'application/json',
         },
         transformRequest: (data, headers) => {
           return formData; // Return the FormData object directly

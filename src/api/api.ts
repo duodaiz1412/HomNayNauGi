@@ -6,7 +6,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { IngredientSearch } from '../types';
 
 const api = axios.create({
-  baseURL: 'http://192.168.1.195:3001',
+  baseURL: 'http://10.21.1.151:3001',
   // timeout: 50000,
   // headers: {
   //   Accept: 'application/json',
